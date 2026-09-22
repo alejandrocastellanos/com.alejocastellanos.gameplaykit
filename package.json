@@ -4,6 +4,10 @@
   "displayName": "Gameplay Kit",
   "description": "Kit modular de scripts de gameplay (movimiento de personaje, IA de enemigos, interactuables) pensado para agregarse por componente en cualquier proyecto de Unity.",
   "unity": "6000.0",
+  "dependencies": {
+    "com.unity.modules.ui": "1.0.0",
+    "com.unity.ugui": "1.0.0"
+  },
   "keywords": ["gameplay", "character-controller", "ai", "platformer", "topdown"],
   "author": {
     "name": "Alejandro Castellanos"

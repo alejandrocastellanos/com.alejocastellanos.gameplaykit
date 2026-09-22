@@ -13,11 +13,16 @@ namespace GameplayKit.AI
     {
         [SerializeField] private List<AIState> states = new List<AIState>();
         [SerializeField] private string initialState;
+        [Tooltip("Objetivo compartido (normalmente el jugador) que leen las AIAction/AIDecision de este enemigo.")]
+        [SerializeField] private Transform target;
 
         private AIState _currentState;
         private readonly Dictionary<string, AIState> _statesByName = new Dictionary<string, AIState>();
+        private float _stateEnteredTime;
 
         public AIState CurrentState => _currentState;
+        public Transform Target { get => target; set => target = value; }
+        public float TimeInCurrentState => Time.time - _stateEnteredTime;
 
         private void Awake()
         {
@@ -71,6 +76,7 @@ namespace GameplayKit.AI
             }
 
             _currentState = next;
+            _stateEnteredTime = Time.time;
 
             foreach (AIActionBase action in _currentState.actions) action?.OnEnterState(this);
         }

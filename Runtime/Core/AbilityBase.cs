@@ -12,11 +12,13 @@ namespace GameplayKit.Core
     public abstract class AbilityBase : MonoBehaviour
     {
         protected CharacterCore Character { get; private set; }
+        protected ICharacterInput CharacterInput { get; private set; }
         public bool AbilityEnabled { get; set; } = true;
 
         public virtual void Initialize(CharacterCore character)
         {
             Character = character;
+            CharacterInput = character.GetComponent<ICharacterInput>();
         }
 
         /// <summary>Lee input crudo. Se llama antes que ProcessAbility.</summary>

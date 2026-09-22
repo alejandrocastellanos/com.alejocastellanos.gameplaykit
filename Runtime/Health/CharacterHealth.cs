@@ -1,4 +1,5 @@
 using System;
+using GameplayKit.Core;
 using UnityEngine;
 
 namespace GameplayKit.Health
@@ -8,7 +9,7 @@ namespace GameplayKit.Health
     /// No depende de CharacterCore para poder usarse también en objetos sin abilities (barriles, enemigos simples, etc).
     /// </summary>
     [DisallowMultipleComponent]
-    public class CharacterHealth : MonoBehaviour
+    public class CharacterHealth : MonoBehaviour, IDamageable
     {
         [Header("Vida")]
         [SerializeField] private float maxHealth = 100f;
@@ -39,6 +40,21 @@ namespace GameplayKit.Health
             if (_invulnerabilityTimer <= 0f)
             {
                 IsInvulnerable = false;
+            }
+        }
+
+        /// <summary>Implementacion de IDamageable: permite que cualquier arma dañe a este personaje
+        /// sin conocer CharacterHealth directamente. Si hay un CharacterKnockback, tambien lo dispara.</summary>
+        public void ApplyDamage(float amount, Vector2 hitPoint, Vector2 hitDirection, GameObject instigator)
+        {
+            if (IsDead || IsInvulnerable) return;
+
+            TakeDamage(amount);
+
+            var knockback = GetComponent<GameplayKit.Health.CharacterKnockback>();
+            if (knockback != null && hitDirection != Vector2.zero)
+            {
+                knockback.ApplyKnockback(hitDirection, amount);
             }
         }
 

@@ -16,6 +16,8 @@ namespace GameplayKit.Movement
 
         private void OnTriggerEnter2D(Collider2D other)
         {
+            if (!other.CompareTag(ziplineTag)) return;
+
             var zipline = other.GetComponent<ZiplinePath>();
             if (zipline == null) return;
 
@@ -42,7 +44,8 @@ namespace GameplayKit.Movement
         }
     }
 
-    /// <summary>Marca los dos extremos de una tirolesa. Se coloca en el mismo objeto que el trigger de entrada.</summary>
+    /// <summary>Marca los dos extremos de una tirolesa. Se coloca en el mismo objeto que el trigger de entrada,
+    /// y ese objeto debe tener el tag configurado en PlayerZipline (por defecto "Zipline").</summary>
     public class ZiplinePath : MonoBehaviour
     {
         public Transform Start;

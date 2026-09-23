@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using GameplayKit.Core;
 using UnityEngine;
 
@@ -16,8 +17,10 @@ namespace GameplayKit.Combat
         [SerializeField] private float cooldown = 0.4f;
 
         public bool IsOnCooldown { get; private set; }
+        public bool IsHitboxActive { get; private set; }
 
         private float _cooldownTimer;
+        private readonly HashSet<IDamageable> _alreadyHit = new HashSet<IDamageable>();
 
         private void Update()
         {
@@ -31,10 +34,28 @@ namespace GameplayKit.Combat
         {
             if (IsOnCooldown) return false;
 
-            DealDamage();
+            StartCoroutine(ActiveWindow());
             _cooldownTimer = cooldown;
             IsOnCooldown = true;
             return true;
+        }
+
+        /// <summary>Mantiene la hitbox activa durante activeDuration, comprobando colisiones cada frame
+        /// para que un ataque no dependa de un unico chequeo instantaneo.</summary>
+        private IEnumerator ActiveWindow()
+        {
+            IsHitboxActive = true;
+            _alreadyHit.Clear();
+
+            float elapsed = 0f;
+            while (elapsed < activeDuration)
+            {
+                DealDamage();
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            IsHitboxActive = false;
         }
 
         private void DealDamage()
@@ -47,7 +68,10 @@ namespace GameplayKit.Combat
                 if (hit.gameObject == gameObject) continue;
 
                 var damageable = hit.GetComponentInParent<IDamageable>();
-                damageable?.ApplyDamage(damage, origin, ((Vector2)hit.transform.position - origin).normalized, gameObject);
+                if (damageable == null || _alreadyHit.Contains(damageable)) continue;
+
+                _alreadyHit.Add(damageable);
+                damageable.ApplyDamage(damage, origin, ((Vector2)hit.transform.position - origin).normalized, gameObject);
             }
         }
 

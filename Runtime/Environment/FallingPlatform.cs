@@ -1,3 +1,4 @@
+using GameplayKit.Core;
 using UnityEngine;
 
 namespace GameplayKit.Environment
@@ -27,7 +28,7 @@ namespace GameplayKit.Environment
         private void OnCollisionEnter2D(Collision2D collision)
         {
             if (_isFalling) return;
-            if (!string.IsNullOrEmpty(triggerTag) && !collision.transform.CompareTag(triggerTag)) return;
+            if (!TagFilter.PassesOptional(collision.transform, triggerTag)) return;
 
             _isFalling = true;
             Invoke(nameof(StartFalling), fallDelay);

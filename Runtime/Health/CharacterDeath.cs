@@ -41,9 +41,12 @@ namespace GameplayKit.Health
         {
             if (_character != null) _character.Condition.ChangeState(ConditionState.Dead);
 
-            foreach (var ability in _abilities)
+            _enabledBeforeDeath = new bool[_abilities.Length];
+            for (int i = 0; i < _abilities.Length; i++)
             {
-                if (ability != null) ability.AbilityEnabled = false;
+                if (_abilities[i] == null) continue;
+                _enabledBeforeDeath[i] = _abilities[i].AbilityEnabled;
+                _abilities[i].AbilityEnabled = false;
             }
 
             if (_animator != null && !string.IsNullOrEmpty(deathAnimatorTrigger))
@@ -54,6 +57,27 @@ namespace GameplayKit.Health
             OnCharacterDeath?.Invoke();
 
             if (disableDelay >= 0f) Invoke(nameof(DisableGameObject), disableDelay);
+        }
+
+        private bool[] _enabledBeforeDeath;
+
+        /// <summary>
+        /// Deshace lo que hizo la muerte: reactiva las habilidades que estaban activas, vuelve a la condición
+        /// Normal y reactiva el GameObject si se había desactivado. CharacterRespawn lo llama al respawnear.
+        /// </summary>
+        public void Revive()
+        {
+            CancelInvoke(nameof(DisableGameObject));
+            if (!gameObject.activeSelf) gameObject.SetActive(true);
+            if (_enabledBeforeDeath != null)
+            {
+                for (int i = 0; i < _abilities.Length; i++)
+                {
+                    if (_abilities[i] != null) _abilities[i].AbilityEnabled = _enabledBeforeDeath[i];
+                }
+                _enabledBeforeDeath = null;
+            }
+            if (_character != null) _character.Condition.ChangeState(ConditionState.Normal);
         }
 
         private void DisableGameObject()

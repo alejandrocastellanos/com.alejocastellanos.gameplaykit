@@ -10,6 +10,7 @@ namespace GameplayKit.Movement
     public class PlayerClimbLadder : AbilityBase
     {
         [SerializeField] private float climbSpeed = 3f;
+        [Tooltip("Opcional: además de cualquier LadderZone, cuenta como escalera todo trigger con este tag.")]
         [SerializeField] private string ladderTag = "Ladder";
 
         public bool IsOnLadder { get; private set; }
@@ -17,13 +18,21 @@ namespace GameplayKit.Movement
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.CompareTag(ladderTag)) _touchingLadder = true;
+            if (IsLadder(other)) _touchingLadder = true;
         }
 
         private void OnTriggerExit2D(Collider2D other)
         {
-            if (other.CompareTag(ladderTag)) { _touchingLadder = false; IsOnLadder = false; }
+            if (IsLadder(other))
+            {
+                _touchingLadder = false;
+                if (IsOnLadder) Character.Controller.Rigidbody.gravityScale = Character.Controller.DefaultGravityScale;
+                IsOnLadder = false;
+            }
         }
+
+        private bool IsLadder(Collider2D other) =>
+            other.GetComponent<LadderZone>() != null || TagFilter.Matches(other, ladderTag);
 
         public override void ProcessAbility()
         {
@@ -38,13 +47,16 @@ namespace GameplayKit.Movement
             if (Character.Controller.IsGrounded && CharacterInput.MoveInput.y < 0f)
             {
                 IsOnLadder = false;
-                Character.Controller.Rigidbody.gravityScale = 1f;
+                Character.Controller.Rigidbody.gravityScale = Character.Controller.DefaultGravityScale;
             }
         }
 
         public override void ResetAbility()
         {
-            Character.Controller.Rigidbody.gravityScale = 1f;
+            Character.Controller.Rigidbody.gravityScale = Character.Controller.DefaultGravityScale;
         }
     }
+
+    /// <summary>Marca un trigger como escalera para PlayerClimbLadder (no hace falta crear tags).</summary>
+    public class LadderZone : MonoBehaviour { }
 }

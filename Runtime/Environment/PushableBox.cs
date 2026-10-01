@@ -1,3 +1,4 @@
+using GameplayKit.Core;
 using UnityEngine;
 
 namespace GameplayKit.Environment
@@ -20,7 +21,7 @@ namespace GameplayKit.Environment
 
         private void OnCollisionStay2D(Collision2D collision)
         {
-            if (!collision.transform.CompareTag("Player")) return;
+            if (!TagFilter.Matches(collision.transform, "Player")) return;
 
             var playerRb = collision.rigidbody;
             if (playerRb == null || Mathf.Abs(playerRb.linearVelocity.x) < 0.1f) return;

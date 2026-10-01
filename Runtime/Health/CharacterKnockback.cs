@@ -30,7 +30,7 @@ namespace GameplayKit.Health
 
             if (lockoutDuration > 0f)
             {
-                if (_lockoutRoutine != null) StopCoroutine(_lockoutRoutine);
+                if (_lockoutRoutine != null) { StopCoroutine(_lockoutRoutine); SetAbilitiesEnabled(true); }
                 _lockoutRoutine = StartCoroutine(LockoutRoutine());
             }
         }
@@ -43,11 +43,29 @@ namespace GameplayKit.Health
             _lockoutRoutine = null;
         }
 
+        private bool[] _enabledBeforeLockout;
+
+        // Al terminar se restaura el estado previo de cada habilidad, no "todas activas": así no se
+        // reactivan habilidades que el juego (o CharacterCore, por un error) había desactivado.
         private void SetAbilitiesEnabled(bool enabled)
         {
-            foreach (var ability in _abilities)
+            if (!enabled)
             {
-                if (ability != null) ability.AbilityEnabled = enabled;
+                _enabledBeforeLockout = new bool[_abilities.Length];
+                for (int i = 0; i < _abilities.Length; i++)
+                {
+                    if (_abilities[i] == null) continue;
+                    _enabledBeforeLockout[i] = _abilities[i].AbilityEnabled;
+                    _abilities[i].AbilityEnabled = false;
+                }
+            }
+            else if (_enabledBeforeLockout != null)
+            {
+                for (int i = 0; i < _abilities.Length; i++)
+                {
+                    if (_abilities[i] != null) _abilities[i].AbilityEnabled = _enabledBeforeLockout[i];
+                }
+                _enabledBeforeLockout = null;
             }
         }
     }

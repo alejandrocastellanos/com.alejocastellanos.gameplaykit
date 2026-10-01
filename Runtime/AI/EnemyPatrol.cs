@@ -1,3 +1,4 @@
+using GameplayKit.Core;
 using UnityEngine;
 
 namespace GameplayKit.AI
@@ -12,8 +13,8 @@ namespace GameplayKit.AI
         [SerializeField] private Transform edgeCheck;
         [SerializeField] private float wallCheckDistance = 0.2f;
         [SerializeField] private float edgeCheckDistance = 0.5f;
-        [SerializeField] private LayerMask obstacleLayers;
-        [SerializeField] private LayerMask groundLayers;
+        [SerializeField] private LayerMask obstacleLayers = ~0;
+        [SerializeField] private LayerMask groundLayers = ~0;
 
         private Rigidbody2D _rb;
         private int _direction = 1;
@@ -32,11 +33,23 @@ namespace GameplayKit.AI
 
         private bool ShouldTurnAround()
         {
-            bool hitsWall = wallCheck != null &&
-                Physics2D.Raycast(wallCheck.position, Vector2.right * _direction, wallCheckDistance, obstacleLayers);
+            // Sin wallCheck/edgeCheck asignados se usan los bordes del Collider2D del enemigo.
+            var body = GetComponent<Collider2D>();
+            Vector2 wallOrigin; float wallDistance = wallCheckDistance;
+            if (wallCheck != null) wallOrigin = wallCheck.position;
+            else if (body != null) { wallOrigin = body.bounds.center; wallDistance += body.bounds.extents.x; }
+            else wallOrigin = transform.position;
 
-            bool aboutToFallOffEdge = edgeCheck != null &&
-                !Physics2D.Raycast(edgeCheck.position, Vector2.down, edgeCheckDistance, groundLayers);
+            Vector2 edgeOrigin;
+            bool canCheckEdge = true;
+            if (edgeCheck != null) edgeOrigin = edgeCheck.position;
+            else if (body != null) { Bounds b = body.bounds; edgeOrigin = new Vector2(b.center.x + _direction * (b.extents.x + 0.05f), b.min.y + 0.05f); }
+            else { edgeOrigin = default; canCheckEdge = false; }
+
+            bool hitsWall = PhysicsQuery2D.Raycast(wallOrigin, Vector2.right * _direction, wallDistance, obstacleLayers, transform).collider != null;
+
+            bool aboutToFallOffEdge = canCheckEdge &&
+                PhysicsQuery2D.Raycast(edgeOrigin, Vector2.down, edgeCheckDistance, groundLayers, transform).collider == null;
 
             return hitsWall || aboutToFallOffEdge;
         }

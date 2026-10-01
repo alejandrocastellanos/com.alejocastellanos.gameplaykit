@@ -1,4 +1,5 @@
 using GameplayKit.Combat;
+using GameplayKit.Core;
 using UnityEngine;
 
 namespace GameplayKit.AI
@@ -13,7 +14,7 @@ namespace GameplayKit.AI
         [SerializeField] private Transform target;
         [SerializeField] private float sightRange = 10f;
         [SerializeField] private float sightAngle = 60f;
-        [SerializeField] private LayerMask obstacleLayers;
+        [SerializeField] private LayerMask obstacleLayers = ~0;
         [SerializeField] private float fireInterval = 1f;
 
         private WeaponHitscan _hitscan;
@@ -50,7 +51,8 @@ namespace GameplayKit.AI
             float angle = Vector2.Angle(facing, toTarget);
             if (angle > sightAngle * 0.5f) return false;
 
-            var hit = Physics2D.Raycast(transform.position, toTarget.normalized, distance, obstacleLayers);
+            var hit = PhysicsQuery2D.Raycast(transform.position, toTarget.normalized, distance, obstacleLayers,
+                PhysicsQuery2D.OwnerOf(this), PhysicsQuery2D.OwnerOf(target));
             return hit.collider == null;
         }
     }

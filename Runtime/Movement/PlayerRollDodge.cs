@@ -20,7 +20,7 @@ namespace GameplayKit.Movement
         {
             _cooldownTimer -= Time.deltaTime;
 
-            if (!_isRolling && Input.GetKeyDown(rollKey) && _cooldownTimer <= 0f && Character.Controller.IsGrounded)
+            if (!_isRolling && InputCompat.GetKeyDown(rollKey) && _cooldownTimer <= 0f && Character.Controller.IsGrounded)
             {
                 StartCoroutine(RollRoutine());
             }

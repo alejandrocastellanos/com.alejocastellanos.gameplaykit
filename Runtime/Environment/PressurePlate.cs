@@ -1,4 +1,5 @@
 using System;
+using GameplayKit.Core;
 using UnityEngine;
 
 namespace GameplayKit.Environment
@@ -41,7 +42,7 @@ namespace GameplayKit.Environment
 
         private bool IsValid(Collider2D other)
         {
-            return string.IsNullOrEmpty(requiredTag) || other.CompareTag(requiredTag);
+            return TagFilter.PassesOptional(other, requiredTag);
         }
     }
 }

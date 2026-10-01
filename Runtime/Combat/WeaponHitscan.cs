@@ -34,7 +34,7 @@ namespace GameplayKit.Combat
             if (IsOnCooldown) return false;
 
             Vector2 origin = firePoint != null ? (Vector2)firePoint.position : (Vector2)transform.position;
-            var hit = Physics2D.Raycast(origin, direction.normalized, range, hittableLayers);
+            var hit = PhysicsQuery2D.Raycast(origin, direction.normalized, range, hittableLayers, PhysicsQuery2D.OwnerOf(this));
             Vector2 endPoint = hit.collider != null ? hit.point : origin + direction.normalized * range;
 
             if (hit.collider != null)

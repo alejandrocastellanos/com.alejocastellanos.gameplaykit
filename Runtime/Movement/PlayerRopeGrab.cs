@@ -9,6 +9,7 @@ namespace GameplayKit.Movement
     /// </summary>
     public class PlayerRopeGrab : AbilityBase
     {
+        [Tooltip("Opcional: además de cualquier RopeAnchor, cuenta como ancla todo trigger con este tag.")]
         [SerializeField] private string ropeTag = "RopeAnchor";
         [SerializeField] private float swingForce = 6f;
 
@@ -18,7 +19,7 @@ namespace GameplayKit.Movement
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (!other.CompareTag(ropeTag)) return;
+            if (other.GetComponent<RopeAnchor>() == null && !TagFilter.Matches(other, ropeTag)) return;
             _anchor = other.transform;
             _ropeLength = Vector2.Distance(transform.position, _anchor.position);
         }
@@ -39,7 +40,7 @@ namespace GameplayKit.Movement
             {
                 IsSwinging = false;
                 _anchor = null;
-                Character.Controller.Rigidbody.gravityScale = 1f;
+                Character.Controller.Rigidbody.gravityScale = Character.Controller.DefaultGravityScale;
                 return;
             }
 
@@ -52,4 +53,7 @@ namespace GameplayKit.Movement
             transform.position = desiredPos;
         }
     }
+
+    /// <summary>Marca un trigger como punto de agarre de cuerda para PlayerRopeGrab (no hace falta crear tags).</summary>
+    public class RopeAnchor : MonoBehaviour { }
 }

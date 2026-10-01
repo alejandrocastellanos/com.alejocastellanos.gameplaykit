@@ -20,9 +20,12 @@ namespace GameplayKit.Environment
 
         private readonly Dictionary<Rigidbody2D, float> _originalDrag = new Dictionary<Rigidbody2D, float>();
 
+        private readonly TriggerOccupants<Rigidbody2D> _bodies = new TriggerOccupants<Rigidbody2D>();
+
         private void OnTriggerEnter2D(Collider2D other)
         {
             var rb = other.attachedRigidbody;
+            _bodies.Enter(rb);
             if (rb != null && !_originalDrag.ContainsKey(rb))
             {
                 _originalDrag[rb] = rb.linearDamping;
@@ -32,15 +35,16 @@ namespace GameplayKit.Environment
             OnEnterWater?.Invoke(other.gameObject);
         }
 
-        private void OnTriggerStay2D(Collider2D other)
+        private void FixedUpdate()
         {
-            var rb = other.attachedRigidbody;
-            rb?.AddForce(Vector2.up * buoyancyForce, ForceMode2D.Force);
+            // Desde FixedUpdate y no OnTriggerStay2D: un cuerpo dormido deja de recibir Stay y se hundiría.
+            foreach (var rb in _bodies.Snapshot()) rb.AddForce(Vector2.up * buoyancyForce, ForceMode2D.Force);
         }
 
         private void OnTriggerExit2D(Collider2D other)
         {
             var rb = other.attachedRigidbody;
+            _bodies.Exit(rb);
             if (rb != null && _originalDrag.TryGetValue(rb, out float original))
             {
                 rb.linearDamping = original;

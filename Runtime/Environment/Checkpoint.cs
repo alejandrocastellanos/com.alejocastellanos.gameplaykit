@@ -1,5 +1,6 @@
 using System;
 using GameplayKit.Health;
+using GameplayKit.Core;
 using UnityEngine;
 
 namespace GameplayKit.Environment
@@ -16,10 +17,10 @@ namespace GameplayKit.Environment
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (IsActivated || !other.CompareTag(playerTag)) return;
+            if (IsActivated || !TagFilter.Matches(other, playerTag)) return;
 
             var respawn = other.GetComponentInParent<CharacterRespawn>();
-            respawn?.SetCheckpoint(transform);
+            if (respawn != null) respawn.SetCheckpoint(transform);
 
             IsActivated = true;
             if (activeVisual != null) activeVisual.SetActive(true);

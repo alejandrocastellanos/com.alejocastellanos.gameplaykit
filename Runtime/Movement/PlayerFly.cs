@@ -13,10 +13,10 @@ namespace GameplayKit.Movement
 
         public override void ProcessAbility()
         {
-            if (Input.GetKeyDown(toggleKey))
+            if (InputCompat.GetKeyDown(toggleKey))
             {
                 IsFlying = !IsFlying;
-                Character.Controller.Rigidbody.gravityScale = IsFlying ? 0f : 1f;
+                Character.Controller.Rigidbody.gravityScale = IsFlying ? 0f : Character.Controller.DefaultGravityScale;
             }
 
             if (!IsFlying) return;

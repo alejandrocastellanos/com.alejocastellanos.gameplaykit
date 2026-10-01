@@ -62,10 +62,11 @@ namespace GameplayKit.Combat
         {
             Vector2 origin = hitboxOrigin != null ? (Vector2)hitboxOrigin.position : (Vector2)transform.position;
             var hits = Physics2D.OverlapCircleAll(origin, hitboxRadius, targetLayers);
+            Transform owner = PhysicsQuery2D.OwnerOf(this);
 
             foreach (var hit in hits)
             {
-                if (hit.gameObject == gameObject) continue;
+                if (PhysicsQuery2D.IsPartOf(hit, owner)) continue;
 
                 var damageable = hit.GetComponentInParent<IDamageable>();
                 if (damageable == null || _alreadyHit.Contains(damageable)) continue;

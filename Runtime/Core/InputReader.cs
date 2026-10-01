@@ -4,8 +4,8 @@ namespace GameplayKit.Core
 {
     /// <summary>
     /// Contrato de entrada que consumen las habilidades (PlayerJump, PlayerWalkRun, etc.).
-    /// Al ser una interfaz, cambiar del Input Manager clásico al New Input System más
-    /// adelante no obliga a tocar ninguna habilidad — solo se reemplaza la implementación.
+    /// Al ser una interfaz, se puede reemplazar KeyboardInputReader por otra implementación
+    /// (PlayerInput con acciones, IA, replays...) sin tocar ninguna habilidad.
     /// </summary>
     public interface ICharacterInput
     {
@@ -20,11 +20,10 @@ namespace GameplayKit.Core
     }
 
     /// <summary>
-    /// Implementación de referencia usando el Input Manager clásico de Unity. Suficiente
-    /// para prototipar sin depender de un paquete extra; todas las habilidades dependen de
-    /// ICharacterInput, así que reemplazar esto por el New Input System no las afecta.
-    /// Bindings: mover = ejes Horizontal/Vertical, saltar = Space ("Jump"), correr = Shift
-    /// (mantener), agacharse = Ctrl izquierdo (mantener), dash = Q, interactuar = E.
+    /// Implementación de referencia de ICharacterInput. Lee a través de InputCompat, así que funciona
+    /// tanto con el Input System (New) como con el Input Manager clásico, sin configurar nada.
+    /// Bindings: mover = WASD/flechas o stick izquierdo, saltar = Space o botón sur del gamepad,
+    /// correr = Shift izquierdo (mantener), agacharse = Ctrl izquierdo (mantener), dash = Q, interactuar = E.
     /// </summary>
     public class KeyboardInputReader : MonoBehaviour, ICharacterInput
     {
@@ -39,14 +38,14 @@ namespace GameplayKit.Core
 
         private void Update()
         {
-            MoveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-            JumpPressedThisFrame = Input.GetButtonDown("Jump");
-            JumpHeld = Input.GetButton("Jump");
-            JumpReleasedThisFrame = Input.GetButtonUp("Jump");
-            RunHeld = Input.GetKey(KeyCode.LeftShift);
-            CrouchHeld = Input.GetKey(KeyCode.LeftControl);
-            DashPressedThisFrame = Input.GetKeyDown(KeyCode.Q);
-            InteractPressedThisFrame = Input.GetKeyDown(KeyCode.E);
+            MoveInput = InputCompat.MoveAxis;
+            JumpPressedThisFrame = InputCompat.JumpPressedThisFrame;
+            JumpHeld = InputCompat.JumpHeld;
+            JumpReleasedThisFrame = InputCompat.JumpReleasedThisFrame;
+            RunHeld = InputCompat.GetKey(KeyCode.LeftShift);
+            CrouchHeld = InputCompat.GetKey(KeyCode.LeftControl);
+            DashPressedThisFrame = InputCompat.GetKeyDown(KeyCode.Q);
+            InteractPressedThisFrame = InputCompat.GetKeyDown(KeyCode.E);
         }
     }
 }

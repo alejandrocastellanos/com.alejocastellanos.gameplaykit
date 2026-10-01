@@ -24,7 +24,7 @@ namespace GameplayKit.AI
         private void TryDamage(Collider2D other)
         {
             if (_cooldownTimer > 0f) return;
-            if (!string.IsNullOrEmpty(targetTag) && !other.CompareTag(targetTag)) return;
+            if (!TagFilter.PassesOptional(other, targetTag)) return;
 
             var damageable = other.GetComponentInParent<IDamageable>();
             if (damageable == null) return;

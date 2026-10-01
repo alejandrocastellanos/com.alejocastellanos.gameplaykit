@@ -1,3 +1,4 @@
+using GameplayKit.Core;
 using UnityEngine;
 
 namespace GameplayKit.Environment
@@ -21,7 +22,7 @@ namespace GameplayKit.Environment
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (_cooldownTimer > 0f || destination == null) return;
-            if (!string.IsNullOrEmpty(targetTag) && !other.CompareTag(targetTag)) return;
+            if (!TagFilter.PassesOptional(other, targetTag)) return;
 
             var rb = other.attachedRigidbody;
             Vector2 previousVelocity = rb != null ? rb.linearVelocity : Vector2.zero;

@@ -10,10 +10,14 @@ namespace GameplayKit.Movement
     /// </summary>
     public class PlayerLedgeGrab : AbilityBase
     {
+        [Tooltip("Origen del rayo a la altura del pecho. Si se deja vacío se usa la posición del personaje + Chest Offset.")]
         [SerializeField] private Transform chestCheck;
+        [Tooltip("Origen del rayo a la altura de la cabeza. Si se deja vacío se usa la posición del personaje + Head Offset.")]
         [SerializeField] private Transform headCheck;
+        [SerializeField] private Vector2 chestOffset = new Vector2(0f, 0.2f);
+        [SerializeField] private Vector2 headOffset = new Vector2(0f, 0.8f);
         [SerializeField] private float checkDistance = 0.3f;
-        [SerializeField] private LayerMask ledgeLayers;
+        [SerializeField] private LayerMask ledgeLayers = ~0;
 
         public bool IsGrabbingLedge { get; private set; }
 
@@ -23,8 +27,13 @@ namespace GameplayKit.Movement
 
             if (!IsGrabbingLedge)
             {
-                bool chestBlocked = Physics2D.Raycast(chestCheck.position, transform.right, checkDistance, ledgeLayers);
-                bool headFree = !Physics2D.Raycast(headCheck.position, transform.right, checkDistance, ledgeLayers);
+                Vector2 chest = chestCheck != null ? (Vector2)chestCheck.position : (Vector2)transform.position + chestOffset;
+                Vector2 head = headCheck != null ? (Vector2)headCheck.position : (Vector2)transform.position + headOffset;
+                Vector2 facing = Vector2.right * PhysicsQuery2D.Facing(transform);
+                var body = GetComponent<Collider2D>();
+                float reach = checkDistance + (body != null ? body.bounds.extents.x : 0f);
+                bool chestBlocked = PhysicsQuery2D.Raycast(chest, facing, reach, ledgeLayers, transform).collider != null;
+                bool headFree = PhysicsQuery2D.Raycast(head, facing, reach, ledgeLayers, transform).collider == null;
 
                 if (chestBlocked && headFree && Character.Controller.Velocity.y < 0f)
                 {
@@ -40,12 +49,12 @@ namespace GameplayKit.Movement
                 if (CharacterInput.MoveInput.y < -0.5f)
                 {
                     IsGrabbingLedge = false;
-                    Character.Controller.Rigidbody.gravityScale = 1f;
+                    Character.Controller.Rigidbody.gravityScale = Character.Controller.DefaultGravityScale;
                 }
             }
             else
             {
-                Character.Controller.Rigidbody.gravityScale = 1f;
+                Character.Controller.Rigidbody.gravityScale = Character.Controller.DefaultGravityScale;
             }
         }
     }

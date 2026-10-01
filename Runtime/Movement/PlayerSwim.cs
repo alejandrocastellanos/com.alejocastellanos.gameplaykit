@@ -9,6 +9,7 @@ namespace GameplayKit.Movement
     /// </summary>
     public class PlayerSwim : AbilityBase
     {
+        [Tooltip("Opcional: además de cualquier WaterZone, cuenta como agua todo trigger con este tag.")]
         [SerializeField] private string waterTag = "Water";
         [SerializeField] private float swimSpeed = 3.5f;
         [SerializeField] private float waterGravityScale = 0.2f;
@@ -17,7 +18,7 @@ namespace GameplayKit.Movement
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.CompareTag(waterTag))
+            if (IsWater(other))
             {
                 IsInWater = true;
                 Character.Controller.Rigidbody.gravityScale = waterGravityScale;
@@ -26,12 +27,15 @@ namespace GameplayKit.Movement
 
         private void OnTriggerExit2D(Collider2D other)
         {
-            if (other.CompareTag(waterTag))
+            if (IsWater(other))
             {
                 IsInWater = false;
-                Character.Controller.Rigidbody.gravityScale = 1f;
+                Character.Controller.Rigidbody.gravityScale = Character.Controller.DefaultGravityScale;
             }
         }
+
+        private bool IsWater(Collider2D other) =>
+            other.GetComponent<GameplayKit.Environment.WaterZone>() != null || TagFilter.Matches(other, waterTag);
 
         public override void ProcessAbility()
         {

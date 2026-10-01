@@ -44,7 +44,7 @@ namespace GameplayKit.Movement
             }
 
             transform.position = target;
-            Character.Controller.Rigidbody.gravityScale = 1f;
+            Character.Controller.Rigidbody.gravityScale = Character.Controller.DefaultGravityScale;
             _isClimbing = false;
         }
     }

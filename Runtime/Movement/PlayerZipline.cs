@@ -6,7 +6,8 @@ namespace GameplayKit.Movement
     /// <summary>Se desliza a velocidad constante entre dos puntos al entrar en contacto con una tirolesa.</summary>
     public class PlayerZipline : AbilityBase
     {
-        [SerializeField] private string ziplineTag = "Zipline";
+        [Tooltip("Filtro opcional: si no está vacío, solo se usan tirolesas (ZiplinePath) con este tag.")]
+        [SerializeField] private string ziplineTag = "";
         [SerializeField] private float rideSpeed = 8f;
 
         public bool IsRiding { get; private set; }
@@ -16,10 +17,8 @@ namespace GameplayKit.Movement
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (!other.CompareTag(ziplineTag)) return;
-
             var zipline = other.GetComponent<ZiplinePath>();
-            if (zipline == null) return;
+            if (zipline == null || !TagFilter.PassesOptional(other, ziplineTag)) return;
 
             _start = zipline.Start;
             _end = zipline.End;
@@ -39,7 +38,7 @@ namespace GameplayKit.Movement
             if (_progress >= 1f || CharacterInput.JumpPressedThisFrame)
             {
                 IsRiding = false;
-                Character.Controller.Rigidbody.gravityScale = 1f;
+                Character.Controller.Rigidbody.gravityScale = Character.Controller.DefaultGravityScale;
             }
         }
     }

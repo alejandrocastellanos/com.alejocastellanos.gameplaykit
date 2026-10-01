@@ -1,3 +1,4 @@
+using GameplayKit.Core;
 using UnityEngine;
 
 namespace GameplayKit.Environment
@@ -9,12 +10,15 @@ namespace GameplayKit.Environment
         public enum LoopMode { Loop, PingPong }
 
         [Header("Recorrido")]
+        [Tooltip("Puntos del recorrido. Pueden ser hijos de la plataforma: sus posiciones se fijan al iniciar.")]
         [SerializeField] private Transform[] waypoints;
         [SerializeField] private float speed = 2f;
         [SerializeField] private LoopMode loopMode = LoopMode.PingPong;
         [SerializeField] private float waypointThreshold = 0.05f;
 
         private Rigidbody2D _rb;
+        private Vector2[] _points;
+        private PlatformRiders _riders;
         private int _currentIndex;
         private int _direction = 1;
 
@@ -22,19 +26,24 @@ namespace GameplayKit.Environment
         {
             _rb = GetComponent<Rigidbody2D>();
             _rb.bodyType = RigidbodyType2D.Kinematic;
+            _riders = new PlatformRiders(GetComponent<Collider2D>());
+
+            // Se copian las posiciones: si los waypoints son hijos se moverían con la plataforma y nunca llegaría.
+            var points = new System.Collections.Generic.List<Vector2>();
+            if (waypoints != null) foreach (var w in waypoints) if (w != null) points.Add(w.position);
+            _points = points.ToArray();
         }
 
         private void FixedUpdate()
         {
-            if (waypoints == null || waypoints.Length < 2) return;
+            if (_points == null || _points.Length < 2) return;
 
-            Transform target = waypoints[_currentIndex];
-            if (target == null) return;
-
-            Vector2 newPosition = Vector2.MoveTowards(_rb.position, target.position, speed * Time.fixedDeltaTime);
+            Vector2 target = _points[_currentIndex];
+            Vector2 newPosition = Vector2.MoveTowards(_rb.position, target, speed * Time.fixedDeltaTime);
+            _riders.Carry(newPosition - _rb.position);
             _rb.MovePosition(newPosition);
 
-            if (Vector2.Distance(newPosition, target.position) <= waypointThreshold)
+            if (Vector2.Distance(newPosition, target) <= waypointThreshold)
             {
                 AdvanceWaypoint();
             }
@@ -44,14 +53,14 @@ namespace GameplayKit.Environment
         {
             if (loopMode == LoopMode.Loop)
             {
-                _currentIndex = (_currentIndex + 1) % waypoints.Length;
+                _currentIndex = (_currentIndex + 1) % _points.Length;
                 return;
             }
 
             _currentIndex += _direction;
-            if (_currentIndex >= waypoints.Length)
+            if (_currentIndex >= _points.Length)
             {
-                _currentIndex = waypoints.Length - 2;
+                _currentIndex = _points.Length - 2;
                 _direction = -1;
             }
             else if (_currentIndex < 0)
@@ -61,15 +70,8 @@ namespace GameplayKit.Environment
             }
         }
 
-        // Lleva al jugador consigo mientras esté parado encima (parenting temporal).
-        private void OnCollisionEnter2D(Collision2D collision)
-        {
-            if (collision.transform.CompareTag("Player")) collision.transform.SetParent(transform);
-        }
-
-        private void OnCollisionExit2D(Collision2D collision)
-        {
-            if (collision.transform.CompareTag("Player")) collision.transform.SetParent(null);
-        }
+        private void OnCollisionEnter2D(Collision2D collision) => _riders.OnContact(collision);
+        private void OnCollisionStay2D(Collision2D collision) => _riders.OnContact(collision);
+        private void OnCollisionExit2D(Collision2D collision) => _riders.OnContactEnded(collision);
     }
 }

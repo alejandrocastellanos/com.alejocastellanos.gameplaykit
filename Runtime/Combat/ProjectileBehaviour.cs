@@ -11,11 +11,14 @@ namespace GameplayKit.Combat
         [SerializeField] private float lifetime = 5f;
         [SerializeField] private int maxBounces = 0;
         [SerializeField] private LayerMask collidableLayers = ~0;
+        [Tooltip("Desactivado: vuela en línea recta (bala, flecha). Activado: cae con la gravedad (granada).")]
+        [SerializeField] private bool affectedByGravity = false;
 
         private Rigidbody2D _rb;
         private float _damage;
         private GameObject _instigator;
         private int _bounceCount;
+        private Transform _owner;
 
         private void Awake()
         {
@@ -27,13 +30,16 @@ namespace GameplayKit.Combat
         {
             _damage = damage;
             _instigator = instigator;
+            _owner = instigator != null ? PhysicsQuery2D.OwnerOf(instigator.transform) : null;
+            if (!affectedByGravity) _rb.gravityScale = 0f;
             _rb.linearVelocity = direction.normalized * speed;
             Destroy(gameObject, lifetime);
         }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (_instigator != null && other.gameObject == _instigator) return;
+            // Nace dentro de quien dispara: sin esto se dañaría a sí mismo al salir.
+            if (PhysicsQuery2D.IsPartOf(other, _owner)) return;
 
             var damageable = other.GetComponentInParent<IDamageable>();
             if (damageable != null)
@@ -43,6 +49,8 @@ namespace GameplayKit.Combat
                 return;
             }
 
+            // Zonas trigger (agua, viento, checkpoints...) no detienen el proyectil.
+            if (other.isTrigger) return;
             if (((1 << other.gameObject.layer) & collidableLayers) == 0) return;
 
             if (_bounceCount < maxBounces)

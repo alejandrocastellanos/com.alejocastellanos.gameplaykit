@@ -1,4 +1,5 @@
 using System;
+using GameplayKit.Core;
 using UnityEngine;
 
 namespace GameplayKit.Environment
@@ -17,7 +18,7 @@ namespace GameplayKit.Environment
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (!other.CompareTag(playerTag)) return;
+            if (!TagFilter.Matches(other, playerTag)) return;
 
             if (collectEffectPrefab != null) Instantiate(collectEffectPrefab, transform.position, Quaternion.identity);
 

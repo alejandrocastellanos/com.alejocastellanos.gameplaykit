@@ -9,17 +9,28 @@ namespace GameplayKit.Movement
     /// </summary>
     public class PlayerEdgeDangle : AbilityBase
     {
+        [Tooltip("Punto frente a los pies desde el que se busca suelo. Si se deja vacío se usa el borde delantero del Collider2D.")]
         [SerializeField] private Transform edgeCheck;
         [SerializeField] private float rayLength = 1f;
-        [SerializeField] private LayerMask groundLayers;
+        [SerializeField] private LayerMask groundLayers = ~0;
 
         public bool IsAtEdge { get; private set; }
 
         public override void ProcessAbility()
         {
-            if (!Character.Controller.IsGrounded || edgeCheck == null) { IsAtEdge = false; return; }
+            if (!Character.Controller.IsGrounded) { IsAtEdge = false; return; }
 
-            IsAtEdge = !Physics2D.Raycast(edgeCheck.position, Vector2.down, rayLength, groundLayers);
+            Vector2 origin;
+            if (edgeCheck != null) origin = edgeCheck.position;
+            else
+            {
+                var body = GetComponent<Collider2D>();
+                if (body == null) { IsAtEdge = false; return; }
+                Bounds b = body.bounds;
+                origin = new Vector2(b.center.x + PhysicsQuery2D.Facing(transform) * b.extents.x, b.min.y + 0.05f);
+            }
+
+            IsAtEdge = PhysicsQuery2D.Raycast(origin, Vector2.down, rayLength, groundLayers, transform).collider == null;
         }
     }
 }

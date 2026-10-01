@@ -14,6 +14,7 @@ namespace GameplayKit.Movement
         {
             if (Character.Condition.CurrentState == ConditionState.Stunned ||
                 Character.Condition.CurrentState == ConditionState.Dead) return;
+            if (Character.Controller.IsHorizontalControlLocked) return;
 
             float horizontal = CharacterInput.MoveInput.x;
             float speed = CharacterInput.RunHeld ? runSpeed : walkSpeed;

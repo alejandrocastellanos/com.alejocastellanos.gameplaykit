@@ -1,6 +1,7 @@
 using System;
 using GameplayKit.Core;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace GameplayKit.Environment
 {
@@ -9,6 +10,8 @@ namespace GameplayKit.Environment
     {
         [Header("Placa de presión")]
         [SerializeField] private string requiredTag = "";
+        [SerializeField] private UnityEvent onPressed = new UnityEvent();
+        [SerializeField] private UnityEvent onReleased = new UnityEvent();
 
         public bool IsPressed { get; private set; }
         public event Action OnPressed;
@@ -24,6 +27,7 @@ namespace GameplayKit.Environment
             if (_contactCount == 1)
             {
                 IsPressed = true;
+                onPressed.Invoke();
                 OnPressed?.Invoke();
             }
         }
@@ -36,6 +40,7 @@ namespace GameplayKit.Environment
             if (_contactCount == 0)
             {
                 IsPressed = false;
+                onReleased.Invoke();
                 OnReleased?.Invoke();
             }
         }

@@ -78,6 +78,14 @@ namespace GameplayKit.Health
             }
         }
 
+        /// <summary>Hace al personaje inmune al daño durante unos segundos (por ejemplo, durante un roll). No acorta una invulnerabilidad más larga ya activa.</summary>
+        public void GrantInvulnerability(float seconds)
+        {
+            if (seconds <= 0f || IsDead) return;
+            IsInvulnerable = true;
+            _invulnerabilityTimer = Mathf.Max(_invulnerabilityTimer, seconds);
+        }
+
         public void Heal(float amount)
         {
             if (IsDead || amount <= 0f) return;

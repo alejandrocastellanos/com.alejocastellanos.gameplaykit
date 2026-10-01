@@ -24,6 +24,12 @@ namespace GameplayKit.Movement
             _ropeLength = Vector2.Distance(transform.position, _anchor.position);
         }
 
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            // Fuera del alcance de la cuerda ya no se puede agarrar (salvo que ya se esté columpiando).
+            if (!IsSwinging && _anchor != null && other.transform == _anchor) _anchor = null;
+        }
+
         public override void ProcessAbility()
         {
             if (_anchor == null) return;
@@ -31,7 +37,7 @@ namespace GameplayKit.Movement
             if (!IsSwinging && CharacterInput.InteractPressedThisFrame)
             {
                 IsSwinging = true;
-                Character.Controller.Rigidbody.gravityScale = 0f;
+                Character.Controller.OverrideGravity(this, 0f);
             }
 
             if (!IsSwinging) return;
@@ -40,7 +46,7 @@ namespace GameplayKit.Movement
             {
                 IsSwinging = false;
                 _anchor = null;
-                Character.Controller.Rigidbody.gravityScale = Character.Controller.DefaultGravityScale;
+                Character.Controller.ReleaseGravity(this);
                 return;
             }
 
@@ -50,6 +56,7 @@ namespace GameplayKit.Movement
 
             // Mantiene la distancia constante al ancla (cuerda rígida).
             Vector2 desiredPos = (Vector2)_anchor.position - toAnchor.normalized * _ropeLength;
+            Character.Controller.Rigidbody.position = desiredPos;
             transform.position = desiredPos;
         }
     }

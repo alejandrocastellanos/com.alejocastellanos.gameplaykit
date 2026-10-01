@@ -24,7 +24,7 @@ namespace GameplayKit.Movement
             _end = zipline.End;
             _progress = 0f;
             IsRiding = true;
-            Character.Controller.Rigidbody.gravityScale = 0f;
+            Character.Controller.OverrideGravity(this, 0f);
         }
 
         public override void ProcessAbility()
@@ -33,12 +33,15 @@ namespace GameplayKit.Movement
 
             float distance = Vector2.Distance(_start.position, _end.position);
             _progress += rideSpeed * Time.deltaTime / Mathf.Max(distance, 0.001f);
-            transform.position = Vector3.Lerp(_start.position, _end.position, _progress);
+            Vector2 p = Vector2.Lerp(_start.position, _end.position, _progress);
+            Character.Controller.Move(Vector2.zero);
+            Character.Controller.Rigidbody.position = p;
+            transform.position = p;
 
             if (_progress >= 1f || CharacterInput.JumpPressedThisFrame)
             {
                 IsRiding = false;
-                Character.Controller.Rigidbody.gravityScale = Character.Controller.DefaultGravityScale;
+                Character.Controller.ReleaseGravity(this);
             }
         }
     }

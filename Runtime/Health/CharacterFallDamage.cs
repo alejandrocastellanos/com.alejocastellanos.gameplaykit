@@ -20,6 +20,7 @@ namespace GameplayKit.Health
         {
             base.Initialize(character);
             _health = GetComponent<CharacterHealth>();
+            _fallStartHeight = transform.position.y; // si nace en el aire, la caída se mide desde donde apareció
         }
 
         public override void ProcessAbility()

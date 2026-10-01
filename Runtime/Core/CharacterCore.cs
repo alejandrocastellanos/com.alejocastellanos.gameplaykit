@@ -17,6 +17,17 @@ namespace GameplayKit.Core
         public CharacterController2D Controller { get; private set; }
 
         private readonly List<AbilityBase> _abilities = new List<AbilityBase>();
+        private readonly HashSet<object> _suspensions = new HashSet<object>();
+
+        /// <summary>True mientras algún sistema (muerte, aturdimiento, knockback...) tenga las habilidades en pausa.</summary>
+        public bool AbilitiesSuspended => _suspensions.Count > 0;
+
+        /// <summary>
+        /// Pausa todas las habilidades en nombre de <paramref name="source"/> sin tocar su AbilityEnabled.
+        /// Varias fuentes pueden suspender a la vez; las habilidades vuelven cuando todas llaman Resume.
+        /// </summary>
+        public void Suspend(object source) { if (source != null) _suspensions.Add(source); }
+        public void Resume(object source) { if (source != null) _suspensions.Remove(source); }
 
         private void Awake()
         {
@@ -37,7 +48,7 @@ namespace GameplayKit.Core
 
         private void Update()
         {
-            if (Condition.CurrentState == ConditionState.Paused) return;
+            if (Condition.CurrentState == ConditionState.Paused || AbilitiesSuspended) return;
 
             foreach (AbilityBase ability in _abilities)
             {
@@ -73,6 +84,7 @@ namespace GameplayKit.Core
 
         public void ResetCharacter()
         {
+            _suspensions.Clear();
             Movement.ChangeState(MovementState.Idle);
             Condition.ChangeState(ConditionState.Normal);
             foreach (AbilityBase ability in _abilities) ability.ResetAbility();

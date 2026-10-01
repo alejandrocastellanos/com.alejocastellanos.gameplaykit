@@ -139,6 +139,61 @@ namespace GameplayKit.Core
             }
         }
 
+        /// <summary>Botones de gamepad, independientes del paquete de input instalado.</summary>
+        public enum PadButton { None, South, East, West, North, LeftShoulder, RightShoulder, LeftTrigger, RightTrigger, Start, Select }
+
+        public static bool GetPadButton(PadButton button)
+        {
+#if GK_NEW_INPUT
+            var control = FindPadControl(button);
+            return control != null && control.isPressed;
+#else
+            return false;
+#endif
+        }
+
+        public static bool GetPadButtonDown(PadButton button)
+        {
+#if GK_NEW_INPUT
+            var control = FindPadControl(button);
+            return control != null && control.wasPressedThisFrame;
+#else
+            return false;
+#endif
+        }
+
+        public static bool GetPadButtonUp(PadButton button)
+        {
+#if GK_NEW_INPUT
+            var control = FindPadControl(button);
+            return control != null && control.wasReleasedThisFrame;
+#else
+            return false;
+#endif
+        }
+
+#if GK_NEW_INPUT
+        private static ButtonControl FindPadControl(PadButton button)
+        {
+            var pad = Gamepad.current;
+            if (pad == null) return null;
+            switch (button)
+            {
+                case PadButton.South: return pad.buttonSouth;
+                case PadButton.East: return pad.buttonEast;
+                case PadButton.West: return pad.buttonWest;
+                case PadButton.North: return pad.buttonNorth;
+                case PadButton.LeftShoulder: return pad.leftShoulder;
+                case PadButton.RightShoulder: return pad.rightShoulder;
+                case PadButton.LeftTrigger: return pad.leftTrigger;
+                case PadButton.RightTrigger: return pad.rightTrigger;
+                case PadButton.Start: return pad.startButton;
+                case PadButton.Select: return pad.selectButton;
+                default: return null;
+            }
+        }
+#endif
+
 #if GK_NEW_INPUT
         private static readonly Dictionary<KeyCode, Key> KeyMap = new Dictionary<KeyCode, Key>();
 
@@ -153,6 +208,7 @@ namespace GameplayKit.Core
                 case KeyCode.Mouse4: return Mouse.current?.forwardButton;
             }
 
+            if (keyCode == KeyCode.None) return null;
             var keyboard = Keyboard.current;
             if (keyboard == null) return null;
 

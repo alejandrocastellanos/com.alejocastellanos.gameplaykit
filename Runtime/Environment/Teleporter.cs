@@ -12,26 +12,25 @@ namespace GameplayKit.Environment
         [SerializeField] private float cooldown = 0.2f;
         [SerializeField] private bool preserveVelocity = true;
 
-        private float _cooldownTimer;
-
-        private void Update()
-        {
-            if (_cooldownTimer > 0f) _cooldownTimer -= Time.deltaTime;
-        }
+        // Enfriamiento por objeto transportado y compartido entre teletransportadores: sin esto, al aparecer
+        // dentro de otro teletransportador (un par de portales) se le devolvía de inmediato.
+        private static readonly System.Collections.Generic.Dictionary<Transform, float> LastTeleportTime =
+            new System.Collections.Generic.Dictionary<Transform, float>();
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (_cooldownTimer > 0f || destination == null) return;
+            if (destination == null) return;
             if (!TagFilter.PassesOptional(other, targetTag)) return;
 
             var rb = other.attachedRigidbody;
+            Transform traveler = rb != null ? rb.transform : other.transform;
+            if (LastTeleportTime.TryGetValue(traveler, out float last) && Time.time - last < cooldown) return;
+
             Vector2 previousVelocity = rb != null ? rb.linearVelocity : Vector2.zero;
-
-            other.transform.position = destination.position;
-
-            if (rb != null && preserveVelocity) rb.linearVelocity = previousVelocity;
-
-            _cooldownTimer = cooldown;
+            if (rb != null) rb.position = destination.position;
+            traveler.position = destination.position;
+            if (rb != null) rb.linearVelocity = preserveVelocity ? previousVelocity : Vector2.zero;
+            LastTeleportTime[traveler] = Time.time;
         }
     }
 }

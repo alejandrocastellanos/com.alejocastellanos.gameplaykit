@@ -18,8 +18,38 @@ namespace GameplayKit.Core
 
         public Rigidbody2D Rigidbody { get; private set; }
         public bool IsGrounded { get; private set; }
-        /// <summary>gravityScale original del Rigidbody2D; las habilidades que anulan la gravedad la restauran a este valor.</summary>
-        public float DefaultGravityScale { get; private set; } = 1f;
+        /// <summary>Gravedad base del personaje (por defecto, el gravityScale original del Rigidbody2D).</summary>
+        public float DefaultGravityScale { get; set; } = 1f;
+
+        /// <summary>Multiplicador sobre la gravedad base (lo usa CharacterGravityController para caer más rápido, etc.).</summary>
+        public float GravityMultiplier { get; set; } = 1f;
+
+        // La gravedad es compartida: varias habilidades la anulan (volar, escalera, agua, cornisa...). Cada una
+        // registra su valor con OverrideGravity y lo libera al terminar; gana la última que la pidió.
+        private readonly System.Collections.Generic.List<(object owner, float scale)> _gravityOverrides =
+            new System.Collections.Generic.List<(object owner, float scale)>();
+
+        public void OverrideGravity(object owner, float scale)
+        {
+            _gravityOverrides.RemoveAll(o => o.owner == owner);
+            _gravityOverrides.Add((owner, scale));
+            ApplyGravity();
+        }
+
+        public void ReleaseGravity(object owner)
+        {
+            if (_gravityOverrides.RemoveAll(o => o.owner == owner) > 0) ApplyGravity();
+        }
+
+        public bool IsGravityOverridden => _gravityOverrides.Count > 0;
+
+        private void ApplyGravity()
+        {
+            if (Rigidbody == null) return;
+            Rigidbody.gravityScale = _gravityOverrides.Count > 0
+                ? _gravityOverrides[_gravityOverrides.Count - 1].scale
+                : DefaultGravityScale * GravityMultiplier;
+        }
         public Vector2 Velocity => Rigidbody.linearVelocity;
 
         private void Awake()
@@ -62,6 +92,7 @@ namespace GameplayKit.Core
 
         private void FixedUpdate()
         {
+            ApplyGravity();
             IsGrounded = TryGetGroundProbe(out Vector2 probe) &&
                 PhysicsQuery2D.OverlapCircle(probe, groundCheckRadius, groundLayers, transform);
         }

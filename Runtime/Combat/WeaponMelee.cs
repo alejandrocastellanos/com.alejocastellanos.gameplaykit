@@ -11,6 +11,8 @@ namespace GameplayKit.Combat
         [Header("Ataque cuerpo a cuerpo")]
         [SerializeField] private Transform hitboxOrigin;
         [SerializeField] private float hitboxRadius = 0.75f;
+        [Tooltip("Sin Hitbox Origin, el centro del golpe se desplaza esto hacia donde mira el personaje.")]
+        [SerializeField] private Vector2 hitboxOffset = new Vector2(0.75f, 0f);
         [SerializeField] private float damage = 10f;
         [SerializeField] private LayerMask targetLayers = ~0;
         [SerializeField] private float activeDuration = 0.15f;
@@ -60,7 +62,7 @@ namespace GameplayKit.Combat
 
         private void DealDamage()
         {
-            Vector2 origin = hitboxOrigin != null ? (Vector2)hitboxOrigin.position : (Vector2)transform.position;
+            Vector2 origin = HitboxCenter();
             var hits = Physics2D.OverlapCircleAll(origin, hitboxRadius, targetLayers);
             Transform owner = PhysicsQuery2D.OwnerOf(this);
 
@@ -76,9 +78,17 @@ namespace GameplayKit.Combat
             }
         }
 
+        private Vector2 HitboxCenter()
+        {
+            if (hitboxOrigin != null) return hitboxOrigin.position;
+            Vector2 offset = hitboxOffset;
+            offset.x *= PhysicsQuery2D.Facing(transform);
+            return (Vector2)transform.position + offset;
+        }
+
         private void OnDrawGizmosSelected()
         {
-            Vector3 origin = hitboxOrigin != null ? hitboxOrigin.position : transform.position;
+            Vector3 origin = HitboxCenter();
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(origin, hitboxRadius);
         }

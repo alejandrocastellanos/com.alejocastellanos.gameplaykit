@@ -22,7 +22,7 @@ namespace GameplayKit.Health
         {
             base.Initialize(character);
             _rb = Character.Controller.Rigidbody;
-            _rb.gravityScale = baseGravityScale;
+            Character.Controller.DefaultGravityScale = baseGravityScale;
         }
 
         public override void ProcessAbility()
@@ -33,18 +33,19 @@ namespace GameplayKit.Health
 
             if (verticalVelocity < 0f)
             {
-                _rb.gravityScale = baseGravityScale * fallGravityMultiplier;
+                Character.Controller.GravityMultiplier = fallGravityMultiplier;
             }
             else if (verticalVelocity > 0f && CharacterInput != null && !CharacterInput.JumpHeld)
             {
-                _rb.gravityScale = baseGravityScale * lowJumpGravityMultiplier;
+                Character.Controller.GravityMultiplier = lowJumpGravityMultiplier;
             }
             else
             {
-                _rb.gravityScale = baseGravityScale;
+                Character.Controller.GravityMultiplier = 1f;
             }
 
-            if (_rb.linearVelocity.y < -maxFallSpeed)
+            // Con la gravedad anulada (volando, escalera...) no se limita nada: la controla otra habilidad.
+            if (!Character.Controller.IsGravityOverridden && _rb.linearVelocity.y < -maxFallSpeed)
             {
                 _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, -maxFallSpeed);
             }

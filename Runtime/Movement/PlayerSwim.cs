@@ -21,7 +21,7 @@ namespace GameplayKit.Movement
             if (IsWater(other))
             {
                 IsInWater = true;
-                Character.Controller.Rigidbody.gravityScale = waterGravityScale;
+                Character.Controller.OverrideGravity(this, waterGravityScale);
             }
         }
 
@@ -30,7 +30,7 @@ namespace GameplayKit.Movement
             if (IsWater(other))
             {
                 IsInWater = false;
-                Character.Controller.Rigidbody.gravityScale = Character.Controller.DefaultGravityScale;
+                Character.Controller.ReleaseGravity(this);
             }
         }
 

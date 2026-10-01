@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace GameplayKit.Health
 {
-    /// <summary>Aplica un impulso de retroceso y bloquea brevemente las abilities al recibir un golpe.</summary>
+    /// <summary>Aplica un impulso de retroceso y pausa brevemente las habilidades al recibir un golpe,
+    /// para que el input no anule el empujón.</summary>
     [RequireComponent(typeof(Rigidbody2D))]
     public class CharacterKnockback : MonoBehaviour
     {
@@ -12,13 +13,13 @@ namespace GameplayKit.Health
         [SerializeField] private float lockoutDuration = 0.2f;
 
         private Rigidbody2D _rb;
-        private AbilityBase[] _abilities;
+        private CharacterCore _character;
         private Coroutine _lockoutRoutine;
 
         private void Awake()
         {
             _rb = GetComponent<Rigidbody2D>();
-            _abilities = GetComponentsInChildren<AbilityBase>();
+            _character = GetComponent<CharacterCore>();
         }
 
         public void ApplyKnockback(Vector2 direction, float force)
@@ -30,43 +31,24 @@ namespace GameplayKit.Health
 
             if (lockoutDuration > 0f)
             {
-                if (_lockoutRoutine != null) { StopCoroutine(_lockoutRoutine); SetAbilitiesEnabled(true); }
+                if (_lockoutRoutine != null) StopCoroutine(_lockoutRoutine);
                 _lockoutRoutine = StartCoroutine(LockoutRoutine());
             }
         }
 
         private IEnumerator LockoutRoutine()
         {
-            SetAbilitiesEnabled(false);
+            if (_character == null) _character = GetComponent<CharacterCore>();
+            if (_character != null) _character.Suspend(this);
             yield return new WaitForSeconds(lockoutDuration);
-            SetAbilitiesEnabled(true);
+            if (_character != null) _character.Resume(this);
             _lockoutRoutine = null;
         }
 
-        private bool[] _enabledBeforeLockout;
-
-        // Al terminar se restaura el estado previo de cada habilidad, no "todas activas": así no se
-        // reactivan habilidades que el juego (o CharacterCore, por un error) había desactivado.
-        private void SetAbilitiesEnabled(bool enabled)
+        private void OnDisable()
         {
-            if (!enabled)
-            {
-                _enabledBeforeLockout = new bool[_abilities.Length];
-                for (int i = 0; i < _abilities.Length; i++)
-                {
-                    if (_abilities[i] == null) continue;
-                    _enabledBeforeLockout[i] = _abilities[i].AbilityEnabled;
-                    _abilities[i].AbilityEnabled = false;
-                }
-            }
-            else if (_enabledBeforeLockout != null)
-            {
-                for (int i = 0; i < _abilities.Length; i++)
-                {
-                    if (_abilities[i] != null) _abilities[i].AbilityEnabled = _enabledBeforeLockout[i];
-                }
-                _enabledBeforeLockout = null;
-            }
+            if (_character != null) _character.Resume(this);
+            _lockoutRoutine = null;
         }
     }
 }

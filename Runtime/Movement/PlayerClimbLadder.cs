@@ -26,7 +26,7 @@ namespace GameplayKit.Movement
             if (IsLadder(other))
             {
                 _touchingLadder = false;
-                if (IsOnLadder) Character.Controller.Rigidbody.gravityScale = Character.Controller.DefaultGravityScale;
+                if (IsOnLadder) Character.Controller.ReleaseGravity(this);
                 IsOnLadder = false;
             }
         }
@@ -41,19 +41,19 @@ namespace GameplayKit.Movement
             if (Mathf.Abs(CharacterInput.MoveInput.y) > 0.1f) IsOnLadder = true;
             if (!IsOnLadder) return;
 
-            Character.Controller.Rigidbody.gravityScale = 0f;
+            Character.Controller.OverrideGravity(this, 0f);
             Character.Controller.Move(new Vector2(Character.Controller.Velocity.x, CharacterInput.MoveInput.y * climbSpeed));
 
             if (Character.Controller.IsGrounded && CharacterInput.MoveInput.y < 0f)
             {
                 IsOnLadder = false;
-                Character.Controller.Rigidbody.gravityScale = Character.Controller.DefaultGravityScale;
+                Character.Controller.ReleaseGravity(this);
             }
         }
 
         public override void ResetAbility()
         {
-            Character.Controller.Rigidbody.gravityScale = Character.Controller.DefaultGravityScale;
+            Character.Controller.ReleaseGravity(this);
         }
     }
 

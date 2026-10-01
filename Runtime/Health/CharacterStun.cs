@@ -5,8 +5,8 @@ using UnityEngine;
 namespace GameplayKit.Health
 {
     /// <summary>
-    /// Aturde al personaje: desactiva temporalmente todas sus abilities y marca ConditionState.Stunned.
-    /// No requiere CharacterCore (funciona con solo un Rigidbody2D), pero si existe lo usa para el estado.
+    /// Aturde al personaje: pausa sus habilidades y marca ConditionState.Stunned durante un tiempo.
+    /// Sin CharacterCore solo expone IsStunned (útil para enemigos con scripts propios).
     /// </summary>
     public class CharacterStun : MonoBehaviour
     {
@@ -15,13 +15,11 @@ namespace GameplayKit.Health
         public bool IsStunned { get; private set; }
 
         private CharacterCore _character;
-        private AbilityBase[] _abilities;
         private Coroutine _stunRoutine;
 
         private void Awake()
         {
             _character = GetComponent<CharacterCore>();
-            _abilities = GetComponentsInChildren<AbilityBase>();
         }
 
         public void Stun() => Stun(defaultStunDuration);
@@ -35,27 +33,31 @@ namespace GameplayKit.Health
         private IEnumerator StunRoutine(float duration)
         {
             IsStunned = true;
-            if (_character != null) _character.Condition.ChangeState(ConditionState.Stunned);
-            SetAbilitiesEnabled(false);
+            if (_character == null) _character = GetComponent<CharacterCore>();
+            if (_character != null)
+            {
+                _character.Condition.ChangeState(ConditionState.Stunned);
+                _character.Suspend(this);
+            }
 
             yield return new WaitForSeconds(duration);
 
-            SetAbilitiesEnabled(true);
-            if (_character != null && _character.Condition.CurrentState == ConditionState.Stunned)
+            if (_character != null)
             {
-                _character.Condition.ChangeState(ConditionState.Normal);
+                _character.Resume(this);
+                if (_character.Condition.CurrentState == ConditionState.Stunned)
+                    _character.Condition.ChangeState(ConditionState.Normal);
             }
-
             IsStunned = false;
             _stunRoutine = null;
         }
 
-        private void SetAbilitiesEnabled(bool enabled)
+        private void OnDisable()
         {
-            foreach (var ability in _abilities)
-            {
-                if (ability != null) ability.AbilityEnabled = enabled;
-            }
+            // Si se desactiva a mitad del aturdimiento, no dejar al personaje pausado para siempre.
+            if (_character != null) _character.Resume(this);
+            IsStunned = false;
+            _stunRoutine = null;
         }
     }
 }

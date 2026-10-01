@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using GameplayKit.Core;
 using UnityEngine;
 
@@ -34,6 +35,21 @@ namespace GameplayKit.Tests
         public void TapDash() => _dashQueued = true;
         public void TapInteract() => _interactQueued = true;
 
+        // Acciones: se "mantienen" con Hold/Release o se pulsan un frame con TapAction.
+        private readonly HashSet<CharacterAction> _held = new HashSet<CharacterAction>();
+        private readonly HashSet<CharacterAction> _previousHeld = new HashSet<CharacterAction>();
+        private readonly HashSet<CharacterAction> _tapQueued = new HashSet<CharacterAction>();
+        private readonly HashSet<CharacterAction> _down = new HashSet<CharacterAction>();
+        private readonly HashSet<CharacterAction> _up = new HashSet<CharacterAction>();
+
+        public void Hold(CharacterAction action) => _held.Add(action);
+        public void Release(CharacterAction action) => _held.Remove(action);
+        public void TapAction(CharacterAction action) => _tapQueued.Add(action);
+
+        public bool GetActionDown(CharacterAction action) => _down.Contains(action);
+        public bool GetAction(CharacterAction action) => _held.Contains(action) || _down.Contains(action);
+        public bool GetActionUp(CharacterAction action) => _up.Contains(action);
+
         private void Update()
         {
             JumpPressedThisFrame = Jump && !_previousJump;
@@ -44,6 +60,14 @@ namespace GameplayKit.Tests
             _dashQueued = false;
             InteractPressedThisFrame = _interactQueued;
             _interactQueued = false;
+
+            _down.Clear(); _up.Clear();
+            foreach (var a in _held) if (!_previousHeld.Contains(a)) _down.Add(a);
+            foreach (var a in _previousHeld) if (!_held.Contains(a)) _up.Add(a);
+            foreach (var a in _tapQueued) _down.Add(a);
+            _tapQueued.Clear();
+            _previousHeld.Clear();
+            foreach (var a in _held) _previousHeld.Add(a);
         }
     }
 
@@ -80,6 +104,23 @@ namespace GameplayKit.Tests
             input = go.AddComponent<ScriptedCharacterInput>();
             foreach (var ability in abilities) go.AddComponent(ability);
             return go.AddComponent<CharacterCore>();
+        }
+
+        /// <summary>Asigna un campo [SerializeField] privado, como lo haría el Inspector.</summary>
+        public static void Set(object target, string field, object value)
+        {
+            FieldInfo info = null;
+            for (var type = target.GetType(); type != null && info == null; type = type.BaseType)
+                info = type.GetField(field, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            if (info == null) throw new ArgumentException($"No existe el campo {field} en {target.GetType().Name}");
+            info.SetValue(target, value);
+        }
+
+        public GameObject Point(Vector2 position)
+        {
+            var go = Track(new GameObject("Point"));
+            go.transform.position = position;
+            return go;
         }
 
         public void Dispose()

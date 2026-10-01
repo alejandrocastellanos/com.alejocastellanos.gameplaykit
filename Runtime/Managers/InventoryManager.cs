@@ -28,6 +28,7 @@ namespace GameplayKit.Managers
         }
 
         // --- IKeyHolder ---
+        public void AddKey(string keyId) => AddItem(keyId);
         public bool HasKey(string keyId) => HasItem(keyId);
         public void RemoveKey(string keyId) => RemoveItem(keyId);
     }

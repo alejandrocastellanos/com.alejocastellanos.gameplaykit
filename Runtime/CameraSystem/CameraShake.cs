@@ -3,43 +3,43 @@ using UnityEngine;
 
 namespace GameplayKit.CameraSystem
 {
-    /// <summary>Sacude la cámara al recibir un evento externo (daño, explosión, aterrizaje fuerte).</summary>
+    /// <summary>Sacude la cámara al recibir un evento externo (daño, explosión, aterrizaje fuerte).
+    /// El temblor se suma encima de lo que haga CameraFollow/CameraBounds y se retira al frame siguiente,
+    /// así nunca devuelve la cámara a una posición vieja.</summary>
+    [DefaultExecutionOrder(100)]
     public class CameraShake : MonoBehaviour
     {
         [Header("Shake")]
         [SerializeField] private float defaultDuration = 0.2f;
         [SerializeField] private float defaultMagnitude = 0.15f;
 
-        private Vector3 _originalLocalPosition;
-        private Coroutine _shakeRoutine;
+        public bool IsShaking => _remaining > 0f;
 
-        private void Awake()
-        {
-            _originalLocalPosition = transform.localPosition;
-        }
+        private float _remaining;
+        private float _magnitude;
+        private Vector3 _appliedOffset;
 
         public void Shake() => Shake(defaultDuration, defaultMagnitude);
 
         public void Shake(float duration, float magnitude)
         {
-            if (_shakeRoutine != null) StopCoroutine(_shakeRoutine);
-            _shakeRoutine = StartCoroutine(ShakeRoutine(duration, magnitude));
+            _remaining = Mathf.Max(_remaining, duration);
+            _magnitude = Mathf.Max(IsShaking ? _magnitude : 0f, magnitude);
         }
 
-        private IEnumerator ShakeRoutine(float duration, float magnitude)
+        private void Update()
         {
-            float elapsed = 0f;
-            while (elapsed < duration)
-            {
-                Vector2 offset = Random.insideUnitCircle * magnitude;
-                transform.localPosition = _originalLocalPosition + (Vector3)offset;
+            // Se quita el temblor del frame anterior antes de que el seguimiento calcule la nueva posición.
+            transform.position -= _appliedOffset;
+            _appliedOffset = Vector3.zero;
+        }
 
-                elapsed += Time.deltaTime;
-                yield return null;
-            }
-
-            transform.localPosition = _originalLocalPosition;
-            _shakeRoutine = null;
+        private void LateUpdate()
+        {
+            if (_remaining <= 0f) return;
+            _remaining -= Time.unscaledDeltaTime;
+            _appliedOffset = (Vector3)(Random.insideUnitCircle * _magnitude);
+            transform.position += _appliedOffset;
         }
     }
 }

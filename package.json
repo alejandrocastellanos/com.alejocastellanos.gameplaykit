@@ -2,14 +2,29 @@
   "name": "com.alejocastellanos.gameplaykit",
   "version": "0.1.0",
   "displayName": "Gameplay Kit",
-  "description": "Kit modular de scripts de gameplay (movimiento de personaje, IA de enemigos, interactuables) pensado para agregarse por componente en cualquier proyecto de Unity.",
+  "description": "Kit modular de gameplay 2D (movimiento, combate, vida, IA, entorno, cámara, managers y UI) pensado para armarse por componentes desde Add Component, con menús para crear un jugador o una escena demo listos para jugar.",
   "unity": "6000.0",
   "dependencies": {
+    "com.unity.modules.ai": "1.0.0",
+    "com.unity.modules.physics2d": "1.0.0",
     "com.unity.modules.ui": "1.0.0",
     "com.unity.ugui": "1.0.0"
   },
-  "keywords": ["gameplay", "character-controller", "ai", "platformer", "topdown"],
+  "keywords": [
+    "gameplay",
+    "character-controller",
+    "ai",
+    "platformer",
+    "topdown"
+  ],
   "author": {
     "name": "Alejandro Castellanos"
-  }
+  },
+  "samples": [
+    {
+      "displayName": "Demo 2D",
+      "description": "Nivel corto que recorre las mecánicas principales: plataformas, enemigo, pinchos, checkpoint, escalera, llave y puerta, agua, cinta, palanca con elevador, HUD y pausa.",
+      "path": "Samples~/Demo"
+    }
+  ]
 }

@@ -56,7 +56,4 @@ namespace GameplayKit.Movement
             Character.Controller.ReleaseGravity(this);
         }
     }
-
-    /// <summary>Marca un trigger como escalera para PlayerClimbLadder (no hace falta crear tags).</summary>
-    public class LadderZone : MonoBehaviour { }
 }

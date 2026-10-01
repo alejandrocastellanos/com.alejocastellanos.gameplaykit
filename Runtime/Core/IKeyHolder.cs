@@ -6,6 +6,7 @@ namespace GameplayKit.Core
     /// </summary>
     public interface IKeyHolder
     {
+        void AddKey(string keyId);
         bool HasKey(string keyId);
         void RemoveKey(string keyId);
     }

@@ -4,6 +4,7 @@ namespace GameplayKit.CameraSystem
 {
     /// <summary>Limita el recorrido de la cámara a un rectángulo (los bordes del nivel), respetando el tamaño ortográfico.</summary>
     [RequireComponent(typeof(Camera))]
+    [DefaultExecutionOrder(50)] // después de CameraFollow, para que el límite gane
     public class CameraBounds : MonoBehaviour
     {
         [Header("Límites del nivel")]
@@ -20,6 +21,7 @@ namespace GameplayKit.CameraSystem
         private void LateUpdate()
         {
             if (!_camera.orthographic) return;
+            if (maxBounds.x <= minBounds.x || maxBounds.y <= minBounds.y) return; // sin configurar: no limita
 
             float halfHeight = _camera.orthographicSize;
             float halfWidth = halfHeight * _camera.aspect;

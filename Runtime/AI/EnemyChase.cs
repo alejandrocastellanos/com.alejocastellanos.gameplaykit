@@ -3,7 +3,8 @@ using UnityEngine;
 
 namespace GameplayKit.AI
 {
-    /// <summary>Persigue a un objetivo (normalmente el jugador) mientras esté dentro de rango de detección.</summary>
+    /// <summary>Persigue a un objetivo (normalmente el jugador) mientras esté dentro de rango de detección.
+    /// En plataformas se mueve solo en X; con Move Vertically (juegos top-down) persigue en las dos direcciones.</summary>
     [RequireComponent(typeof(Rigidbody2D))]
     public class EnemyChase : MonoBehaviour
     {
@@ -13,6 +14,8 @@ namespace GameplayKit.AI
         [SerializeField] private float detectionRange = 8f;
         [SerializeField] private float speed = 3f;
         [SerializeField] private float stoppingDistance = 0.5f;
+        [Tooltip("Top-down: persigue también en Y y desactiva la gravedad del Rigidbody2D.")]
+        [SerializeField] private bool moveVertically = false;
 
         public bool IsChasing { get; private set; }
 
@@ -25,6 +28,7 @@ namespace GameplayKit.AI
         private void Awake()
         {
             _rb = GetComponent<Rigidbody2D>();
+            if (moveVertically) _rb.gravityScale = 0f;
         }
 
         private void Update()
@@ -32,25 +36,33 @@ namespace GameplayKit.AI
             if (!PlayerLocator.Resolve(ref target, ref _nextTargetSearch))
             {
                 IsChasing = false;
-                _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
+                Stop();
                 return;
             }
 
-            float distance = Vector2.Distance(transform.position, target.position);
+            Vector2 toTarget = (Vector2)target.position - (Vector2)transform.position;
+            float distance = toTarget.magnitude;
             IsChasing = distance <= detectionRange;
 
             if (!IsChasing || distance <= stoppingDistance)
             {
-                _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
+                Stop();
                 return;
             }
 
-            float direction = Mathf.Sign(target.position.x - transform.position.x);
-            _rb.linearVelocity = new Vector2(direction * speed, _rb.linearVelocity.y);
+            float direction = Mathf.Sign(toTarget.x);
+            _rb.linearVelocity = moveVertically
+                ? toTarget.normalized * speed
+                : new Vector2(direction * speed, _rb.linearVelocity.y);
 
-            Vector3 scale = transform.localScale;
-            scale.x = Mathf.Abs(scale.x) * (direction >= 0 ? 1f : -1f);
-            transform.localScale = scale;
+            if (Mathf.Abs(toTarget.x) > 0.05f)
+            {
+                Vector3 scale = transform.localScale;
+                scale.x = Mathf.Abs(scale.x) * (direction >= 0 ? 1f : -1f);
+                transform.localScale = scale;
+            }
         }
+
+        private void Stop() => _rb.linearVelocity = moveVertically ? Vector2.zero : new Vector2(0f, _rb.linearVelocity.y);
     }
 }

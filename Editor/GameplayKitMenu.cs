@@ -64,6 +64,14 @@ namespace GameplayKit.Editor
             EditorUtility.DisplayDialog("Gameplay Kit", $"Escena demo creada en {path}.\n\nControles: A/D mover, Espacio saltar, Shift correr, Q dash, J atacar, E interactuar, Esc pausa.", "OK");
         }
 
+        [MenuItem("GameplayKit/Create Top-Down Demo Scene", false, 41)]
+        private static void CreateTopDownDemoSceneMenu()
+        {
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            string path = BuildTopDownDemoScene(DemoFolder);
+            EditorUtility.DisplayDialog("Gameplay Kit", $"Escena demo top-down creada en {path}.\n\nControles: WASD o flechas mover, Shift correr, Q dash en 8 direcciones, J atacar, E interactuar, Esc pausa.", "OK");
+        }
+
         [MenuItem("GameObject/GameplayKit/Player", false, 10)]
         private static void CreatePlayerContext(MenuCommand command) => Place(BuildPlayer(SpawnPoint()), "Crear Player", command.context as GameObject);
 
@@ -384,6 +392,201 @@ namespace GameplayKit.Editor
             return path;
         }
 
+        // ------------------------------------------------------------------ Escena demo top-down
+
+        public static readonly Color FloorColor = new Color(0.19f, 0.21f, 0.27f);
+        public static readonly Color TurretColor = new Color(0.65f, 0.2f, 0.55f);
+
+        /// <summary>Enemigo top-down que persigue al jugador en 8 direcciones (sin gravedad), daña al tocar y se destruye al recibir daño.</summary>
+        public static GameObject BuildTopDownChaser(Vector2 position)
+        {
+            var go = new GameObject("Enemy Chaser");
+            go.transform.position = position;
+            AddVisual(go, new Vector2(0.8f, 0.8f), EnemyColor, 9);
+            go.AddComponent<CircleCollider2D>().radius = 0.4f;
+            var rb = go.AddComponent<Rigidbody2D>();
+            rb.gravityScale = 0f;
+            rb.freezeRotation = true;
+            rb.linearDamping = 2f;
+            var chase = go.AddComponent<EnemyChase>();
+            SetBool(chase, "moveVertically", true);
+            SetFloatOrInt(chase, "detectionRange", 7f);
+            SetFloatOrInt(chase, "speed", 2.5f);
+            SetFloatOrInt(chase, "stoppingDistance", 0.2f);
+            go.AddComponent<EnemyMeleeOnContact>();
+            SetFloatOrInt(go.AddComponent<DamageableObject>(), "maxHealth", 30f);
+            go.AddComponent<DamageFlash>();
+            go.AddComponent<DamagePopupSpawner>();
+            return go;
+        }
+
+        /// <summary>Torreta fija que dispara proyectiles al jugador cuando lo ve en cualquier dirección.</summary>
+        public static GameObject BuildTurret(Vector2 position, ProjectileBehaviour bulletPrefab)
+        {
+            var go = new GameObject("Enemy Turret");
+            go.transform.position = position;
+            AddVisual(go, new Vector2(1f, 1f), TurretColor, 9);
+            go.AddComponent<BoxCollider2D>().size = new Vector2(1f, 1f);
+            var weapon = go.AddComponent<WeaponProjectile>();
+            if (bulletPrefab != null) SetRef(weapon, "projectilePrefab", bulletPrefab);
+            SetFloatOrInt(weapon, "projectileSpeed", 7f);
+            SetFloatOrInt(weapon, "damage", 10f);
+            var shooter = go.AddComponent<EnemyShootOnSight>();
+            SetFloatOrInt(shooter, "sightAngle", 360f);
+            SetFloatOrInt(shooter, "sightRange", 9f);
+            SetFloatOrInt(shooter, "fireInterval", 1.4f);
+            SetFloatOrInt(go.AddComponent<DamageableObject>(), "maxHealth", 40f);
+            go.AddComponent<DamageFlash>();
+            go.AddComponent<DamagePopupSpawner>();
+            return go;
+        }
+
+        /// <summary>Proyectil para las torretas: trigger pequeño sin gravedad.</summary>
+        public static GameObject BuildBullet()
+        {
+            var go = new GameObject("Bullet");
+            AddVisual(go, new Vector2(0.3f, 0.3f), new Color(1f, 0.85f, 0.2f), 15);
+            var col = go.AddComponent<CircleCollider2D>();
+            col.radius = 0.15f;
+            col.isTrigger = true;
+            var rb = go.AddComponent<Rigidbody2D>();
+            rb.gravityScale = 0f;
+            go.AddComponent<ProjectileBehaviour>();
+            return go;
+        }
+
+        /// <summary>Crea (y guarda) un pequeño dungeon visto desde arriba que recorre las mecánicas top-down del kit.
+        /// No toca otras escenas ni prefabs de la carpeta. Devuelve la ruta de la escena.</summary>
+        public static string BuildTopDownDemoScene(string folder)
+        {
+            EnsureFolder(folder);
+            EnsureFolder(folder + "/Prefabs");
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+
+            var level = new GameObject("Level").transform;
+            Transform Add(GameObject g) { g.transform.SetParent(level, true); return g.transform; }
+            void Wall(string name, float minX, float minY, float maxX, float maxY) =>
+                Add(BuildBlock(name, new Vector2((minX + maxX) * 0.5f, (minY + maxY) * 0.5f), new Vector2(maxX - minX, maxY - minY), GroundColor));
+            void Floor(string name, float minX, float minY, float maxX, float maxY)
+            {
+                var floor = new GameObject(name);
+                floor.transform.position = new Vector2((minX + maxX) * 0.5f, (minY + maxY) * 0.5f);
+                AddVisual(floor, new Vector2(maxX - minX, maxY - minY), FloorColor, -10);
+                Add(floor);
+            }
+            GameObject Trigger(string name, Vector2 center, Vector2 size, Color color, int order = 5) =>
+                Add(BuildBlock(name, center, size, color, trigger: true, order: order)).gameObject;
+
+            // Sala A (inicio): x -10..10, y -7..7, salida a la derecha
+            Floor("Floor_RoomA", -10f, -7f, 10f, 7f);
+            Wall("RoomA_Left", -11f, -8f, -10f, 8f);
+            Wall("RoomA_Top", -11f, 7f, 11f, 8f);
+            Wall("RoomA_Bottom", -11f, -8f, 11f, -7f);
+            Wall("RoomA_RightUpper", 10f, 1.5f, 11f, 7f);
+            Wall("RoomA_RightLower", 10f, -7f, 11f, -1.5f);
+
+            // Pasillo con pinchos: x 11..22, y -1.5..1.5
+            Floor("Floor_Corridor", 10f, -1.5f, 23f, 1.5f);
+            Wall("Corridor_Top", 11f, 1.5f, 22f, 2.5f);
+            Wall("Corridor_Bottom", 11f, -2.5f, 22f, -1.5f);
+            Trigger("Spikes", new Vector2(15.5f, 0f), new Vector2(3f, 3f), new Color(0.85f, 0.2f, 0.6f, 0.8f), order: -5).AddComponent<HazardZone>();
+
+            // Sala B (arena): x 23..43, y -8..8, puerta con llave arriba
+            Floor("Floor_RoomB", 23f, -8f, 43f, 8f);
+            Wall("RoomB_LeftUpper", 22f, 1.5f, 23f, 9f);
+            Wall("RoomB_LeftLower", 22f, -9f, 23f, -1.5f);
+            Wall("RoomB_Right", 43f, -9f, 44f, 9f);
+            Wall("RoomB_Bottom", 22f, -9f, 44f, -8f);
+            Wall("RoomB_TopLeft", 22f, 8f, 31f, 9f);
+            Wall("RoomB_TopRight", 35f, 8f, 44f, 9f);
+            Wall("Pillar_A", 28f, 2f, 29.5f, 3.5f);
+            Wall("Pillar_B", 36f, -3.5f, 37.5f, -2f);
+
+            // Sala C (tesoro): x 27..39, y 9..19, con reja que abre una palanca
+            Floor("Floor_RoomC", 27f, 8f, 39f, 19f);
+            Wall("RoomC_Left", 26f, 9f, 27f, 20f);
+            Wall("RoomC_Right", 39f, 9f, 40f, 20f);
+            Wall("RoomC_Top", 26f, 19f, 40f, 20f);
+            Wall("RoomC_InnerLeft", 27f, 15f, 32f, 16f);
+            Wall("RoomC_InnerRight", 34f, 15f, 39f, 16f);
+
+            // Puerta con llave entre B y C (como en la demo de plataformas: trigger + hoja que bloquea)
+            var door = BuildBlock("Door", new Vector2(33f, 8.5f), new Vector2(4f, 2.5f), new Color(0.5f, 0.3f, 0.15f), trigger: true);
+            var doorBlocker = BuildBlock("DoorBlocker", new Vector2(33f, 8.5f), new Vector2(4f, 1f), new Color(0.5f, 0.3f, 0.15f));
+            doorBlocker.transform.SetParent(door.transform, true);
+            door.GetComponentInChildren<SpriteRenderer>().enabled = false;
+            var doorComp = door.AddComponent<DoorWithKey>();
+            SetRef(doorComp, "blockingCollider", doorBlocker.GetComponent<Collider2D>());
+            SetRef(doorComp, "visualWhenClosed", doorBlocker);
+            Add(door);
+            Trigger("Key", new Vector2(40.5f, -6f), new Vector2(0.5f, 0.5f), new Color(1f, 0.8f, 0f)).AddComponent<ItemPickup>();
+
+            // Reja + palanca (Lever -> UnityEvent -> SetActive)
+            var gate = Add(BuildBlock("Gate", new Vector2(33f, 15.5f), new Vector2(2f, 1f), new Color(0.55f, 0.55f, 0.6f))).gameObject;
+            var lever = Trigger("Lever", new Vector2(29f, 11f), new Vector2(0.6f, 0.6f), new Color(0.9f, 0.5f, 0.1f)).AddComponent<Lever>();
+            AddBoolPersistentListener(lever, "onTurnedOn", gate.SetActive, false);
+            AddBoolPersistentListener(lever, "onTurnedOff", gate.SetActive, true);
+            var goal = Trigger("Goal", new Vector2(33f, 17.5f), new Vector2(0.8f, 0.8f), new Color(0.3f, 1f, 0.5f));
+            SetFloatOrInt(goal.AddComponent<Collectible>(), "value", 100);
+
+            // Teletransportes de ida y vuelta entre la sala C y la sala A
+            var tpA = Trigger("Teleporter_A", new Vector2(-8f, -5f), new Vector2(1f, 1f), new Color(0.5f, 0.3f, 1f, 0.8f), order: -5);
+            var tpC = Trigger("Teleporter_C", new Vector2(37f, 11f), new Vector2(1f, 1f), new Color(0.5f, 0.3f, 1f, 0.8f), order: -5);
+            var toC = new GameObject("Destination"); toC.transform.SetParent(tpA.transform); toC.transform.position = new Vector2(35.5f, 11f);
+            var toA = new GameObject("Destination"); toA.transform.SetParent(tpC.transform); toA.transform.position = new Vector2(-6.5f, -5f);
+            SetRef(tpA.AddComponent<Teleporter>(), "destination", toC.transform);
+            SetRef(tpC.AddComponent<Teleporter>(), "destination", toA.transform);
+
+            // Sala A: cajas rompibles, corazón, monedas; checkpoint al final del pasillo
+            foreach (var p in new[] { new Vector2(2f, 4.5f), new Vector2(3f, 4.5f), new Vector2(4f, 4.5f), new Vector2(3f, 5.5f) })
+                Add(BuildBlock("BreakableCrate", p, new Vector2(0.9f, 0.9f), new Color(0.7f, 0.5f, 0.25f))).gameObject.AddComponent<BreakableObject>();
+            Trigger("HealthPickup", new Vector2(6f, -4f), new Vector2(0.5f, 0.5f), new Color(1f, 0.35f, 0.5f)).AddComponent<HealthPickup>();
+            Trigger("Checkpoint", new Vector2(21f, 0f), new Vector2(0.6f, 3f), new Color(1f, 0.85f, 0.2f, 0.6f), order: -4).AddComponent<Checkpoint>();
+            foreach (var p in new[] { new Vector2(-4f, 3f), new Vector2(-2f, 3f), new Vector2(0f, 3f), new Vector2(-3f, -3f), new Vector2(26f, 6f), new Vector2(41f, 6.5f), new Vector2(25f, -6f), new Vector2(31f, 17.5f), new Vector2(35f, 17.5f) })
+                Trigger("Coin", p, new Vector2(0.4f, 0.4f), new Color(1f, 0.85f, 0.1f)).AddComponent<Collectible>();
+
+            // Enemigos de la sala B
+            var bulletPrefab = SavePrefab(BuildBullet(), folder + "/Prefabs/TopDownBullet.prefab").GetComponent<ProjectileBehaviour>();
+            var chaserPrefab = SavePrefab(BuildTopDownChaser(Vector2.zero), folder + "/Prefabs/TopDownChaser.prefab");
+            var turretPrefab = SavePrefab(BuildTurret(Vector2.zero, bulletPrefab), folder + "/Prefabs/TopDownTurret.prefab");
+            Add(InstantiatePrefab(chaserPrefab, new Vector2(32f, 5f)));
+            Add(InstantiatePrefab(chaserPrefab, new Vector2(39f, -4f)));
+            Add(InstantiatePrefab(turretPrefab, new Vector2(41.5f, 6.5f)));
+
+            var patroller = new GameObject("Enemy Patroller");
+            patroller.transform.position = new Vector2(30f, -6f);
+            AddVisual(patroller, new Vector2(0.9f, 0.9f), EnemyColor, 9);
+            patroller.AddComponent<BoxCollider2D>().size = new Vector2(0.9f, 0.9f);
+            var patrolRb = patroller.AddComponent<Rigidbody2D>();
+            patrolRb.gravityScale = 0f;
+            patrolRb.freezeRotation = true;
+            var leftBound = new GameObject("LeftBound"); leftBound.transform.SetParent(patroller.transform); leftBound.transform.position = new Vector2(25f, -6f);
+            var rightBound = new GameObject("RightBound"); rightBound.transform.SetParent(patroller.transform); rightBound.transform.position = new Vector2(37f, -6f);
+            var patrol = patroller.AddComponent<EnemyPatrolWithinBounds>();
+            SetRef(patrol, "leftBound", leftBound.transform);
+            SetRef(patrol, "rightBound", rightBound.transform);
+            patroller.AddComponent<EnemyMeleeOnContact>();
+            patroller.AddComponent<DamageableObject>();
+            patroller.AddComponent<DamageFlash>();
+            patroller.AddComponent<DamagePopupSpawner>();
+            Add(patroller);
+
+            // Jugador, cámara, managers y HUD
+            var playerPrefab = SavePrefab(BuildTopDownPlayer(new Vector2(-6f, 0f)), folder + "/Prefabs/TopDownPlayer.prefab");
+            var player = InstantiatePrefab(playerPrefab, new Vector2(-6f, 0f));
+            var cam = BuildCamera(player.transform);
+            cam.orthographicSize = 7f;
+            var bounds = cam.gameObject.AddComponent<CameraBounds>();
+            SetVector2(bounds, "minBounds", new Vector2(-11f, -9f));
+            SetVector2(bounds, "maxBounds", new Vector2(44f, 20f));
+            BuildManagers();
+            BuildHud(player.GetComponent<CharacterHealth>());
+
+            string path = AssetDatabase.GenerateUniqueAssetPath(folder + "/GameplayKitTopDownDemo.unity");
+            EditorSceneManager.SaveScene(scene, path);
+            return path;
+        }
+
         // ------------------------------------------------------------------ Utilidades
 
         private static Sprite Square()
@@ -463,6 +666,20 @@ namespace GameplayKit.Editor
             if (prop.propertyType == SerializedPropertyType.Integer) prop.intValue = Mathf.RoundToInt(value);
             else prop.floatValue = value;
             so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void SetBool(UnityEngine.Object target, string field, bool value)
+        {
+            var so = new SerializedObject(target);
+            so.FindProperty(field).boolValue = value;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void AddBoolPersistentListener(UnityEngine.Object target, string eventField, UnityAction<bool> call, bool argument)
+        {
+            var field = target.GetType().GetField(eventField, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+            UnityEventTools.AddBoolPersistentListener((UnityEvent)field.GetValue(target), call, argument);
+            EditorUtility.SetDirty(target);
         }
 
         private static void AddPersistentListener(UnityEngine.Object target, string eventField, UnityAction call)

@@ -53,7 +53,12 @@ water, a conveyor belt, a lever with an elevator, a health pickup, the HUD and t
 - **GameplayKit → Create Demo Scene** builds the level and saves it as
   `Assets/GameplayKitDemo/GameplayKitDemo.unity`, with `Player` and `Enemy` prefabs in
   `Assets/GameplayKitDemo/Prefabs`. It asks you to save the current scene first.
-- The same level is listed as a sample: **Package Manager → Gameplay Kit → Samples → Demo 2D →
+- **GameplayKit → Create Top-Down Demo Scene** builds a small top-down dungeon and saves it as
+  `Assets/GameplayKitDemo/GameplayKitTopDownDemo.unity` (prefabs `TopDownPlayer`, `TopDownChaser`,
+  `TopDownTurret` and `TopDownBullet`). It never touches the platformer scene: 8-direction movement and
+  dash, chasing enemies, a turret, a patrol, spikes, breakable crates, a key and a locked door, a lever
+  that opens a gate, teleporters, a checkpoint, the HUD and the pause menu.
+- Both levels are listed as a sample: **Package Manager → Gameplay Kit → Samples → Demo 2D →
   Import**.
 
 Open the scene and press Play.
@@ -72,7 +77,8 @@ centre of the Scene view, selected, and can be undone with ++ctrl+z++.
 | **Create 2D Camera** | An orthographic `Main Camera` (size 6) with [CameraFollow](../components/camera/CameraFollow.md) and [CameraShake](../components/camera/CameraShake.md). It follows whatever is tagged `Player`. |
 | **Create Managers** | A `Managers` object with [ScoreManager](../components/managers/ScoreManager.md) and [PauseManager](../components/managers/PauseManager.md). |
 | **Create HUD** | A canvas with a health bar, a score text and a pause menu (resume / restart), plus an `EventSystem` if the scene has none. |
-| **Create Demo Scene** | The demo level described above. |
+| **Create Demo Scene** | The platformer demo level described above. |
+| **Create Top-Down Demo Scene** | The top-down demo dungeon described above. |
 
 **Player** and **Enemy** are also available from the Hierarchy context menu (right-click →
 **GameplayKit**), which parents them to the object you clicked.

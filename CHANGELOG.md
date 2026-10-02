@@ -13,6 +13,9 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
   del Inspector.
 - Helper `PlayerLocator` y propiedades públicas `Target` en `EnemyChase`, `EnemyFlee` y `EnemyShootOnSight`.
 - Campos `force` y `upwardLift` en `CharacterKnockback` y `swingDamping` en `PlayerRopeGrab`.
+- Escena demo top-down (**GameplayKit → Create Top-Down Demo Scene**, también en el sample Demo): dungeon
+  de tres salas con perseguidores, torreta, patrulla, pinchos, llave y puerta, palanca con reja y
+  teletransportes. Opción **Move Vertically** en `EnemyChase` y `EnemyFlee` para enemigos top-down.
 
 ### Corregido
 

@@ -22,7 +22,8 @@ en:
   fields:
     target: What to run away from. Empty means the GameObject tagged `Player`, found automatically.
     fleeRange: Radius in units; while the target is closer than this, the creature flees.
-    speed: Horizontal flee speed in units per second.
+    speed: Flee speed in units per second (horizontal, or in any direction with Move Vertically).
+    moveVertically: Top-down mode. Runs straight away from the target on both axes and sets the `Rigidbody2D` Gravity Scale to 0 on Awake. Leave it off for platformers.
   api:
     IsFleeing: True while the target is within **Flee Range**.
     Target: Gets or sets what the creature runs from at runtime. `null` goes back to the `Player`-tagged object.
@@ -70,7 +71,8 @@ es:
   fields:
     target: De qué huir. Vacío significa el GameObject con tag `Player`, que se busca solo.
     fleeRange: Radio en unidades; mientras el objetivo esté más cerca, la criatura huye.
-    speed: Velocidad horizontal de huida en unidades por segundo.
+    speed: Velocidad de huida en unidades por segundo (horizontal, o en cualquier dirección con Move Vertically).
+    moveVertically: Modo top-down. Huye en línea recta lejos del objetivo en los dos ejes y pone en 0 el Gravity Scale del `Rigidbody2D` en Awake. Déjalo apagado en juegos de plataformas.
   api:
     IsFleeing: Verdadero mientras el objetivo está dentro de **Flee Range**.
     Target: Lee o cambia de qué huye la criatura en runtime. `null` vuelve al objeto con tag `Player`.

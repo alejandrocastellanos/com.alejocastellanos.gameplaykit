@@ -15,6 +15,8 @@ Inspector, vive en `Documentation~/` y se publica en GitHub Pages con el workflo
 ## Empezar en un minuto
 
 - **GameplayKit → Create Demo Scene** genera un nivel jugable que recorre las mecánicas principales.
+- **GameplayKit → Create Top-Down Demo Scene** genera un dungeon visto desde arriba con el jugador top-down,
+  enemigos que persiguen en 8 direcciones, torreta, llave y puerta, palanca y teletransportes.
   También está como sample: *Package Manager → Gameplay Kit → Samples → Demo 2D → Import*.
 - **GameplayKit → Create Player / Create Top-Down Player / Create Enemy / Create Platform / Create 2D Camera / Create Managers / Create HUD**
   crean objetos listos para usar (también con clic derecho en la jerarquía → *GameplayKit*).

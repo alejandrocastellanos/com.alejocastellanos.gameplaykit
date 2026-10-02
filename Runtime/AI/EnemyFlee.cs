@@ -3,7 +3,8 @@ using UnityEngine;
 
 namespace GameplayKit.AI
 {
-    /// <summary>Huye del objetivo mientras esté dentro de rango — útil para criaturas neutrales o cobardes.</summary>
+    /// <summary>Huye del objetivo mientras esté dentro de rango — útil para criaturas neutrales o cobardes.
+    /// En plataformas se mueve solo en X; con Move Vertically (juegos top-down) huye en las dos direcciones.</summary>
     [RequireComponent(typeof(Rigidbody2D))]
     public class EnemyFlee : MonoBehaviour
     {
@@ -12,6 +13,8 @@ namespace GameplayKit.AI
         [SerializeField] private Transform target;
         [SerializeField] private float fleeRange = 6f;
         [SerializeField] private float speed = 3.5f;
+        [Tooltip("Top-down: huye también en Y y desactiva la gravedad del Rigidbody2D.")]
+        [SerializeField] private bool moveVertically = false;
 
         public bool IsFleeing { get; private set; }
 
@@ -24,6 +27,7 @@ namespace GameplayKit.AI
         private void Awake()
         {
             _rb = GetComponent<Rigidbody2D>();
+            if (moveVertically) _rb.gravityScale = 0f;
         }
 
         private void Update()
@@ -31,24 +35,28 @@ namespace GameplayKit.AI
             if (!PlayerLocator.Resolve(ref target, ref _nextTargetSearch))
             {
                 IsFleeing = false;
-                _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
+                Stop();
                 return;
             }
 
-            float distance = Vector2.Distance(transform.position, target.position);
-            IsFleeing = distance <= fleeRange;
+            Vector2 away = (Vector2)transform.position - (Vector2)target.position;
+            IsFleeing = away.magnitude <= fleeRange;
 
             if (!IsFleeing)
             {
-                _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
+                Stop();
                 return;
             }
 
-            float direction = Mathf.Sign(transform.position.x - target.position.x);
-            _rb.linearVelocity = new Vector2(direction * speed, _rb.linearVelocity.y);
+            float direction = away.x >= 0f ? 1f : -1f;
+            _rb.linearVelocity = moveVertically
+                ? (away.sqrMagnitude > 0.0001f ? away.normalized : Vector2.right) * speed
+                : new Vector2(direction * speed, _rb.linearVelocity.y);
             Vector3 scale = transform.localScale;
             scale.x = Mathf.Abs(scale.x) * direction; // mira hacia donde huye
             transform.localScale = scale;
         }
+
+        private void Stop() => _rb.linearVelocity = moveVertically ? Vector2.zero : new Vector2(0f, _rb.linearVelocity.y);
     }
 }

@@ -13,6 +13,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ### Agregado
 
+- Escena demo top-down (**GameplayKit → Create Top-Down Demo Scene**, también en el sample Demo) y opción **Move Vertically** en `EnemyChase` y `EnemyFlee` para enemigos top-down.
 - Sitio de documentación (MkDocs Material, inglés y español) en `Documentation~/`, publicado en GitHub Pages por `.github/workflows/docs.yml`, con un clip animado de cada componente.
 - Helper `PlayerLocator` y propiedades públicas `Target` en `EnemyChase`, `EnemyFlee` y `EnemyShootOnSight`.
 

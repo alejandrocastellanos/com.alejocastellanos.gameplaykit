@@ -25,8 +25,8 @@
   "license": "MIT",
   "samples": [
     {
-      "displayName": "Demo 2D",
-      "description": "Nivel corto que recorre las mecánicas principales: plataformas, plataforma de un sentido, enemigo, pinchos, checkpoint, escalera, llave y puerta, agua, cinta, palanca con elevador, pickup de vida, HUD y pausa.",
+      "displayName": "Demo 2D (plataformas y top-down)",
+      "description": "Dos escenas: un nivel de plataformas (plataforma de un sentido, enemigo, pinchos, checkpoint, escalera, llave y puerta, agua, cinta, palanca con elevador, pickup de vida) y un dungeon top-down (movimiento en 8 direcciones, dash, enemigos que persiguen, torreta, patrulla, pinchos, llave y puerta, palanca con reja y teletransportes), ambas con HUD y pausa.",
       "path": "Samples~/Demo"
     }
   ]

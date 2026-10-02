@@ -134,6 +134,19 @@ lo sigue con **Smooth Time** `0.2` y **Offset** `(0, 0, -10)`.
   jugador se mueve más rápido. Toma el control del **Size** de la cámara, entre su **Min Zoom**
   (`5`) y su **Max Zoom** (`8`).
 
+## Enemigos y el dungeon demo
+
+Marca **Move Vertically** en [EnemyChase](../components/ai/EnemyChase.md) o
+[EnemyFlee](../components/ai/EnemyFlee.md) y se moverán en los dos ejes sin gravedad. Un
+[EnemyShootOnSight](../components/ai/EnemyShootOnSight.md) quieto con **Sight Angle** en 360 funciona como
+torreta que dispara en cualquier dirección, y [EnemyPatrolWithinBounds](../components/ai/EnemyPatrolWithinBounds.md)
+patrulla un pasillo si su `Rigidbody2D` tiene Gravity Scale 0.
+
+**GameplayKit → Create Top-Down Demo Scene** arma todo esto en un dungeon de tres salas
+(`Assets/GameplayKitDemo/GameplayKitTopDownDemo.unity`) para que veas cómo se conectan las piezas: ábrelo
+y dale Play. Controles: ++w++ ++a++ ++s++ ++d++ o flechas para moverte, ++shift++ para correr, ++q++ para
+el dash, ++j++ para atacar, ++e++ para interactuar y ++esc++ para pausar.
+
 ## Siguientes pasos
 
 - [Input](input.md) — soporte para gamepad y fuentes de input propias.

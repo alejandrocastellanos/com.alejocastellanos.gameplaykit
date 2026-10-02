@@ -128,6 +128,19 @@ then follows with **Smooth Time** `0.2` and **Offset** `(0, 0, -10)`.
 - [CameraZoomBySpeed](../components/camera/CameraZoomBySpeed.md) zooms out as the player moves
   faster. It takes over the camera's **Size**, between its **Min Zoom** (`5`) and **Max Zoom** (`8`).
 
+## Enemies and the demo dungeon
+
+Tick **Move Vertically** on [EnemyChase](../components/ai/EnemyChase.md) or
+[EnemyFlee](../components/ai/EnemyFlee.md) and they move on both axes with no gravity. A static
+[EnemyShootOnSight](../components/ai/EnemyShootOnSight.md) with **Sight Angle** 360 works as a turret that
+fires in any direction, and [EnemyPatrolWithinBounds](../components/ai/EnemyPatrolWithinBounds.md) patrols a
+corridor if its `Rigidbody2D` has Gravity Scale 0.
+
+**GameplayKit → Create Top-Down Demo Scene** builds all of this into a three-room dungeon
+(`Assets/GameplayKitDemo/GameplayKitTopDownDemo.unity`) so you can see how the pieces are wired: open it
+and press Play. Controls: ++w++ ++a++ ++s++ ++d++ or arrows to move, ++shift++ to run, ++q++ to dash,
+++j++ to attack, ++e++ to interact and ++esc++ to pause.
+
 ## Next steps
 
 - [Input](input.md) — gamepad support and custom input sources.

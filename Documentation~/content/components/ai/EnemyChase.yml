@@ -10,6 +10,10 @@ en:
     it is within **Stopping Distance**. Outside the range, or while there is no target, it stands still.
     Only the X velocity of the `Rigidbody2D` is set, so gravity keeps working.
 
+    For top-down games tick **Move Vertically**: the enemy then moves straight towards the target on both
+    axes, with no gravity, and stops completely when it is close or loses the target. The top-down demo
+    scene uses it for its chasers.
+
     If **Target** is empty it looks for the GameObject tagged `Player` on its own (at most every half
     second, through `PlayerLocator`), so prefabs and enemies spawned at runtime work without a scene
     reference. It needs no `AIBrain`: drop it on an enemy and tag your player `Player`. Because it drives the velocity on
@@ -25,6 +29,7 @@ en:
     detectionRange: Radius in units within which the enemy notices and chases the target.
     speed: Horizontal chase speed in units per second.
     stoppingDistance: Distance at which the enemy stops moving towards the target.
+    moveVertically: Top-down mode. Chases on both axes (straight at the target) and sets the `Rigidbody2D` Gravity Scale to 0 on Awake. Leave it off for platformers.
   api:
     IsChasing: True while the target is within **Detection Range** (also while stopped next to it).
     Target: Gets or sets the current target from code. Set it to `null` to go back to the `Player`-tagged object.
@@ -56,6 +61,10 @@ es:
     al quedar dentro de **Stopping Distance**. Fuera del rango, o sin objetivo, se queda quieto. Solo se
     fija la velocidad X del `Rigidbody2D`, así que la gravedad sigue funcionando.
 
+    En juegos top-down marca **Move Vertically**: el enemigo avanza directo hacia el objetivo en los dos
+    ejes, sin gravedad, y se detiene por completo al estar cerca o perder el objetivo. La escena demo
+    top-down lo usa en sus perseguidores.
+
     Si **Target** está vacío, busca solo el GameObject con tag `Player` (como mucho cada medio segundo,
     con `PlayerLocator`), así los prefabs y los enemigos generados en runtime funcionan sin referencias a
     la escena. No necesita `AIBrain`: ponlo en un enemigo y ponle el tag `Player` a tu jugador. Como controla la velocidad por su
@@ -71,6 +80,7 @@ es:
     detectionRange: Radio en unidades dentro del cual el enemigo nota al objetivo y lo persigue.
     speed: Velocidad horizontal de persecución en unidades por segundo.
     stoppingDistance: Distancia a la que el enemigo deja de acercarse al objetivo.
+    moveVertically: Modo top-down. Persigue en los dos ejes (directo hacia el objetivo) y pone en 0 el Gravity Scale del `Rigidbody2D` en Awake. Déjalo apagado en juegos de plataformas.
   api:
     IsChasing: Verdadero mientras el objetivo está dentro de **Detection Range** (también mientras está detenido a su lado).
     Target: Lee o cambia el objetivo actual desde código. Ponlo en `null` para volver al objeto con tag `Player`.

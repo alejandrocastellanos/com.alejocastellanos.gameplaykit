@@ -88,7 +88,11 @@ Como paquete local (desarrollo), en el `Packages/manifest.json` del proyecto:
 Desde git, una vez publicado:
 
 ```
-"com.alejocastellanos.gameplaykit": "https://github.com/<usuario>/<repo>.git#v0.1.0"
+"com.alejocastellanos.gameplaykit": "https://github.com/<usuario>/<repo>.git#v1.0.0"
 ```
 
 Requiere Unity 6000.0 o superior.
+
+## Licencia
+
+MIT. Ver [LICENSE.md](LICENSE.md). Historial de cambios en [CHANGELOG.md](CHANGELOG.md).

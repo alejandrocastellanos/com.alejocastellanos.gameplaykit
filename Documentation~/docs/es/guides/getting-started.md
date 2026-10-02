@@ -55,8 +55,8 @@ de vida, el HUD y el menú de pausa.
   `Assets/GameplayKitDemo/Prefabs`. Antes te pide guardar la escena actual.
 - **GameplayKit → Create Top-Down Demo Scene** arma un pequeño dungeon visto desde arriba y lo guarda
   como `Assets/GameplayKitDemo/GameplayKitTopDownDemo.unity` (prefabs `TopDownPlayer`, `TopDownChaser`,
-  `TopDownTurret` y `TopDownBullet`). Nunca toca la escena de plataformas: movimiento y dash en 8
-  direcciones, enemigos que persiguen, una torreta, una patrulla, pinchos, cajas rompibles, llave y puerta,
+  `TopDownTurret`, `TopDownBullet` y `TopDownPlayerBullet`). Nunca toca la escena de plataformas: movimiento y
+  dash en 8 direcciones, una pistola que apunta con el mouse más una espada (se cambian con ++k++), enemigos que persiguen, una torreta, una patrulla, pinchos, cajas rompibles, llave y puerta,
   una palanca que abre una reja, teletransportes, checkpoint, HUD y menú de pausa.
 - El mismo nivel aparece como sample: **Package Manager → Gameplay Kit → Samples → Demo 2D →
   Import**.

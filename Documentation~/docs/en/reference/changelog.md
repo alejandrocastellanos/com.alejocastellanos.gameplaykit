@@ -13,7 +13,7 @@ All notable changes to this package are documented here. The format follows
 
 ### Added
 
-- Top-down demo scene (**GameplayKit → Create Top-Down Demo Scene**, also in the Demo sample) and a **Move Vertically** option on `EnemyChase` and `EnemyFlee` for top-down enemies.
+- Top-down demo scene (**GameplayKit → Create Top-Down Demo Scene**, also in the Demo sample, with a mouse-aimed gun and a sword switched with K) and a **Move Vertically** option on `EnemyChase` and `EnemyFlee` for top-down enemies.
 - Documentation site (MkDocs Material, English and Spanish) in `Documentation~/`, published to GitHub Pages by `.github/workflows/docs.yml`, with an animated clip for every component.
 - `PlayerLocator` helper and public `Target` properties on `EnemyChase`, `EnemyFlee` and `EnemyShootOnSight`.
 

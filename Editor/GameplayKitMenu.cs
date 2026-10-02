@@ -69,7 +69,7 @@ namespace GameplayKit.Editor
         {
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
             string path = BuildTopDownDemoScene(DemoFolder);
-            EditorUtility.DisplayDialog("Gameplay Kit", $"Escena demo top-down creada en {path}.\n\nControles: WASD o flechas mover, Shift correr, Q dash en 8 direcciones, J atacar, E interactuar, Esc pausa.", "OK");
+            EditorUtility.DisplayDialog("Gameplay Kit", $"Escena demo top-down creada en {path}.\n\nControles: WASD o flechas mover, mouse apuntar, J disparar / atacar, K cambiar de arma, Shift correr, Q dash en 8 direcciones, E interactuar, Esc pausa.", "OK");
         }
 
         [MenuItem("GameObject/GameplayKit/Player", false, 10)]
@@ -441,11 +441,13 @@ namespace GameplayKit.Editor
             return go;
         }
 
-        /// <summary>Proyectil para las torretas: trigger pequeño sin gravedad.</summary>
-        public static GameObject BuildBullet()
+        /// <summary>Proyectil: trigger pequeño sin gravedad (amarillo para las torretas, celeste para el jugador).</summary>
+        public static GameObject BuildBullet() => BuildBullet("Bullet", new Color(1f, 0.85f, 0.2f));
+
+        public static GameObject BuildBullet(string name, Color color)
         {
-            var go = new GameObject("Bullet");
-            AddVisual(go, new Vector2(0.3f, 0.3f), new Color(1f, 0.85f, 0.2f), 15);
+            var go = new GameObject(name);
+            AddVisual(go, new Vector2(0.3f, 0.3f), color, 15);
             var col = go.AddComponent<CircleCollider2D>();
             col.radius = 0.15f;
             col.isTrigger = true;
@@ -453,6 +455,48 @@ namespace GameplayKit.Editor
             rb.gravityScale = 0f;
             go.AddComponent<ProjectileBehaviour>();
             return go;
+        }
+
+        /// <summary>
+        /// Arsenal top-down: reemplaza el WeaponMelee de la raíz por un WeaponInventorySlot con dos armas hijas
+        /// (pistola que dispara hacia el mouse con CharacterAimAndOrient, y espada), que se cambian con la acción
+        /// Special (K). PlayerAttack siempre usa el arma activa y dispara hacia AimDirection en 360°.
+        /// </summary>
+        public static void EquipTopDownArsenal(GameObject player, ProjectileBehaviour playerBullet)
+        {
+            var rootMelee = player.GetComponent<WeaponMelee>();
+            if (rootMelee != null) UnityEngine.Object.DestroyImmediate(rootMelee);
+
+            // Pistola: el hijo "Gun" gira hacia el apuntado; el cañón visible sobresale del cuerpo.
+            var gun = new GameObject("Gun");
+            gun.transform.SetParent(player.transform, false);
+            var barrel = new GameObject("Barrel");
+            barrel.transform.SetParent(gun.transform, false);
+            barrel.transform.localPosition = new Vector3(0.62f, 0f, 0f);
+            AddVisual(barrel, new Vector2(0.5f, 0.2f), new Color(0.85f, 0.9f, 1f), 11);
+            var firePoint = new GameObject("FirePoint");
+            firePoint.transform.SetParent(gun.transform, false);
+            firePoint.transform.localPosition = new Vector3(0.95f, 0f, 0f);
+            var weapon = gun.AddComponent<WeaponProjectile>();
+            if (playerBullet != null) SetRef(weapon, "projectilePrefab", playerBullet);
+            SetRef(weapon, "firePoint", firePoint.transform);
+            SetFloatOrInt(weapon, "damage", 10f);
+            SetFloatOrInt(weapon, "projectileSpeed", 14f);
+            SetFloatOrInt(weapon, "cooldown", 0.25f);
+
+            // Espada: cuerpo a cuerpo (izquierda/derecha según hacia dónde mira), con una hoja visible.
+            var sword = new GameObject("Sword");
+            sword.transform.SetParent(player.transform, false);
+            var blade = new GameObject("Blade");
+            blade.transform.SetParent(sword.transform, false);
+            blade.transform.localPosition = new Vector3(0.7f, 0.1f, 0f);
+            AddVisual(blade, new Vector2(0.6f, 0.14f), new Color(0.95f, 0.95f, 0.8f), 11);
+            SetFloatOrInt(sword.AddComponent<WeaponMelee>(), "damage", 20f);
+
+            var aim = player.AddComponent<CharacterAimAndOrient>();
+            SetRef(aim, "partToRotate", gun.transform);
+            var inventory = player.AddComponent<WeaponInventorySlot>();
+            SetRefArray(inventory, "weapons", gun, sword);
         }
 
         /// <summary>Crea (y guarda) un pequeño dungeon visto desde arriba que recorre las mecánicas top-down del kit.
@@ -572,7 +616,10 @@ namespace GameplayKit.Editor
             Add(patroller);
 
             // Jugador, cámara, managers y HUD
-            var playerPrefab = SavePrefab(BuildTopDownPlayer(new Vector2(-6f, 0f)), folder + "/Prefabs/TopDownPlayer.prefab");
+            var playerBullet = SavePrefab(BuildBullet("PlayerBullet", new Color(0.45f, 0.95f, 1f)), folder + "/Prefabs/TopDownPlayerBullet.prefab").GetComponent<ProjectileBehaviour>();
+            var playerGo = BuildTopDownPlayer(new Vector2(-6f, 0f));
+            EquipTopDownArsenal(playerGo, playerBullet);
+            var playerPrefab = SavePrefab(playerGo, folder + "/Prefabs/TopDownPlayer.prefab");
             var player = InstantiatePrefab(playerPrefab, new Vector2(-6f, 0f));
             var cam = BuildCamera(player.transform);
             cam.orthographicSize = 7f;

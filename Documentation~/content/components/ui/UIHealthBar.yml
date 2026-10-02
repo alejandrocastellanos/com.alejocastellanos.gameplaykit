@@ -1,0 +1,49 @@
+name: UIHealthBar
+clip: true
+related: [CharacterHealth, UIDamagePopup, DamagePopupSpawner, HealthPickup]
+en:
+  summary: A health bar (Slider or filled Image) that follows a character's health automatically.
+  clip_caption: The bar drops with each spike hit and refills when the player grabs a heart.
+  description: |
+    `UIHealthBar` listens to a `CharacterHealth`'s `OnHealthChanged` event and shows the ratio
+    `current / max` (0 to 1) on a **Slider**, on an **Image** of type *Filled*, or on both. It paints the bar
+    when it's enabled and again on `Start`, in case the health component initialized after it.
+
+    **Health** is optional: when empty, it uses the `CharacterHealth` of the object tagged **Player**. If that
+    character disappears (a scene change with `CharacterPersistence`, a respawn that creates a new player),
+    it searches for the tagged player again every frame until it finds one, so the HUD keeps working
+    without references. The menu **GameplayKit > Create HUD** builds a ready-to-use bar with a filled Image.
+  setup:
+    - Create a UI Slider (set its **Min Value** to 0, **Max Value** to 1 and untick **Interactable**) or an Image with **Image Type** *Filled* and a sprite.
+    - Add `UIHealthBar` and drag the Slider or the fill Image into its field.
+    - Tag your player **Player**, or drag any `CharacterHealth` (an enemy, a boss) into **Health**.
+  fields:
+    health: CharacterHealth to display. Empty uses the object tagged Player, and finds it again if it's replaced.
+    fillImage: Image whose `fillAmount` shows the ratio. It needs a sprite and **Image Type** set to *Filled*.
+    slider: Slider whose value shows the ratio. Use the 0–1 range.
+  tips:
+    - A filled Image without a sprite is drawn full no matter the value; assign any sprite (even a plain square).
+    - For a boss bar, assign the boss's `CharacterHealth` explicitly so it doesn't fall back to the player.
+es:
+  summary: Una barra de vida (Slider o Image de tipo Filled) que sigue la vida de un personaje automáticamente.
+  clip_caption: La barra baja con cada golpe de los pinchos y se rellena cuando el jugador toma un corazón.
+  description: |
+    `UIHealthBar` escucha el evento `OnHealthChanged` de un `CharacterHealth` y muestra la proporción
+    `actual / máxima` (0 a 1) en un **Slider**, en una **Image** de tipo *Filled* o en ambos. Pinta la barra
+    al activarse y otra vez en `Start`, por si el componente de vida se inicializó después.
+
+    **Health** es opcional: si está vacío, usa el `CharacterHealth` del objeto con tag **Player**. Si ese
+    personaje desaparece (un cambio de escena con `CharacterPersistence`, un respawn que crea un jugador
+    nuevo), vuelve a buscar al jugador con el tag cada frame hasta encontrarlo, así el HUD sigue funcionando
+    sin referencias. El menú **GameplayKit > Create HUD** arma una barra lista para usar con una Image Filled.
+  setup:
+    - Crea un Slider de UI (pon **Min Value** en 0, **Max Value** en 1 y desmarca **Interactable**) o una Image con **Image Type** *Filled* y un sprite.
+    - Agrega `UIHealthBar` y arrastra el Slider o la Image de relleno a su campo.
+    - Ponle el tag **Player** a tu jugador, o arrastra cualquier `CharacterHealth` (un enemigo, un jefe) a **Health**.
+  fields:
+    health: CharacterHealth a mostrar. Vacío usa el objeto con tag Player, y lo vuelve a buscar si se reemplaza.
+    fillImage: Image cuyo `fillAmount` muestra la proporción. Necesita un sprite y **Image Type** en *Filled*.
+    slider: Slider cuyo valor muestra la proporción. Usa el rango 0–1.
+  tips:
+    - Una Image Filled sin sprite se dibuja llena sin importar el valor; asígnale cualquier sprite (aunque sea un cuadrado liso).
+    - Para la barra de un jefe, asigna su `CharacterHealth` explícitamente para que no caiga en el jugador.

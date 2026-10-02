@@ -1,0 +1,98 @@
+name: CharacterRespawn
+clip: true
+related: [Checkpoint, CharacterDeath, CharacterLives, CharacterHealth, LevelManager]
+en:
+  summary: Brings the character back at the last checkpoint after dying, with full health.
+  clip_caption: The character passes a checkpoint, dies in a spike pit and reappears at the checkpoint with full HP.
+  description: |
+    When `CharacterHealth` reports a death and **Auto Respawn On Death** is on, `CharacterRespawn` waits
+    **Respawn Delay** seconds and calls `Respawn`. That moves the character to the current checkpoint,
+    stops its velocity, restores full health, calls `CharacterDeath.Revive` (abilities back, condition
+    `Normal`, GameObject active), resets `CharacterCore` and fires `OnRespawn`.
+
+    The respawn point is **Initial Checkpoint** at first, or the position where the character started if
+    it's empty. Touching a `Checkpoint` calls `SetCheckpoint` automatically, so later respawns happen
+    there. With `CharacterLives`, each death spends a life and the character only respawns while lives
+    remain. Combined with `LevelManager`'s void kill, falling off the level also sends the player back to
+    the last checkpoint.
+  setup:
+    - Add `CharacterRespawn` to a player with `CharacterHealth` and `CharacterDeath` (the **Create Player** menu includes all three).
+    - Optionally assign **Initial Checkpoint**; otherwise the start position is used.
+    - Place `Checkpoint` triggers in the level; make sure the player has the tag they check (`Player` by default).
+  fields:
+    initialCheckpoint: First respawn point. Empty = the position where the character was when the scene started.
+    respawnDelay: Seconds between dying and reappearing.
+    autoRespawnOnDeath: When on, respawns automatically after each death. Turn it off to call `Respawn` yourself (for example from a "Retry" button).
+  events:
+    OnRespawn: C# event fired after the character has been moved, healed and revived.
+  api:
+    AutoRespawn: Read or change **Auto Respawn On Death** from code.
+    Respawn: Respawns immediately at the current checkpoint, dead or alive.
+    SetCheckpoint: Sets the transform used as respawn point from now on.
+  example: |
+    A "Retry" button for a game that doesn't respawn automatically:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class RetryButton : MonoBehaviour
+    {
+        [SerializeField] private CharacterRespawn player;
+
+        private void Awake() => player.AutoRespawn = false;
+
+        public void OnRetryClicked() => player.Respawn();
+    }
+    ```
+  tips:
+    - Keep **Disable Delay** of `CharacterDeath` at -1 (or longer than **Respawn Delay**) so the player isn't deactivated while waiting.
+    - Use `OnRespawn` to snap the camera, play a sound or show a spawn effect.
+es:
+  summary: Trae al personaje de vuelta en el último checkpoint tras morir, con la vida llena.
+  clip_caption: El personaje pasa un checkpoint, muere en un foso de pinchos y reaparece en el checkpoint con la vida llena.
+  description: |
+    Cuando `CharacterHealth` avisa de una muerte y **Auto Respawn On Death** está activado,
+    `CharacterRespawn` espera **Respawn Delay** segundos y llama a `Respawn`. Eso lleva al personaje al
+    checkpoint actual, frena su velocidad, restaura la vida al máximo, llama a `CharacterDeath.Revive`
+    (habilidades de vuelta, condición `Normal`, GameObject activo), reinicia `CharacterCore` y dispara
+    `OnRespawn`.
+
+    El punto de reaparición es **Initial Checkpoint** al principio, o la posición donde empezó el
+    personaje si está vacío. Tocar un `Checkpoint` llama a `SetCheckpoint` automáticamente, así que las
+    siguientes reapariciones ocurren ahí. Con `CharacterLives`, cada muerte gasta una vida y el personaje
+    solo reaparece mientras queden. Junto a la zona de vacío de `LevelManager`, caerse del nivel también
+    devuelve al jugador al último checkpoint.
+  setup:
+    - Agrega `CharacterRespawn` a un jugador con `CharacterHealth` y `CharacterDeath` (el menú **Create Player** incluye los tres).
+    - Si quieres, asigna **Initial Checkpoint**; si no, se usa la posición inicial.
+    - Pon triggers `Checkpoint` en el nivel; asegúrate de que el jugador tenga el tag que revisan (`Player` por defecto).
+  fields:
+    initialCheckpoint: Primer punto de reaparición. Vacío = la posición del personaje al iniciar la escena.
+    respawnDelay: Segundos entre morir y reaparecer.
+    autoRespawnOnDeath: Activado, reaparece solo tras cada muerte. Desactívalo para llamar tú a `Respawn` (por ejemplo desde un botón "Reintentar").
+  events:
+    OnRespawn: Evento C# que se dispara cuando el personaje ya fue movido, curado y revivido.
+  api:
+    AutoRespawn: Lee o cambia **Auto Respawn On Death** desde código.
+    Respawn: Reaparece de inmediato en el checkpoint actual, esté vivo o muerto.
+    SetCheckpoint: Define el transform que se usa como punto de reaparición desde ahora.
+  example: |
+    Un botón "Reintentar" para un juego sin reaparición automática:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class RetryButton : MonoBehaviour
+    {
+        [SerializeField] private CharacterRespawn player;
+
+        private void Awake() => player.AutoRespawn = false;
+
+        public void OnRetryClicked() => player.Respawn();
+    }
+    ```
+  tips:
+    - Deja **Disable Delay** de `CharacterDeath` en -1 (o más largo que **Respawn Delay**) para que el jugador no se desactive mientras espera.
+    - Usa `OnRespawn` para recolocar la cámara, sonar un efecto o mostrar una animación de aparición.

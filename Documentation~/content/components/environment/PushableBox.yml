@@ -1,0 +1,47 @@
+name: PushableBox
+clip: true
+related: [PressurePlate, ConveyorBelt, PlayerWalkRun, WindZone2D]
+en:
+  summary: A heavy crate the player can shove sideways by walking into it.
+  clip_caption: The player walks into the crate and pushes it along; walking away leaves it where it is.
+  description: |
+    `PushableBox` goes on a dynamic `Rigidbody2D` (added automatically). While an object tagged **Player**
+    touches it and moves sideways faster than 0.1 u/s, the box's horizontal velocity is set to
+    **Push Speed** in the same direction, keeping its vertical velocity so it still falls off ledges. When
+    the player stops or walks away, friction brings the box to rest.
+
+    On start it writes **Mass** into the `Rigidbody2D`, which keeps it from being bumped around by light
+    objects and makes it press `PressurePlate`s reliably. The **Player** tag is fixed in code, so other
+    characters only move it through regular physics.
+  setup:
+    - Create a GameObject with a solid `BoxCollider2D` and add `PushableBox` (a `Rigidbody2D` is added for you).
+    - On the `Rigidbody2D`, tick **Freeze Rotation Z** so the box slides instead of tipping over.
+    - Give the player the **Player** tag and walk into the box.
+  fields:
+    pushSpeed: Horizontal speed of the box while being pushed, in units per second. Lower than the walk speed feels heavy.
+    mass: Mass written to the Rigidbody2D on start. Higher values resist bumps from other bodies.
+  tips:
+    - Pair it with a `PressurePlate` for the classic "push the box onto the button" puzzle.
+    - A box resting on a `ConveyorBelt` is carried too, which makes for nice timing puzzles.
+es:
+  summary: Una caja pesada que el jugador puede empujar de lado caminando contra ella.
+  clip_caption: El jugador camina contra la caja y la empuja; al alejarse, la caja se queda donde está.
+  description: |
+    `PushableBox` va en un `Rigidbody2D` dinámico (se agrega solo). Mientras un objeto con tag **Player** la
+    toca y se mueve de lado a más de 0.1 u/s, la velocidad horizontal de la caja pasa a **Push Speed** en la
+    misma dirección, conservando su velocidad vertical para que igual caiga por los bordes. Cuando el
+    jugador se detiene o se aleja, la fricción la frena.
+
+    Al iniciar escribe **Mass** en el `Rigidbody2D`, lo que evita que objetos livianos la muevan y hace que
+    pulse las `PressurePlate` de forma confiable. El tag **Player** está fijo en el código, así que otros
+    personajes solo la mueven con la física normal.
+  setup:
+    - Crea un GameObject con un `BoxCollider2D` sólido y agrégale `PushableBox` (el `Rigidbody2D` se agrega solo).
+    - En el `Rigidbody2D`, marca **Freeze Rotation Z** para que la caja se deslice en vez de volcarse.
+    - Dale al jugador el tag **Player** y camina contra la caja.
+  fields:
+    pushSpeed: Velocidad horizontal de la caja mientras la empujan, en unidades por segundo. Menor que la de caminar se siente pesada.
+    mass: Masa que se escribe en el Rigidbody2D al iniciar. Valores altos resisten los golpes de otros cuerpos.
+  tips:
+    - Combínala con una `PressurePlate` para el clásico puzle de "empuja la caja sobre el botón".
+    - Una caja sobre una `ConveyorBelt` también viaja, ideal para puzles de sincronización.

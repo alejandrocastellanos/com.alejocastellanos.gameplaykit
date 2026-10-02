@@ -1,0 +1,122 @@
+name: PlayerGroundSlam
+clip: true
+related: [PlayerJump, PlayerMultiJump, PlayerDash, CameraShake]
+en:
+  summary: Slam straight down from the air with down + Dash, and get an event the moment you hit the ground.
+  clip_caption: A jump followed by a fast slam into the ground (with a shockwave and camera shake), then a second slam from a short hop.
+  description: |
+    While airborne, holding **down** (S, down arrow or left stick) and pressing **Dash** (Q) starts a ground
+    slam. After a short **Min Air Time To Trigger** delay, the vertical velocity is forced to **Slam Speed**
+    downwards every frame until the character is grounded. Horizontal speed isn't touched, so with
+    `PlayerWalkRun` the character drops straight down unless the input also leans sideways.
+
+    On landing it raises the C# event `OnSlamLanded`. Hook it up to `CameraShake`, an area-damage script,
+    particles or a sound: the ability itself doesn't damage anything.
+
+    It only starts in the air and only once per slam. Holding down alone does nothing; the **Dash** press is
+    what triggers it, which is why it shares the button with `PlayerDash`.
+  setup:
+    - Build a character with `CharacterController2D`, `PlayerWalkRun` and `PlayerJump` (or `PlayerMultiJump`).
+    - Add `PlayerGroundSlam` before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Jump, then hold **down** and press **Q**. Subscribe to `OnSlamLanded` for the impact effects.
+  fields:
+    slamSpeed: Downward speed forced during the slam, in units per second.
+    minAirTimeToTrigger: Seconds between the press and the start of the dive, a small wind-up during which the character keeps its current motion.
+  events:
+    OnSlamLanded: C# event (`System.Action`, no arguments) fired once when the slam reaches the ground.
+  example: |
+    Shake the camera and damage everything around the landing spot:
+
+    ```csharp
+    using GameplayKit.CameraSystem;
+    using GameplayKit.Core;
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class SlamImpact : MonoBehaviour
+    {
+        [SerializeField] private CameraShake cameraShake;
+        [SerializeField] private float radius = 2f;
+        [SerializeField] private float damage = 25f;
+        private PlayerGroundSlam _slam;
+
+        private void Awake() => _slam = GetComponent<PlayerGroundSlam>();
+        private void OnEnable() => _slam.OnSlamLanded += HandleLanded;
+        private void OnDisable() => _slam.OnSlamLanded -= HandleLanded;
+
+        private void HandleLanded()
+        {
+            cameraShake.Shake(0.25f, 0.2f);
+            foreach (var hit in Physics2D.OverlapCircleAll(transform.position, radius))
+            {
+                if (hit.transform == transform) continue;
+                var target = hit.GetComponentInParent<IDamageable>();
+                Vector2 direction = (hit.transform.position - transform.position).normalized;
+                target?.ApplyDamage(damage, hit.transform.position, direction, gameObject);
+            }
+        }
+    }
+    ```
+  tips:
+    - If the character also has `PlayerDash`, down + Dash in the air triggers both abilities; avoid combining them or change one ability's input.
+    - Raise **Min Air Time To Trigger** a little (0.1–0.15 s) for a readable "hang" before the dive.
+es:
+  summary: Cae en picada desde el aire con abajo + Dash y recibe un evento justo al tocar el suelo.
+  clip_caption: Un salto seguido de un golpe rápido contra el suelo (con onda expansiva y temblor de cámara) y luego un segundo golpe desde un saltito.
+  description: |
+    Estando en el aire, mantener **abajo** (S, flecha abajo o stick izquierdo) y pulsar **Dash** (Q) inicia
+    un golpe al suelo. Tras una pequeña espera de **Min Air Time To Trigger**, la velocidad vertical se fuerza
+    a **Slam Speed** hacia abajo en cada frame hasta que el personaje toca el suelo. La velocidad horizontal
+    no se toca, así que con `PlayerWalkRun` el personaje cae recto, salvo que el input también se incline de
+    lado.
+
+    Al aterrizar dispara el evento de C# `OnSlamLanded`. Conéctalo a `CameraShake`, a un script de daño en
+    área, a partículas o a un sonido: la habilidad en sí no daña a nadie.
+
+    Solo empieza en el aire y una vez por golpe. Mantener abajo por sí solo no hace nada; lo que lo activa es
+    pulsar **Dash**, por eso comparte el botón con `PlayerDash`.
+  setup:
+    - Arma un personaje con `CharacterController2D`, `PlayerWalkRun` y `PlayerJump` (o `PlayerMultiJump`).
+    - Agrega `PlayerGroundSlam` antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Salta, mantén **abajo** y pulsa **Q**. Suscríbete a `OnSlamLanded` para los efectos del impacto.
+  fields:
+    slamSpeed: Velocidad hacia abajo forzada durante el golpe, en unidades por segundo.
+    minAirTimeToTrigger: Segundos entre la pulsación y el inicio de la caída, una pequeña preparación en la que el personaje conserva su movimiento.
+  events:
+    OnSlamLanded: Evento de C# (`System.Action`, sin argumentos) que se dispara una vez cuando el golpe llega al suelo.
+  example: |
+    Sacude la cámara y daña todo lo que esté alrededor del punto de impacto:
+
+    ```csharp
+    using GameplayKit.CameraSystem;
+    using GameplayKit.Core;
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class SlamImpact : MonoBehaviour
+    {
+        [SerializeField] private CameraShake cameraShake;
+        [SerializeField] private float radius = 2f;
+        [SerializeField] private float damage = 25f;
+        private PlayerGroundSlam _slam;
+
+        private void Awake() => _slam = GetComponent<PlayerGroundSlam>();
+        private void OnEnable() => _slam.OnSlamLanded += HandleLanded;
+        private void OnDisable() => _slam.OnSlamLanded -= HandleLanded;
+
+        private void HandleLanded()
+        {
+            cameraShake.Shake(0.25f, 0.2f);
+            foreach (var hit in Physics2D.OverlapCircleAll(transform.position, radius))
+            {
+                if (hit.transform == transform) continue;
+                var target = hit.GetComponentInParent<IDamageable>();
+                Vector2 direction = (hit.transform.position - transform.position).normalized;
+                target?.ApplyDamage(damage, hit.transform.position, direction, gameObject);
+            }
+        }
+    }
+    ```
+  tips:
+    - Si el personaje también tiene `PlayerDash`, abajo + Dash en el aire activa las dos habilidades; evita combinarlas o cambia el input de una.
+    - Sube un poco **Min Air Time To Trigger** (0.1–0.15 s) para que se lea una pausa en el aire antes de caer.

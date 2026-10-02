@@ -1,0 +1,121 @@
+name: PlayerRopeGrab
+clip: true
+related: [RopeAnchor, PlayerJump, PlayerWalkRun, PlayerZipline]
+en:
+  summary: Grab a rope anchor with the interact button and swing from it like a pendulum, then jump off with the momentum.
+  clip_caption: Jumping into an anchor's range, grabbing the rope, pumping the swing higher with left and right, then jumping off at the top of the arc.
+  description: |
+    When the character's collider enters a trigger that has a `RopeAnchor` component (or whose tag matches
+    **Rope Tag**), that anchor becomes available. Pressing **Interact** (E) while still inside the trigger
+    grabs it: the rope length is fixed to the distance between the character and the anchor at that moment
+    (at least 0.5 units), the body's own gravity is switched off and the character hangs on the rope.
+    Leaving the trigger without grabbing forgets the anchor. The velocity it arrived with is projected onto
+    the arc, so jumping into a rope already starts the swing.
+
+    While hanging, the rope works like a real pendulum: gravity (using the character's **Gravity Scale**)
+    pulls it back towards the lowest point, so it keeps swinging on its own, and horizontal input pushes it
+    in the pressed direction (right pushes right) with **Swing Force**. Pushing in time with the swing pumps
+    it higher. **Swing Damping** slowly bleeds off speed so it settles when you let it hang. The position is
+    snapped to the rope length every frame, so the rope behaves like a rigid bar, and the arc stops just
+    short of going over the top of the anchor.
+
+    Pressing **Jump** lets go: gravity returns and the character keeps the velocity it had along the arc, so
+    releasing near the top of a swing flings it forward. The anchor is forgotten on release, so the character
+    has to enter a trigger again to grab another rope.
+  setup:
+    - Build a character with `CharacterController2D`, `PlayerWalkRun` and `PlayerJump`.
+    - Add `PlayerRopeGrab` after `PlayerWalkRun` and before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Create the anchor - a GameObject at the rope's pivot with a `CircleCollider2D` set to **Is Trigger** (its radius is the grab range) - and add `RopeAnchor`.
+    - Reach the range (usually by jumping), press **Interact** (E) to grab, press left/right in time with the swing to pump it and press **Jump** to let go.
+  fields:
+    ropeTag: Optional tag that also marks triggers as rope anchors, on top of any `RopeAnchor`. Missing tags are ignored safely.
+    swingForce: Acceleration along the arc while holding left or right, in units per second squared. Raise it so players can build up a big swing faster.
+    swingDamping: Fraction of the swing speed lost per second. `0` swings forever; raise it so a rope settles quickly when the player stops pushing.
+  api:
+    IsSwinging: True while the character is hanging from a rope.
+  example: |
+    Draw the rope with a `LineRenderer` while the character swings:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class RopeLine : MonoBehaviour
+    {
+        [SerializeField] private PlayerRopeGrab player;
+        [SerializeField] private Transform anchor;
+        [SerializeField] private LineRenderer line;
+
+        private void LateUpdate()
+        {
+            line.enabled = player.IsSwinging;
+            if (!player.IsSwinging) return;
+            line.SetPosition(0, anchor.position);
+            line.SetPosition(1, player.transform.position);
+        }
+    }
+    ```
+  tips:
+    - The rope length comes from where the character is when it grabs, so the trigger radius roughly caps the rope length. Keep the ground further away than that so the swing never scrapes the floor.
+    - Put `PlayerRopeGrab` after `PlayerWalkRun` so the swing velocity is the one that counts while hanging.
+    - Letting go keeps the swing velocity; release on the way up, near the top of the arc, to fling the character the farthest.
+    - Grab range and rope length go together - the rope is as long as the distance at the moment you grab - so a bigger trigger also allows longer, slower swings.
+es:
+  summary: Agárrate de un ancla de cuerda con el botón de interactuar, balancéate como un péndulo y salta aprovechando el impulso.
+  clip_caption: Salta dentro del alcance de un ancla, agarra la cuerda, aumenta el balanceo con izquierda y derecha y salta en lo alto del arco.
+  description: |
+    Cuando el collider del personaje entra en un trigger que tiene un componente `RopeAnchor` (o cuyo tag
+    coincide con **Rope Tag**), esa ancla queda disponible. Pulsar **Interactuar** (E) mientras sigue dentro
+    del trigger lo agarra: el largo de la cuerda se fija a la distancia entre el personaje y el ancla en ese
+    momento (mínimo 0.5 unidades), se apaga la gravedad propia del cuerpo y el personaje queda colgado.
+    Salir del trigger sin agarrarse olvida el ancla. La velocidad con la que llega se proyecta sobre el arco,
+    así que saltar hacia una cuerda ya arranca el balanceo.
+
+    Colgado, la cuerda funciona como un péndulo de verdad: la gravedad (con el **Gravity Scale** del
+    personaje) lo jala hacia el punto más bajo, así que sigue oscilando solo, y el input horizontal lo empuja
+    en la dirección pulsada (derecha empuja a la derecha) con **Swing Force**. Empujar al ritmo del balanceo
+    lo hace subir más. **Swing Damping** le quita velocidad poco a poco para que se calme si lo dejas
+    colgando. La posición se corrige al largo de la cuerda en cada frame, así que se comporta como una barra
+    rígida, y el arco se detiene justo antes de pasar por encima del ancla.
+
+    Pulsar **Salto** lo suelta: vuelve la gravedad y el personaje conserva la velocidad que llevaba en el
+    arco, así que soltarse cerca de lo alto de un balanceo lo lanza hacia adelante. Al soltarse se olvida el
+    ancla, así que tiene que volver a entrar en un trigger para agarrar otra cuerda.
+  setup:
+    - Arma un personaje con `CharacterController2D`, `PlayerWalkRun` y `PlayerJump`.
+    - Agrega `PlayerRopeGrab` después de `PlayerWalkRun` y antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Crea el ancla - un GameObject en el punto de giro de la cuerda con un `CircleCollider2D` en **Is Trigger** (su radio es el alcance para agarrarse) - y agrégale `RopeAnchor`.
+    - Llega al alcance (normalmente saltando), pulsa **Interactuar** (E) para agarrarte, pulsa izquierda/derecha al ritmo del balanceo para impulsarte y pulsa **Salto** para soltarte.
+  fields:
+    ropeTag: Tag opcional que también marca triggers como anclas de cuerda, además de cualquier `RopeAnchor`. Si el tag no existe se ignora sin errores.
+    swingForce: Aceleración a lo largo del arco al mantener izquierda o derecha, en unidades por segundo al cuadrado. Súbela para que el jugador logre un balanceo grande más rápido.
+    swingDamping: Fracción de la velocidad del balanceo que se pierde por segundo. Con `0` oscila para siempre; súbela para que la cuerda se calme rápido cuando el jugador deja de empujar.
+  api:
+    IsSwinging: Verdadero mientras el personaje cuelga de una cuerda.
+  example: |
+    Dibuja la cuerda con un `LineRenderer` mientras el personaje se balancea:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class RopeLine : MonoBehaviour
+    {
+        [SerializeField] private PlayerRopeGrab player;
+        [SerializeField] private Transform anchor;
+        [SerializeField] private LineRenderer line;
+
+        private void LateUpdate()
+        {
+            line.enabled = player.IsSwinging;
+            if (!player.IsSwinging) return;
+            line.SetPosition(0, anchor.position);
+            line.SetPosition(1, player.transform.position);
+        }
+    }
+    ```
+  tips:
+    - El largo de la cuerda sale de dónde está el personaje al agarrarse, así que el radio del trigger limita más o menos el largo de la cuerda. Deja el suelo más lejos que eso para que el balanceo nunca roce el piso.
+    - Pon `PlayerRopeGrab` después de `PlayerWalkRun` para que, colgado, cuente la velocidad del balanceo.
+    - Al soltarte conservas la velocidad del balanceo; suéltate subiendo, cerca de lo alto del arco, para salir disparado lo más lejos posible.
+    - Alcance y largo de la cuerda van juntos (la cuerda mide la distancia al momento de agarrarte), así que un trigger más grande también permite balanceos más largos y lentos.

@@ -1,0 +1,48 @@
+name: WindZone2D
+clip: true
+related: [WaterZone, SpringPad, PlayerGlide, PushableBox]
+en:
+  summary: An area that keeps pushing every physics object inside it, for wind, fans and air currents.
+  clip_caption: The wind slides a crate across the floor and pushes a falling crate sideways, while a crate outside the area stays put.
+  description: |
+    `WindZone2D` works with a trigger collider and applies **Force** to every `Rigidbody2D` inside it,
+    every physics step, until it leaves. It is a continuous force (`ForceMode2D.Force`), so heavier bodies
+    accelerate less and floor friction can cancel a weak wind entirely. Bodies keep being pushed even
+    when they fall asleep standing still.
+
+    Keep in mind how characters move: `PlayerWalkRun` sets the horizontal velocity from the input every
+    frame, so horizontal wind barely affects a walking character. Vertical wind works much better on
+    characters (updrafts, fans pointing up), because their vertical velocity is left to physics. The name
+    has the "2D" suffix because Unity already has a built-in `WindZone` component.
+  setup:
+    - Create a GameObject with a `BoxCollider2D` marked **Is Trigger** covering the windy area and add `WindZone2D`.
+    - Set **Force** to the direction and strength of the wind, for example `(0, 15)` for an updraft.
+    - Add some particles or streak sprites so the player can see the wind.
+  fields:
+    force: Force applied every physics step to each body inside, in newtons (direction and strength). With mass 1 and normal gravity, a vertical force above about 10 lifts the body.
+  tips:
+    - Combine an updraft with `PlayerGlide` to let the player ride air currents upwards.
+    - For a fan you can switch off, connect a `Lever` to the component's **enabled** checkbox.
+es:
+  summary: Un área que empuja sin parar a todo objeto con física dentro, para viento, ventiladores y corrientes de aire.
+  clip_caption: El viento desliza una caja por el suelo y desvía otra que cae, mientras una caja fuera del área no se mueve.
+  description: |
+    `WindZone2D` funciona con un collider trigger y aplica **Force** a cada `Rigidbody2D` que esté dentro, en
+    cada paso de física, hasta que sale. Es una fuerza continua (`ForceMode2D.Force`), así que los cuerpos
+    más pesados aceleran menos y la fricción del suelo puede anular por completo un viento débil. Los
+    cuerpos siguen recibiendo el empuje aunque se duerman quietos.
+
+    Ten en cuenta cómo se mueven los personajes: `PlayerWalkRun` fija la velocidad horizontal según el input
+    en cada frame, así que el viento horizontal casi no afecta a un personaje que camina. El viento vertical
+    funciona mucho mejor con personajes (corrientes ascendentes, ventiladores hacia arriba), porque su
+    velocidad vertical queda en manos de la física. El nombre lleva "2D" porque Unity ya tiene un
+    componente nativo llamado `WindZone`.
+  setup:
+    - Crea un GameObject con un `BoxCollider2D` marcado como **Is Trigger** que cubra la zona de viento y agrégale `WindZone2D`.
+    - Pon en **Force** la dirección y fuerza del viento, por ejemplo `(0, 15)` para una corriente ascendente.
+    - Agrega partículas o sprites de líneas para que el jugador vea el viento.
+  fields:
+    force: Fuerza aplicada en cada paso de física a cada cuerpo dentro, en newtons (dirección e intensidad). Con masa 1 y gravedad normal, una fuerza vertical mayor a unos 10 levanta el cuerpo.
+  tips:
+    - Combina una corriente ascendente con `PlayerGlide` para que el jugador suba planeando.
+    - Para un ventilador que se pueda apagar, conecta una `Lever` a la casilla **enabled** del componente.

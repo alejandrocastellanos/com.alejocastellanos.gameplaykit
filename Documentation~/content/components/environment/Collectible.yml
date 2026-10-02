@@ -1,0 +1,93 @@
+name: Collectible
+clip: true
+related: [ScoreManager, UIScoreText, ItemPickup, HealthPickup]
+en:
+  summary: Coins, gems and other pickups that disappear when touched and report their value for scoring.
+  clip_caption: Walking over coins worth 1 and jumping for a gem worth 5 raises the score to 10.
+  description: |
+    Put `Collectible` on any trigger collider. When a collider with **Player Tag** touches it (the tag of
+    the collider or of its `Rigidbody2D`), it spawns **Collect Effect Prefab**, fires `OnCollected` and the
+    static `OnAnyCollected` with its **Value**, and destroys itself.
+
+    The static event is what makes scoring work without wiring: `ScoreManager` subscribes to
+    `Collectible.OnAnyCollected` automatically and adds the value to the score, and `UIScoreText` shows it.
+    You never have to reference individual coins.
+  setup:
+    - Create a small GameObject with a `CircleCollider2D` or `BoxCollider2D` marked **Is Trigger** and add `Collectible`.
+    - Give the player the **Player** tag.
+    - Add a `ScoreManager` to the scene (**GameplayKit > Create Managers** does it) and set each pickup's **Value**.
+  fields:
+    playerTag: Tag that can collect it. The tag of the touching collider or of its Rigidbody2D must match.
+    value: Points this pickup is worth, passed to `OnAnyCollected` (and added to the score by `ScoreManager`).
+    collectEffectPrefab: Prefab spawned where it was collected (sparkles, a sound). Leave empty for none.
+  events:
+    OnCollected: C# event on this instance, fired right before it is destroyed.
+    OnAnyCollected: Static C# event fired by every collectible with `(Collectible collectible, int value)`. Unsubscribe when your listener is destroyed.
+  example: |
+    Count gems separately from the score by listening to the static event:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    public class GemCounter : MonoBehaviour
+    {
+        public int Gems { get; private set; }
+
+        private void OnEnable() => Collectible.OnAnyCollected += HandleCollected;
+        private void OnDisable() => Collectible.OnAnyCollected -= HandleCollected;
+
+        private void HandleCollected(Collectible collectible, int value)
+        {
+            if (collectible.CompareTag("Gem")) Gems++;
+        }
+    }
+    ```
+  tips:
+    - Use it as **Loot Drops** in `BreakableObject` to make crates spill coins.
+    - For keys and quest items that should go into the inventory, use `ItemPickup` instead.
+es:
+  summary: Monedas, gemas y otros recogibles que desaparecen al tocarlos y reportan su valor para el puntaje.
+  clip_caption: Al pasar por monedas de 1 y saltar por una gema de 5, el puntaje sube a 10.
+  description: |
+    Pon `Collectible` en cualquier collider trigger. Cuando lo toca un collider con **Player Tag** (el tag
+    del collider o de su `Rigidbody2D`), instancia **Collect Effect Prefab**, dispara `OnCollected` y el
+    evento estático `OnAnyCollected` con su **Value**, y se destruye.
+
+    El evento estático es lo que hace que el puntaje funcione sin conectar nada: `ScoreManager` se suscribe
+    solo a `Collectible.OnAnyCollected` y suma el valor, y `UIScoreText` lo muestra. Nunca tienes que
+    referenciar monedas una por una.
+  setup:
+    - Crea un GameObject pequeño con un `CircleCollider2D` o `BoxCollider2D` marcado como **Is Trigger** y agrégale `Collectible`.
+    - Dale al jugador el tag **Player**.
+    - Agrega un `ScoreManager` a la escena (**GameplayKit > Create Managers** lo hace) y ajusta el **Value** de cada recogible.
+  fields:
+    playerTag: Tag que puede recogerlo. Debe coincidir el tag del collider que lo toca o el de su Rigidbody2D.
+    value: Puntos que vale, enviados a `OnAnyCollected` (y sumados al puntaje por `ScoreManager`).
+    collectEffectPrefab: Prefab que aparece donde se recogió (brillos, un sonido). Déjalo vacío si no quieres efecto.
+  events:
+    OnCollected: Evento C# de esta instancia, se dispara justo antes de destruirse.
+    OnAnyCollected: Evento C# estático que dispara cada coleccionable con `(Collectible collectible, int value)`. Desuscríbete cuando tu listener se destruya.
+  example: |
+    Cuenta gemas aparte del puntaje escuchando el evento estático:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    public class GemCounter : MonoBehaviour
+    {
+        public int Gems { get; private set; }
+
+        private void OnEnable() => Collectible.OnAnyCollected += HandleCollected;
+        private void OnDisable() => Collectible.OnAnyCollected -= HandleCollected;
+
+        private void HandleCollected(Collectible collectible, int value)
+        {
+            if (collectible.CompareTag("Gem")) Gems++;
+        }
+    }
+    ```
+  tips:
+    - Úsalo en **Loot Drops** de `BreakableObject` para que las cajas suelten monedas.
+    - Para llaves y objetos de misión que deben ir al inventario, usa `ItemPickup`.

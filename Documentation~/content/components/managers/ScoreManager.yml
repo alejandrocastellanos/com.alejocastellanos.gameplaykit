@@ -1,0 +1,99 @@
+name: ScoreManager
+clip: true
+related: [Collectible, UIScoreText, GameManager, InventoryManager]
+en:
+  summary: Keeps the game's score and adds every collected coin automatically.
+  clip_caption: Picking up coins worth 1 and a gem worth 5; the score adds each value as it's collected.
+  description: |
+    `ScoreManager` holds a single integer, `CurrentScore`, and raises `OnScoreChanged` every time it changes.
+    It listens to the static `Collectible.OnAnyCollected` event while enabled, so every `Collectible` in the
+    scene adds its **Value** without any wiring — drop coins in the level and the score just works.
+
+    It's a lightweight singleton: the first one becomes `ScoreManager.Instance` and extra copies destroy
+    themselves. It doesn't survive scene loads on its own, so each scene can have its own manager (or keep
+    one alive with your own persistence). `UIScoreText` displays the score automatically.
+  setup:
+    - Create an empty GameObject (for example "Managers") and add `ScoreManager`.
+    - Add `Collectible` to your coins and set each one's **Value**.
+    - Add a `UIScoreText` to a UI Text to show the score.
+  events:
+    OnScoreChanged: "C# event (`Action<int>`) raised after every change with the new total, including `ResetScore`."
+  api:
+    Instance: The active ScoreManager in the scene (null if none).
+    CurrentScore: Current score.
+    AddScore: Adds points (use a negative amount to subtract) and raises `OnScoreChanged`.
+    ResetScore: Sets the score back to 0 and raises `OnScoreChanged`.
+  example: |
+    Give points for defeating an enemy and unlock a door at 100 points:
+
+    ```csharp
+    using GameplayKit.Health;
+    using GameplayKit.Managers;
+    using UnityEngine;
+
+    public class ScoreRewards : MonoBehaviour
+    {
+        [SerializeField] private CharacterHealth enemy;
+        [SerializeField] private GameObject secretDoor;
+
+        private void Start()
+        {
+            enemy.OnDeath += () => ScoreManager.Instance.AddScore(50);
+            ScoreManager.Instance.OnScoreChanged += score =>
+            {
+                if (score >= 100) secretDoor.SetActive(false);
+            };
+        }
+    }
+    ```
+  tips:
+    - Collectibles only count while the manager is enabled; coins picked up before it exists are lost.
+    - Collectibles use the **Player** tag by default — remember to tag your player.
+es:
+  summary: Lleva el puntaje de la partida y suma solo cada moneda recogida.
+  clip_caption: Recogiendo monedas que valen 1 y una gema que vale 5; el puntaje suma cada valor al recogerlo.
+  description: |
+    `ScoreManager` guarda un único entero, `CurrentScore`, y dispara `OnScoreChanged` cada vez que cambia.
+    Mientras está activo escucha el evento estático `Collectible.OnAnyCollected`, así cada `Collectible` de
+    la escena suma su **Value** sin conectar nada — pon monedas en el nivel y el puntaje funciona.
+
+    Es un singleton liviano: el primero se vuelve `ScoreManager.Instance` y las copias extra se destruyen
+    solas. No sobrevive por sí solo a los cambios de escena, así que cada escena puede tener el suyo (o
+    mantenerlo vivo con tu propia persistencia). `UIScoreText` muestra el puntaje automáticamente.
+  setup:
+    - Crea un GameObject vacío (por ejemplo "Managers") y agrega `ScoreManager`.
+    - Agrega `Collectible` a tus monedas y define el **Value** de cada una.
+    - Agrega un `UIScoreText` a un Text de UI para mostrar el puntaje.
+  events:
+    OnScoreChanged: "Evento C# (`Action<int>`) que se dispara tras cada cambio con el nuevo total, incluido `ResetScore`."
+  api:
+    Instance: El ScoreManager activo en la escena (null si no hay).
+    CurrentScore: Puntaje actual.
+    AddScore: Suma puntos (usa un valor negativo para restar) y dispara `OnScoreChanged`.
+    ResetScore: Vuelve el puntaje a 0 y dispara `OnScoreChanged`.
+  example: |
+    Da puntos por derrotar a un enemigo y abre una puerta al llegar a 100:
+
+    ```csharp
+    using GameplayKit.Health;
+    using GameplayKit.Managers;
+    using UnityEngine;
+
+    public class ScoreRewards : MonoBehaviour
+    {
+        [SerializeField] private CharacterHealth enemy;
+        [SerializeField] private GameObject secretDoor;
+
+        private void Start()
+        {
+            enemy.OnDeath += () => ScoreManager.Instance.AddScore(50);
+            ScoreManager.Instance.OnScoreChanged += score =>
+            {
+                if (score >= 100) secretDoor.SetActive(false);
+            };
+        }
+    }
+    ```
+  tips:
+    - Los coleccionables solo cuentan mientras el manager está activo; las monedas recogidas antes de que exista se pierden.
+    - Los coleccionables usan el tag **Player** por defecto — acuérdate de ponérselo a tu jugador.

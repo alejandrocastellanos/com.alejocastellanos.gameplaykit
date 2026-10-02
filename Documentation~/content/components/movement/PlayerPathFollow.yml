@@ -1,0 +1,101 @@
+name: PlayerPathFollow
+clip: true
+related: [PlayerZipline, PlayerWalkRun, MovingPlatform]
+en:
+  summary: Moves the character automatically along a list of waypoints at constant speed, for cutscenes or guided sections.
+  clip_caption: Turning IsFollowingPath on carries the character along three waypoints over a wall, then gravity drops it at the end.
+  description: |
+    While `IsFollowingPath` is true, the character travels in straight lines from waypoint to waypoint at
+    **Speed** units per second, with gravity overridden to 0; it doesn't read input itself. Waypoint positions are
+    captured once when the character starts, so they can be children of the character itself without moving
+    with it.
+
+    When the last waypoint is reached, it either starts again from the first one (**Loop** on) or stops
+    (**Loop** off): `IsFollowingPath` goes back to false, velocity is cleared and gravity returns, so the
+    character falls or lands normally. With **Auto Start** the path begins as soon as the character
+    initializes; otherwise set `IsFollowingPath` from your own script.
+
+    The character still has its collider, so walls in the way stop it. Other abilities keep running: put
+    `PlayerPathFollow` after `PlayerWalkRun` so its velocity wins, or disable the movement abilities during
+    a scripted path.
+  setup:
+    - Build a character with `CharacterController2D` and add `PlayerPathFollow` before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Create empty GameObjects for the route and drag them, in order, into **Waypoints**.
+    - Enable **Auto Start**, or set `IsFollowingPath = true` from a trigger or cutscene script.
+  fields:
+    waypoints: Points of the route, visited in order. Their positions are read once on start, so they may be children of the character.
+    speed: Travel speed in units per second.
+    loop: When on, the route repeats forever from the first waypoint; when off, the character stops and gravity returns at the last one.
+    autoStart: Starts following the path as soon as the character initializes.
+  api:
+    IsFollowingPath: Read it to know whether the path is running; set it to true to start and false to stop (stopping clears velocity and restores gravity).
+  example: |
+    Start a guided section when the player enters a trigger:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class StartGuidedPath : MonoBehaviour
+    {
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            var path = other.GetComponent<PlayerPathFollow>();
+            if (path == null || path.IsFollowingPath) return;
+            path.IsFollowingPath = true;
+        }
+    }
+    ```
+  tips:
+    - Turn **Loop** off for one-shot sequences; with it on the character never gets control back until you set `IsFollowingPath` to false.
+    - The path starts from wherever the character is towards the first waypoint, so place the first waypoint close to where the sequence begins.
+    - Set `AbilityEnabled = false` on movement abilities like `PlayerWalkRun` during the path if players might press keys mid-sequence.
+es:
+  summary: Mueve al personaje automáticamente por una lista de puntos a velocidad constante, para cinemáticas o tramos guiados.
+  clip_caption: Activar IsFollowingPath lleva al personaje por tres puntos por encima de un muro y al final la gravedad lo deja caer.
+  description: |
+    Mientras `IsFollowingPath` es verdadero, el personaje viaja en línea recta de punto en punto a **Speed**
+    unidades por segundo, con la gravedad fijada en 0; no lee el input por sí mismo. Las posiciones de los
+    puntos se guardan una sola vez al iniciar, así que pueden ser hijos del propio personaje sin moverse con
+    él.
+
+    Al llegar al último punto, vuelve a empezar desde el primero (**Loop** activado) o se detiene (**Loop**
+    desactivado): `IsFollowingPath` vuelve a falso, la velocidad se borra y regresa la gravedad, así que el
+    personaje cae o aterriza normalmente. Con **Auto Start** el recorrido empieza en cuanto el personaje se
+    inicializa; si no, activa `IsFollowingPath` desde tu propio script.
+
+    El personaje conserva su collider, así que las paredes en el camino lo detienen. Las demás habilidades
+    siguen corriendo: pon `PlayerPathFollow` después de `PlayerWalkRun` para que gane su velocidad, o
+    desactiva las habilidades de movimiento durante un recorrido guionado.
+  setup:
+    - Arma un personaje con `CharacterController2D` y agrega `PlayerPathFollow` antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Crea GameObjects vacíos para la ruta y arrástralos, en orden, a **Waypoints**.
+    - Activa **Auto Start**, o pon `IsFollowingPath = true` desde un trigger o un script de cinemática.
+  fields:
+    waypoints: Puntos de la ruta, recorridos en orden. Sus posiciones se leen una vez al iniciar, así que pueden ser hijos del personaje.
+    speed: Velocidad de viaje en unidades por segundo.
+    loop: Si está activado, la ruta se repite para siempre desde el primer punto; si no, el personaje se detiene y vuelve la gravedad en el último.
+    autoStart: Empieza a seguir la ruta en cuanto el personaje se inicializa.
+  api:
+    IsFollowingPath: Léelo para saber si la ruta está en marcha; ponlo en verdadero para empezar y en falso para detener (al detener se borra la velocidad y vuelve la gravedad).
+  example: |
+    Inicia un tramo guiado cuando el jugador entra en un trigger:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class StartGuidedPath : MonoBehaviour
+    {
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            var path = other.GetComponent<PlayerPathFollow>();
+            if (path == null || path.IsFollowingPath) return;
+            path.IsFollowingPath = true;
+        }
+    }
+    ```
+  tips:
+    - Desactiva **Loop** para secuencias de una sola vez; activado, el personaje no recupera el control hasta que pongas `IsFollowingPath` en falso.
+    - La ruta arranca desde donde esté el personaje hacia el primer punto, así que pon el primer punto cerca de donde empieza la secuencia.
+    - Pon `AbilityEnabled = false` en habilidades de movimiento como `PlayerWalkRun` durante el recorrido si el jugador podría pulsar teclas a mitad de la secuencia.

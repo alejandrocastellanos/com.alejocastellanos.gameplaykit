@@ -1,0 +1,133 @@
+name: PlayerSlopeWalk
+clip: true
+related: [PlayerWalkRun, PlayerJump, PlayerCrouch, CharacterController2D]
+en:
+  summary: Stand still on slopes without sliding down, read the ground angle and optionally tilt a visual to match it.
+  clip_caption: Walking up a ramp, stopping halfway without sliding back down, then walking down again.
+  description: |
+    `CharacterController2D` gives the character a zero-friction material so it never sticks to walls. The
+    side effect is that, on a slope, a character standing still slowly slides downhill. `PlayerSlopeWalk`
+    fixes that: while grounded it casts a short ray down from the feet, measures the angle of the ground,
+    and when the character is on a walkable slope with no horizontal input (and isn't jumping or moving up)
+    it turns gravity off for the character and stops it in place. As soon as you move or jump, gravity is
+    handed back.
+
+    Slopes up to **Max Slope Angle** count as walkable. Steeper ground is ignored by this ability, so the
+    character keeps sliding down it as usual, which is a simple way to make "too steep to stand on"
+    surfaces. Gravity is released through the controller's shared override system, so it plays nicely with
+    other abilities that also change gravity.
+
+    It exposes the signed angle of the ground under the feet in `SlopeAngle` (0 on flat ground, positive
+    when the surface rises to the right) and, if you assign **Align Visual**, smoothly rotates that
+    transform (typically the sprite child) to match the slope.
+  setup:
+    - Build a character with `CharacterController2D` and `PlayerWalkRun`.
+    - Add `PlayerSlopeWalk` before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Make a slope (a rotated `BoxCollider2D`, a `PolygonCollider2D` or an `EdgeCollider2D`) and stop on it; optionally drag your sprite child into **Align Visual**.
+  fields:
+    rayLength: How far below the feet the ground ray reaches, in units. Raise it a little if `SlopeAngle` flickers on bumpy terrain.
+    groundLayers: Layers the ray considers ground. *Everything* is fine; the character's own colliders are ignored.
+    maxSlopeAngle: Steepest slope, in degrees, where the character can stand still. Steeper surfaces are left to slide.
+    alignVisual: Optional transform (usually the sprite) rotated to follow the slope. Leave empty to keep everything upright.
+    rotationSpeed: How fast **Align Visual** turns towards the slope angle. Higher is snappier.
+  api:
+    SlopeAngle: Signed angle in degrees of the walkable ground under the feet (0 on flat ground or when airborne).
+    OnWalkableSlope: True while grounded on a slope steeper than 1° and no steeper than **Max Slope Angle**.
+  example: |
+    Slow the character down while walking uphill by scaling its horizontal speed with the slope:
+
+    ```csharp
+    using GameplayKit.Core;
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class UphillDrag : MonoBehaviour
+    {
+        [SerializeField, Range(0f, 1f)] private float uphillSpeedFactor = 0.7f;
+        private PlayerSlopeWalk _slope;
+        private CharacterController2D _controller;
+
+        private void Awake()
+        {
+            _slope = GetComponent<PlayerSlopeWalk>();
+            _controller = GetComponent<CharacterController2D>();
+        }
+
+        private void LateUpdate()
+        {
+            if (!_slope.OnWalkableSlope) return;
+            Vector2 v = _controller.Velocity;
+            // Positive angle = ground rises to the right, so moving right is uphill.
+            bool uphill = Mathf.Sign(v.x) == Mathf.Sign(_slope.SlopeAngle) && Mathf.Abs(v.x) > 0.01f;
+            if (uphill) _controller.Move(new Vector2(v.x * uphillSpeedFactor, v.y));
+        }
+    }
+    ```
+  tips:
+    - Add it to any platformer character that walks on slopes; the **GameplayKit > Create Player** menu already includes it.
+    - Use **Max Slope Angle** as a level-design tool: ramps under it are safe to stand on, steeper ones become slides.
+es:
+  summary: Quédate quieto en pendientes sin resbalar, lee el ángulo del suelo y, si quieres, inclina un visual para seguirlo.
+  clip_caption: Subiendo una rampa, deteniéndose a la mitad sin resbalar hacia atrás y luego bajando otra vez.
+  description: |
+    `CharacterController2D` le da al personaje un material sin fricción para que nunca se pegue a las
+    paredes. El efecto secundario es que, en una pendiente, un personaje quieto resbala lentamente cuesta
+    abajo. `PlayerSlopeWalk` lo arregla: mientras está en el suelo lanza un rayo corto hacia abajo desde los
+    pies, mide el ángulo del suelo y, cuando el personaje está en una pendiente caminable sin input
+    horizontal (y no está saltando ni subiendo), le quita la gravedad y lo detiene en su lugar. Apenas te
+    mueves o saltas, la gravedad vuelve.
+
+    Las pendientes de hasta **Max Slope Angle** cuentan como caminables. El suelo más empinado se ignora, así
+    que el personaje sigue resbalando por él como siempre, lo que es una forma sencilla de hacer superficies
+    "demasiado empinadas para pararse". La gravedad se libera con el sistema de anulaciones compartido del
+    controlador, así que convive bien con otras habilidades que también cambian la gravedad.
+
+    Expone el ángulo con signo del suelo bajo los pies en `SlopeAngle` (0 en plano, positivo cuando la
+    superficie sube hacia la derecha) y, si asignas **Align Visual**, rota suavemente ese transform
+    (normalmente el hijo con el sprite) para seguir la pendiente.
+  setup:
+    - Arma un personaje con `CharacterController2D` y `PlayerWalkRun`.
+    - Agrega `PlayerSlopeWalk` antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Crea una pendiente (un `BoxCollider2D` rotado, un `PolygonCollider2D` o un `EdgeCollider2D`) y detente en ella; si quieres, arrastra el hijo con el sprite a **Align Visual**.
+  fields:
+    rayLength: Hasta dónde llega el rayo de suelo por debajo de los pies, en unidades. Súbelo un poco si `SlopeAngle` parpadea en terreno irregular.
+    groundLayers: Capas que el rayo considera suelo. *Everything* funciona; los colliders del propio personaje se ignoran.
+    maxSlopeAngle: Pendiente más empinada, en grados, donde el personaje puede quedarse quieto. Las superficies más inclinadas se dejan resbalar.
+    alignVisual: Transform opcional (normalmente el sprite) que se rota para seguir la pendiente. Déjalo vacío para mantener todo derecho.
+    rotationSpeed: Qué tan rápido gira **Align Visual** hacia el ángulo de la pendiente. Más alto es más inmediato.
+  api:
+    SlopeAngle: Ángulo con signo, en grados, del suelo caminable bajo los pies (0 en plano o en el aire).
+    OnWalkableSlope: Verdadero mientras está en el suelo sobre una pendiente de más de 1° y no más empinada que **Max Slope Angle**.
+  example: |
+    Frena al personaje cuando sube una cuesta escalando su velocidad horizontal según la pendiente:
+
+    ```csharp
+    using GameplayKit.Core;
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class UphillDrag : MonoBehaviour
+    {
+        [SerializeField, Range(0f, 1f)] private float uphillSpeedFactor = 0.7f;
+        private PlayerSlopeWalk _slope;
+        private CharacterController2D _controller;
+
+        private void Awake()
+        {
+            _slope = GetComponent<PlayerSlopeWalk>();
+            _controller = GetComponent<CharacterController2D>();
+        }
+
+        private void LateUpdate()
+        {
+            if (!_slope.OnWalkableSlope) return;
+            Vector2 v = _controller.Velocity;
+            // Ángulo positivo = el suelo sube hacia la derecha, así que moverse a la derecha es subir.
+            bool uphill = Mathf.Sign(v.x) == Mathf.Sign(_slope.SlopeAngle) && Mathf.Abs(v.x) > 0.01f;
+            if (uphill) _controller.Move(new Vector2(v.x * uphillSpeedFactor, v.y));
+        }
+    }
+    ```
+  tips:
+    - Agrégalo a cualquier personaje de plataformas que camine por pendientes; el menú **GameplayKit > Create Player** ya lo incluye.
+    - Usa **Max Slope Angle** como herramienta de diseño de niveles: las rampas por debajo son seguras para pararse y las más empinadas se vuelven toboganes.

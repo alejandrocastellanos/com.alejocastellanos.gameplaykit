@@ -1,0 +1,45 @@
+name: UIScoreText
+clip: true
+related: [ScoreManager, Collectible, UIHealthBar]
+en:
+  summary: Shows the ScoreManager's score in a UI Text and updates it on every change.
+  clip_caption: A HUD label (format set to show "Coins N") counting up as the player runs through a row of coins.
+  description: |
+    `UIScoreText` subscribes to `ScoreManager.Instance` and rewrites its `Text` with **Format** every time
+    the score changes, plus once right when it subscribes so it never shows a stale value. It tries to
+    subscribe both on `OnEnable` and `Start`, so it doesn't matter whether the manager wakes up before or
+    after the text.
+
+    It works with the legacy uGUI `Text` component (added automatically if missing). **Format** is a
+    standard `string.Format` pattern where `{0}` is the score, so you can add words, padding or number
+    formats such as `{0:000}`.
+  setup:
+    - Make sure there's a `ScoreManager` in the scene.
+    - Create a UI Text (**GameObject > UI > Legacy > Text**) in your HUD canvas.
+    - "Add `UIScoreText` to it and write your **Format**, for example `Score: {0}`."
+  fields:
+    format: "Text pattern for the label; `{0}` is replaced by the score. The default is the Spanish \"Puntos: {0}\" — change it to your language."
+  tips:
+    - Use `{0:N0}` for thousands separators or `{0:000000}` for an arcade-style fixed width.
+    - The menu **GameplayKit > Create HUD** already includes a score label with this component.
+es:
+  summary: Muestra el puntaje de ScoreManager en un Text de UI y lo actualiza en cada cambio.
+  clip_caption: Una etiqueta del HUD (con un formato que muestra "Coins N") que sube mientras el jugador corre por una fila de monedas.
+  description: |
+    `UIScoreText` se suscribe a `ScoreManager.Instance` y reescribe su `Text` con **Format** cada vez que
+    cambia el puntaje, y una vez más justo al suscribirse para no mostrar nunca un valor viejo. Intenta
+    suscribirse tanto en `OnEnable` como en `Start`, así no importa si el manager despierta antes o después
+    que el texto.
+
+    Funciona con el componente `Text` clásico de uGUI (se agrega solo si falta). **Format** es un patrón
+    normal de `string.Format` donde `{0}` es el puntaje, así puedes agregar palabras, relleno o formatos de
+    número como `{0:000}`.
+  setup:
+    - Asegúrate de que haya un `ScoreManager` en la escena.
+    - Crea un Text de UI (**GameObject > UI > Legacy > Text**) en el canvas de tu HUD.
+    - "Agrégale `UIScoreText` y escribe tu **Format**, por ejemplo `Puntos: {0}`."
+  fields:
+    format: "Patrón de texto de la etiqueta; `{0}` se reemplaza por el puntaje. Por defecto es \"Puntos: {0}\"."
+  tips:
+    - Usa `{0:N0}` para separador de miles o `{0:000000}` para un ancho fijo estilo arcade.
+    - El menú **GameplayKit > Create HUD** ya incluye una etiqueta de puntaje con este componente.

@@ -1,0 +1,105 @@
+name: Lever
+clip: true
+related: [PlayerInteract, Elevator, DoorWithKey, PressurePlate]
+en:
+  summary: A switch the player flips with the interact button to turn doors, elevators and traps on or off.
+  clip_caption: Pressing E next to the lever toggles it on, off and on again, opening and closing a gate.
+  description: |
+    `Lever` is an `IInteractable` with an on/off state. Each interaction (pressing **E** within range of a
+    character's `PlayerInteract`, or calling `Interact()` from code) flips `IsOn` and fires the matching
+    UnityEvent (**On Turned On** or **On Turned Off**), then **On Toggled** and the C# `OnToggled` event.
+
+    The UnityEvents are where the lever does its work: in the Inspector, connect them to `Elevator.Activate`,
+    `DoorWithKey.Open`, `GameObject.SetActive`, a component's **enabled** checkbox or any public method.
+    **Starts On** only sets the initial state; no event fires at start. The lever needs a collider so
+    `PlayerInteract` can find it; a trigger works well so the player can stand over it.
+  setup:
+    - Create a GameObject with a `BoxCollider2D` marked **Is Trigger** and add `Lever`.
+    - Give the player a `PlayerInteract` ability (the player from **GameplayKit > Create Player** has it).
+    - In **On Turned On**, **On Turned Off** or **On Toggled**, click **+**, drag the target object and pick the method to call.
+  fields:
+    startsOn: Initial state of the lever. Doesn't fire any event at start; it only decides whether the first interaction turns it off.
+  events:
+    onTurnedOn: UnityEvent fired when the lever switches to on.
+    onTurnedOff: UnityEvent fired when the lever switches to off.
+    onToggled: UnityEvent fired on every change, on or off, after the specific one.
+    OnToggled: C# event fired on every change with the new state (`true` = on).
+  api:
+    IsOn: Current state of the lever.
+    Interact: Flips the lever from code, exactly as if the player had interacted with it.
+  example: |
+    Swap the lever sprite to match its state:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    [RequireComponent(typeof(Lever))]
+    public class LeverSprite : MonoBehaviour
+    {
+        [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private Sprite onSprite, offSprite;
+
+        private void Awake()
+        {
+            var lever = GetComponent<Lever>();
+            spriteRenderer.sprite = lever.IsOn ? onSprite : offSprite;
+            lever.OnToggled += isOn => spriteRenderer.sprite = isOn ? onSprite : offSprite;
+        }
+    }
+    ```
+  tips:
+    - Use **On Toggled** for things that alternate by themselves (`Elevator.Activate`) and the on/off events for things with two explicit states (opening and closing a gate).
+    - Your own scripts can be interactable too; implement `IInteractable` and `PlayerInteract` will find them like a lever.
+es:
+  summary: Un interruptor que el jugador acciona con el botón de interactuar para encender o apagar puertas, elevadores y trampas.
+  clip_caption: Al pulsar E junto a la palanca la enciende, la apaga y la vuelve a encender, abriendo y cerrando una reja.
+  description: |
+    `Lever` es un `IInteractable` con estado encendido/apagado. Cada interacción (pulsar **E** dentro del
+    alcance del `PlayerInteract` de un personaje, o llamar a `Interact()` desde código) invierte `IsOn` y
+    dispara el UnityEvent correspondiente (**On Turned On** u **On Turned Off**), luego **On Toggled** y el
+    evento C# `OnToggled`.
+
+    Los UnityEvents son donde la palanca hace su trabajo: en el Inspector, conéctalos a `Elevator.Activate`,
+    `DoorWithKey.Open`, `GameObject.SetActive`, la casilla **enabled** de un componente o cualquier método
+    público. **Starts On** solo fija el estado inicial; no se dispara ningún evento al empezar. La palanca
+    necesita un collider para que `PlayerInteract` la encuentre; un trigger funciona bien para que el
+    jugador pueda pararse encima.
+  setup:
+    - Crea un GameObject con un `BoxCollider2D` marcado como **Is Trigger** y agrégale `Lever`.
+    - Dale al jugador la habilidad `PlayerInteract` (el de **GameplayKit > Create Player** la trae).
+    - En **On Turned On**, **On Turned Off** u **On Toggled**, pulsa **+**, arrastra el objeto destino y elige el método a llamar.
+  fields:
+    startsOn: Estado inicial de la palanca. No dispara eventos al empezar; solo decide si la primera interacción la apaga.
+  events:
+    onTurnedOn: UnityEvent que se dispara al pasar a encendida.
+    onTurnedOff: UnityEvent que se dispara al pasar a apagada.
+    onToggled: UnityEvent que se dispara en cada cambio, encendiendo o apagando, después del específico.
+    OnToggled: Evento C# que se dispara en cada cambio con el nuevo estado (`true` = encendida).
+  api:
+    IsOn: Estado actual de la palanca.
+    Interact: Acciona la palanca desde código, igual que si el jugador hubiera interactuado.
+  example: |
+    Cambia el sprite de la palanca según su estado:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    [RequireComponent(typeof(Lever))]
+    public class LeverSprite : MonoBehaviour
+    {
+        [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private Sprite onSprite, offSprite;
+
+        private void Awake()
+        {
+            var lever = GetComponent<Lever>();
+            spriteRenderer.sprite = lever.IsOn ? onSprite : offSprite;
+            lever.OnToggled += isOn => spriteRenderer.sprite = isOn ? onSprite : offSprite;
+        }
+    }
+    ```
+  tips:
+    - Usa **On Toggled** para cosas que alternan solas (`Elevator.Activate`) y los eventos de encendido/apagado para cosas con dos estados explícitos (abrir y cerrar una reja).
+    - Tus propios scripts también pueden ser interactuables; implementa `IInteractable` y `PlayerInteract` los encontrará como a una palanca.

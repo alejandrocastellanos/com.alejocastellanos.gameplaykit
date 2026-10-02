@@ -1,0 +1,87 @@
+name: Checkpoint
+clip: true
+related: [CharacterRespawn, LevelManager, HazardZone, CharacterLives]
+en:
+  summary: Touch it once and it becomes the place where the player reappears after dying.
+  clip_caption: The player activates the checkpoint, dies on the spikes and reappears at the checkpoint.
+  description: |
+    A `Checkpoint` is a trigger area. The first time a collider with **Player Tag** enters it (the tag of
+    the collider or of its `Rigidbody2D`), it calls `SetCheckpoint` on the player's `CharacterRespawn`, so the
+    next respawn happens at the checkpoint's position. If a `LevelManager` exists in the scene, it also
+    becomes the level's active checkpoint.
+
+    Activation happens only once: `IsActivated` turns true, **Active Visual** is switched on and
+    `OnActivated` fires. Walking through it again does nothing, but touching a *different* checkpoint later
+    moves the respawn point there. The player respawns at the checkpoint's transform position, so place
+    its pivot at a spot where the character can stand.
+  setup:
+    - Create a GameObject with a `BoxCollider2D` marked **Is Trigger** and add `Checkpoint`.
+    - Make sure the player has the **Player** tag and a `CharacterRespawn` (the player from **GameplayKit > Create Player** has both).
+    - Optionally create a child flag or light, disable it, and drag it into **Active Visual**.
+  fields:
+    playerTag: Tag that activates the checkpoint. The tag of the touching collider or of its Rigidbody2D must match.
+    activeVisual: Optional GameObject switched on when the checkpoint is activated (a raised flag, a lit torch). Start it disabled.
+  events:
+    OnActivated: C# event fired once, the first time the player touches the checkpoint.
+  api:
+    IsActivated: True after the player has touched this checkpoint.
+  example: |
+    Play a sound and save the game when a checkpoint is reached:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    [RequireComponent(typeof(Checkpoint))]
+    public class CheckpointSound : MonoBehaviour
+    {
+        [SerializeField] private AudioSource chime;
+
+        private void Awake() => GetComponent<Checkpoint>().OnActivated += () => chime.Play();
+    }
+    ```
+  tips:
+    - Pair it with `HazardZone` pits and `CharacterLives` for classic platformer progression.
+    - Checkpoints never deactivate; to reuse the same one after a level restart, reload the scene.
+es:
+  summary: Tócalo una vez y se convierte en el lugar donde reaparece el jugador tras morir.
+  clip_caption: El jugador activa el checkpoint, muere en los pinchos y reaparece en el checkpoint.
+  description: |
+    Un `Checkpoint` es un área trigger. La primera vez que entra un collider con **Player Tag** (el tag del
+    collider o de su `Rigidbody2D`), llama a `SetCheckpoint` en el `CharacterRespawn` del jugador, así el
+    siguiente respawn ocurre en la posición del checkpoint. Si hay un `LevelManager` en la escena, también
+    pasa a ser el checkpoint activo del nivel.
+
+    Se activa una sola vez: `IsActivated` pasa a verdadero, se enciende **Active Visual** y se dispara
+    `OnActivated`. Volver a pasar no hace nada, pero tocar *otro* checkpoint después mueve el punto de
+    reaparición allí. El jugador reaparece en la posición del transform del checkpoint, así que pon su
+    pivote donde el personaje pueda pararse.
+  setup:
+    - Crea un GameObject con un `BoxCollider2D` marcado como **Is Trigger** y agrégale `Checkpoint`.
+    - Asegúrate de que el jugador tenga el tag **Player** y un `CharacterRespawn` (el de **GameplayKit > Create Player** trae ambos).
+    - Si quieres, crea una bandera o luz hija, desactívala y arrástrala a **Active Visual**.
+  fields:
+    playerTag: Tag que activa el checkpoint. Debe coincidir el tag del collider que lo toca o el de su Rigidbody2D.
+    activeVisual: GameObject opcional que se enciende al activarse (una bandera izada, una antorcha). Déjalo desactivado al inicio.
+  events:
+    OnActivated: Evento C# que se dispara una vez, la primera vez que el jugador toca el checkpoint.
+  api:
+    IsActivated: Verdadero desde que el jugador tocó este checkpoint.
+  example: |
+    Reproduce un sonido al llegar a un checkpoint:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    [RequireComponent(typeof(Checkpoint))]
+    public class CheckpointSound : MonoBehaviour
+    {
+        [SerializeField] private AudioSource chime;
+
+        private void Awake() => GetComponent<Checkpoint>().OnActivated += () => chime.Play();
+    }
+    ```
+  tips:
+    - Combínalo con fosos de `HazardZone` y `CharacterLives` para la progresión clásica de plataformas.
+    - Los checkpoints nunca se desactivan; para reutilizar el mismo tras reiniciar el nivel, recarga la escena.

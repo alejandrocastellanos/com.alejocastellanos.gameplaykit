@@ -1,0 +1,75 @@
+name: AIActionWait
+clip: true
+related: [AIBrain, AIDecisionTimeInState, AIActionPatrolPoints, AIDecisionTargetInRange]
+en:
+  summary: AIBrain action that does nothing — use it for idle, pause and "waiting for something" states.
+  clip_caption: A guard alternates between walking its route for 1.4 seconds and standing still for 0.9 seconds.
+  description: |
+    `AIActionWait` has an empty `PerformAction`. It exists so a state can have an action slot filled
+    while the enemy just stands there; the interesting part is the transition that ends the wait. Two
+    classic uses: a timed pause with `AIDecisionTimeInState` (walk for a while, wait, walk again) and an
+    idle state that waits for the player with `AIDecisionTargetInRange` or `AIDecisionLineOfSight`.
+
+    It doesn't stop the enemy by itself. The built-in movement actions already zero the horizontal
+    velocity when their state ends, so switching from a patrol to a wait state halts the enemy.
+  setup:
+    - Add `AIActionWait` to the enemy with the `AIBrain`.
+    - Create a state such as `Wait` or `Idle` and put the action in its **Actions**.
+    - Add a transition out of it, e.g. `AIDecisionTimeInState` → **True Target State** `Patrol`.
+  example: |
+    You can also end a wait from gameplay code, for example when an alarm goes off:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class Alarm : MonoBehaviour
+    {
+        [SerializeField] private AIBrain[] guards;
+
+        public void Trigger()
+        {
+            foreach (var guard in guards) guard.TransitionTo("Chase");
+        }
+    }
+    ```
+  tips:
+    - States without any action work too, but listing `AIActionWait` makes the intent obvious in the Inspector.
+    - The same `AIActionWait` component can be used by several states.
+es:
+  summary: Acción de AIBrain que no hace nada — úsala para estados de reposo, pausas y "esperar a que pase algo".
+  clip_caption: Un guardia alterna entre recorrer su ruta durante 1.4 segundos y quedarse quieto 0.9 segundos.
+  description: |
+    `AIActionWait` tiene un `PerformAction` vacío. Existe para que un estado tenga su lista de acciones
+    con algo mientras el enemigo simplemente se queda ahí; lo interesante es la transición que termina
+    la espera. Dos usos clásicos: una pausa temporizada con `AIDecisionTimeInState` (caminar un rato,
+    esperar, volver a caminar) y un estado de reposo que espera al jugador con `AIDecisionTargetInRange`
+    o `AIDecisionLineOfSight`.
+
+    No detiene al enemigo por sí misma. Las acciones de movimiento incluidas ya ponen en cero la velocidad
+    horizontal al terminar su estado, así que pasar de una patrulla a un estado de espera frena al
+    enemigo.
+  setup:
+    - Agrega `AIActionWait` al enemigo que tiene el `AIBrain`.
+    - Crea un estado como `Wait` o `Idle` y pon la acción en sus **Actions**.
+    - Agrega una transición de salida, por ejemplo `AIDecisionTimeInState` → **True Target State** `Patrol`.
+  example: |
+    También puedes terminar una espera desde el código del juego, por ejemplo cuando suena una alarma:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class Alarm : MonoBehaviour
+    {
+        [SerializeField] private AIBrain[] guards;
+
+        public void Trigger()
+        {
+            foreach (var guard in guards) guard.TransitionTo("Chase");
+        }
+    }
+    ```
+  tips:
+    - Los estados sin acciones también funcionan, pero poner `AIActionWait` deja clara la intención en el Inspector.
+    - El mismo componente `AIActionWait` lo pueden usar varios estados.

@@ -1,0 +1,99 @@
+name: EnemyFlee
+clip: true
+related: [EnemyChase, AIActionFlee, EnemyPatrol]
+en:
+  summary: Stand-alone behaviour for cowardly or neutral creatures that run away from a target while it's close.
+  clip_caption: A critter turns and runs whenever the player gets inside its flee radius, stopping once it's far enough.
+  description: |
+    Every frame it measures the distance to **Target**. While it is within **Flee Range**, the creature
+    runs horizontally away from it at **Speed** and flips `localScale.x` to face the direction it runs.
+    Once the target is out of range, or if there is no target, it stops (it doesn't turn back towards
+    the target). Only the X velocity of the `Rigidbody2D` is set, so gravity keeps working. With **Target**
+    empty it finds the GameObject tagged `Player` by itself (checking at most every half second), so it
+    also works in prefabs and spawned creatures.
+
+    It works without an `AIBrain`, which makes it ideal for ambient wildlife, fleeing loot carriers or
+    neutral NPCs. For an enemy that fights first and flees when hurt, use `AIActionFlee` with
+    `AIDecisionHealthThreshold`.
+  setup:
+    - Give the creature a `Collider2D` and a `Rigidbody2D` (Freeze Rotation Z); `EnemyFlee` requires the body.
+    - Add `EnemyFlee` and tag your player `Player` (or drag another object into **Target**).
+    - Set **Flee Range** and **Speed**, and leave room (or walls) for it to run.
+  fields:
+    target: What to run away from. Empty means the GameObject tagged `Player`, found automatically.
+    fleeRange: Radius in units; while the target is closer than this, the creature flees.
+    speed: Horizontal flee speed in units per second.
+  api:
+    IsFleeing: True while the target is within **Flee Range**.
+    Target: Gets or sets what the creature runs from at runtime. `null` goes back to the `Player`-tagged object.
+  example: |
+    Play a panic sound when the creature starts running:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class PanicSound : MonoBehaviour
+    {
+        [SerializeField] private EnemyFlee flee;
+        [SerializeField] private AudioSource squeak;
+        private bool _wasFleeing;
+
+        private void Update()
+        {
+            if (flee.IsFleeing && !_wasFleeing) squeak.Play();
+            _wasFleeing = flee.IsFleeing;
+        }
+    }
+    ```
+  tips:
+    - It doesn't check edges or walls; on platforms, put walls at the ends so creatures don't fall off.
+    - A speed a bit lower than the player's walk speed (4) lets the player catch it.
+es:
+  summary: Comportamiento independiente para criaturas cobardes o neutrales que huyen de un objetivo mientras está cerca.
+  clip_caption: Una criatura se da vuelta y corre cada vez que el jugador entra en su radio de huida, y se detiene cuando queda lo bastante lejos.
+  description: |
+    En cada frame mide la distancia hasta **Target**. Mientras esté dentro de **Flee Range**, la criatura
+    corre en horizontal alejándose a **Speed** y voltea `localScale.x` para mirar hacia donde corre.
+    Cuando el objetivo sale del rango, o si no hay objetivo, se detiene (no se vuelve a girar hacia el
+    objetivo). Solo se fija la velocidad X del `Rigidbody2D`, así que la gravedad sigue funcionando. Con
+    **Target** vacío busca solo el GameObject con tag `Player` (como mucho cada medio segundo), así que
+    también funciona en prefabs y criaturas generadas.
+
+    Funciona sin `AIBrain`, lo que la hace ideal para fauna ambiental, portadores de botín que escapan o
+    NPCs neutrales. Para un enemigo que primero pelea y huye cuando está herido, usa `AIActionFlee` con
+    `AIDecisionHealthThreshold`.
+  setup:
+    - Dale a la criatura un `Collider2D` y un `Rigidbody2D` (Freeze Rotation Z); `EnemyFlee` requiere el cuerpo.
+    - Agrega `EnemyFlee` y ponle el tag `Player` a tu jugador (o arrastra otro objeto a **Target**).
+    - Ajusta **Flee Range** y **Speed**, y déjale espacio (o paredes) para correr.
+  fields:
+    target: De qué huir. Vacío significa el GameObject con tag `Player`, que se busca solo.
+    fleeRange: Radio en unidades; mientras el objetivo esté más cerca, la criatura huye.
+    speed: Velocidad horizontal de huida en unidades por segundo.
+  api:
+    IsFleeing: Verdadero mientras el objetivo está dentro de **Flee Range**.
+    Target: Lee o cambia de qué huye la criatura en runtime. `null` vuelve al objeto con tag `Player`.
+  example: |
+    Reproduce un sonido de pánico cuando la criatura empieza a correr:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class PanicSound : MonoBehaviour
+    {
+        [SerializeField] private EnemyFlee flee;
+        [SerializeField] private AudioSource squeak;
+        private bool _wasFleeing;
+
+        private void Update()
+        {
+            if (flee.IsFleeing && !_wasFleeing) squeak.Play();
+            _wasFleeing = flee.IsFleeing;
+        }
+    }
+    ```
+  tips:
+    - No revisa bordes ni paredes; en plataformas, pon paredes en los extremos para que las criaturas no se caigan.
+    - Una velocidad un poco menor que la de caminata del jugador (4) permite alcanzarla.

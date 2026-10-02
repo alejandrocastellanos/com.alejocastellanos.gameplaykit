@@ -1,0 +1,131 @@
+name: WeaponHitscan
+clip: true
+related: [PlayerAttack, CharacterAimAndOrient, WeaponProjectile, EnemyShootOnSight, AIActionShoot]
+en:
+  summary: An instant ranged attack that hits the first thing along a ray, like a laser or sniper rifle.
+  clip_caption: Instant shots break the first dummy and then reach the one behind; fired into empty space, the ray goes its full range.
+  description: |
+    Each shot casts a ray from **Fire Point** (or the object's position) up to **Range** units and damages
+    the first solid collider it meets if it is `IDamageable`. Trigger colliders and the shooter's own
+    colliders are ignored, so **Hittable Layers** can stay on *Everything*; a wall simply stops the shot.
+    After firing, the weapon waits **Cooldown** seconds.
+
+    The weapon itself doesn't draw anything: listen to `OnShotFired`, which gives the start and end
+    points (the hit point, or the end of the range on a miss), to draw a line renderer or spawn effects.
+    With `PlayerAttack` the shot goes towards `CharacterAimAndOrient` or the facing direction; enemies
+    use it through `EnemyShootOnSight` or `AIActionShoot`.
+  setup:
+    - Add `WeaponHitscan` to a character with `PlayerAttack` (or to an enemy with `EnemyShootOnSight`).
+    - Optionally create a child at the muzzle and assign it to **Fire Point**.
+    - Subscribe to `OnShotFired` to draw the shot, then press **Attack**.
+  fields:
+    firePoint: Optional transform where the ray starts. Empty = the object's position.
+    range: Maximum distance of the ray, in units.
+    damage: Damage per shot.
+    hittableLayers: Layers the ray can hit. *Everything* works because the shooter is ignored.
+    cooldown: Seconds between shots.
+  events:
+    OnShotFired: "C# event fired on every shot with `(origin, endPoint)` in world space."
+  api:
+    IsOnCooldown: True while waiting to be able to fire again.
+    TryFire: "Fires in the given direction if not on cooldown and returns whether it did. The overload with a damage value overrides **Damage** (used by `WeaponCharge`)."
+  example: |
+    Draw a brief laser line for every shot:
+
+    ```csharp
+    using System.Collections;
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class LaserTrail : MonoBehaviour
+    {
+        [SerializeField] private LineRenderer line;
+        private WeaponHitscan _gun;
+
+        private void Awake() => _gun = GetComponent<WeaponHitscan>();
+        private void OnEnable() => _gun.OnShotFired += Draw;
+        private void OnDisable() => _gun.OnShotFired -= Draw;
+
+        private void Draw(Vector2 from, Vector2 to)
+        {
+            line.SetPosition(0, from);
+            line.SetPosition(1, to);
+            StopAllCoroutines();
+            StartCoroutine(Hide());
+        }
+
+        private IEnumerator Hide()
+        {
+            line.enabled = true;
+            yield return new WaitForSeconds(0.05f);
+            line.enabled = false;
+        }
+    }
+    ```
+  tips:
+    - Without visual feedback the shot is invisible; always hook `OnShotFired` to a line, a muzzle flash or a sound.
+    - Pair it with `CharacterAimAndOrient` for twin-stick or mouse aiming.
+es:
+  summary: Un ataque a distancia instantáneo que golpea lo primero que encuentra en línea recta, como un láser o un rifle.
+  clip_caption: Los disparos instantáneos rompen el primer muñeco y luego alcanzan al de atrás; hacia el vacío, el rayo llega a todo su alcance.
+  description: |
+    Cada disparo lanza un rayo desde **Fire Point** (o la posición del objeto) hasta **Range** unidades y
+    daña el primer collider sólido que encuentra si es `IDamageable`. Se ignoran los colliders trigger y
+    los del propio tirador, así que **Hittable Layers** puede quedarse en *Everything*; una pared
+    simplemente frena el disparo. Tras disparar, el arma espera **Cooldown** segundos.
+
+    El arma no dibuja nada por sí sola: escucha `OnShotFired`, que entrega el punto de inicio y el final
+    (el punto de impacto, o el final del alcance si falla), para dibujar un line renderer o soltar
+    efectos. Con `PlayerAttack` el disparo va hacia `CharacterAimAndOrient` o hacia donde mira el
+    personaje; los enemigos lo usan con `EnemyShootOnSight` o `AIActionShoot`.
+  setup:
+    - Agrega `WeaponHitscan` a un personaje con `PlayerAttack` (o a un enemigo con `EnemyShootOnSight`).
+    - Si quieres, crea un hijo en la boca del cañón y asígnalo a **Fire Point**.
+    - Suscríbete a `OnShotFired` para dibujar el disparo y pulsa **Attack**.
+  fields:
+    firePoint: Transform opcional desde donde sale el rayo. Vacío = la posición del objeto.
+    range: Distancia máxima del rayo, en unidades.
+    damage: Daño por disparo.
+    hittableLayers: Capas que el rayo puede golpear. *Everything* funciona porque el tirador se ignora.
+    cooldown: Segundos entre disparos.
+  events:
+    OnShotFired: "Evento C# que se dispara en cada disparo con `(origin, endPoint)` en coordenadas de mundo."
+  api:
+    IsOnCooldown: Verdadero mientras espera para poder disparar otra vez.
+    TryFire: "Dispara en la dirección indicada si no está en cooldown y devuelve si lo hizo. La sobrecarga con un valor de daño reemplaza **Damage** (la usa `WeaponCharge`)."
+  example: |
+    Dibuja una línea láser breve en cada disparo:
+
+    ```csharp
+    using System.Collections;
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class LaserTrail : MonoBehaviour
+    {
+        [SerializeField] private LineRenderer line;
+        private WeaponHitscan _gun;
+
+        private void Awake() => _gun = GetComponent<WeaponHitscan>();
+        private void OnEnable() => _gun.OnShotFired += Draw;
+        private void OnDisable() => _gun.OnShotFired -= Draw;
+
+        private void Draw(Vector2 from, Vector2 to)
+        {
+            line.SetPosition(0, from);
+            line.SetPosition(1, to);
+            StopAllCoroutines();
+            StartCoroutine(Hide());
+        }
+
+        private IEnumerator Hide()
+        {
+            line.enabled = true;
+            yield return new WaitForSeconds(0.05f);
+            line.enabled = false;
+        }
+    }
+    ```
+  tips:
+    - Sin feedback visual el disparo es invisible; engancha siempre `OnShotFired` a una línea, un fogonazo o un sonido.
+    - Combínalo con `CharacterAimAndOrient` para apuntar con el mouse o con dos sticks.

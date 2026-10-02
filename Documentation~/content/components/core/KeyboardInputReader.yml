@@ -1,0 +1,124 @@
+name: KeyboardInputReader
+clip: false
+related: [CharacterCore, AbilityBase, PlayerAttack, PauseManager]
+en:
+  summary: Default keyboard and gamepad input for characters; works with the new Input System and the classic Input Manager.
+  description: |
+    `KeyboardInputReader` is the kit's reference implementation of `ICharacterInput`, the interface every
+    ability reads. You rarely add it yourself: `CharacterCore` adds it on `Awake` when the character has no
+    other input component. It reads through the kit's compatibility layer, so it works whether the project
+    uses **Input System Package (New)**, **Input Manager (Old)** or **Both**, with no setup.
+
+    Fixed bindings: move with A/D/W/S or the arrows (or the left stick), jump with Space (gamepad South:
+    A/Cross), run holding Left Shift (or the left trigger), crouch holding Left Ctrl, dash with Q (or the
+    right trigger) and interact with E (or Select). Each frame it stores which buttons were pressed,
+    held and released, so abilities can tell a tap from a hold.
+
+    The extra actions (`Attack`, `Special`, `Fly`, `Roll`, `Blink`) are configurable in **Action Bindings**:
+    each entry pairs an action with a keyboard key and a gamepad button. Defaults: Attack J / West
+    (X/Square), Special K / right shoulder, Fly F / North, Roll Left Alt / East, Blink C / left shoulder.
+    With the classic Input Manager only, gamepad buttons aren't read, and movement and jump use its
+    **Horizontal**, **Vertical** and **Jump** axes.
+  setup:
+    - Nothing to do for a standard character — `CharacterCore` adds it if no input component exists.
+    - To change action keys, add it yourself before Play and edit **Action Bindings**.
+    - To replace it (AI, replays, rebindable input), add your own component implementing `ICharacterInput` instead.
+  fields:
+    actionBindings: List of action → key + gamepad button pairs for Attack, Special, Fly, Roll and Blink. Several entries for the same action are allowed; any of them triggers it.
+  api:
+    MoveInput: Movement direction this frame, each axis between -1 and 1.
+    JumpPressedThisFrame: True only on the frame jump was pressed.
+    JumpHeld: True while jump is held.
+    JumpReleasedThisFrame: True only on the frame jump was released (used to cut variable-height jumps).
+    RunHeld: True while run is held.
+    CrouchHeld: True while crouch is held.
+    DashPressedThisFrame: True only on the frame dash was pressed.
+    InteractPressedThisFrame: True only on the frame interact was pressed.
+    GetActionDown: True on the frame any binding of the action was pressed.
+    GetAction: True while any binding of the action is held.
+    GetActionUp: True on the frame any binding of the action was released.
+  example: |
+    Read the same input your abilities use from any script, without depending on the concrete reader:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class SpecialHint : MonoBehaviour
+    {
+        [SerializeField] private GameObject hint;
+        private ICharacterInput _input;
+
+        private void Start() => _input = GetComponent<ICharacterInput>();
+
+        private void Update()
+        {
+            if (_input != null && _input.GetActionDown(CharacterAction.Special)) hint.SetActive(false);
+        }
+    }
+    ```
+  tips:
+    - Gamepad buttons need the Input System package; with the classic Input Manager only the keyboard bindings and its axes work.
+    - Keyboard input can't be scripted in tests or demos; write a small `ICharacterInput` of your own to drive a character from code.
+    - Pause isn't read here; `PauseManager` has its own key (Esc by default).
+es:
+  summary: Input de teclado y gamepad por defecto para personajes; funciona con el Input System nuevo y con el Input Manager clásico.
+  description: |
+    `KeyboardInputReader` es la implementación de referencia del kit de `ICharacterInput`, la interfaz que
+    leen todas las habilidades. Rara vez lo agregas tú: `CharacterCore` lo agrega en `Awake` cuando el
+    personaje no tiene otro componente de input. Lee a través de la capa de compatibilidad del kit, así que
+    funciona igual si el proyecto usa **Input System Package (New)**, **Input Manager (Old)** o **Both**, sin
+    configurar nada.
+
+    Controles fijos: moverse con A/D/W/S o las flechas (o el stick izquierdo), saltar con Espacio (botón sur
+    del gamepad: A/Cruz), correr manteniendo Shift izquierdo (o el gatillo izquierdo), agacharse manteniendo
+    Ctrl izquierdo, dash con Q (o el gatillo derecho) e interactuar con E (o Select). Cada frame guarda qué
+    botones se presionaron, se mantienen y se soltaron, así las habilidades distinguen un toque de mantener.
+
+    Las acciones extra (`Attack`, `Special`, `Fly`, `Roll`, `Blink`) se configuran en **Action Bindings**:
+    cada entrada une una acción con una tecla y un botón de gamepad. Por defecto: Attack J / Oeste
+    (X/Cuadrado), Special K / bumper derecho, Fly F / Norte, Roll Alt izquierdo / Este, Blink C / bumper
+    izquierdo. Solo con el Input Manager clásico no se leen botones de gamepad, y el movimiento y el salto
+    usan sus ejes **Horizontal**, **Vertical** y **Jump**.
+  setup:
+    - Nada que hacer en un personaje normal — `CharacterCore` lo agrega si no hay componente de input.
+    - Para cambiar teclas de acciones, agrégalo tú antes de Play y edita **Action Bindings**.
+    - Para reemplazarlo (IA, replays, controles reasignables), agrega en su lugar tu propio componente que implemente `ICharacterInput`.
+  fields:
+    actionBindings: Lista de pares acción → tecla + botón de gamepad para Attack, Special, Fly, Roll y Blink. Se permiten varias entradas para la misma acción; cualquiera la dispara.
+  api:
+    MoveInput: Dirección de movimiento de este frame, cada eje entre -1 y 1.
+    JumpPressedThisFrame: Verdadero solo en el frame en que se presionó saltar.
+    JumpHeld: Verdadero mientras se mantiene saltar.
+    JumpReleasedThisFrame: Verdadero solo en el frame en que se soltó saltar (sirve para cortar saltos de altura variable).
+    RunHeld: Verdadero mientras se mantiene correr.
+    CrouchHeld: Verdadero mientras se mantiene agacharse.
+    DashPressedThisFrame: Verdadero solo en el frame en que se presionó dash.
+    InteractPressedThisFrame: Verdadero solo en el frame en que se presionó interactuar.
+    GetActionDown: Verdadero en el frame en que se presionó cualquier binding de la acción.
+    GetAction: Verdadero mientras se mantiene cualquier binding de la acción.
+    GetActionUp: Verdadero en el frame en que se soltó cualquier binding de la acción.
+  example: |
+    Lee desde cualquier script el mismo input que usan tus habilidades, sin depender del lector concreto:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class SpecialHint : MonoBehaviour
+    {
+        [SerializeField] private GameObject hint;
+        private ICharacterInput _input;
+
+        private void Start() => _input = GetComponent<ICharacterInput>();
+
+        private void Update()
+        {
+            if (_input != null && _input.GetActionDown(CharacterAction.Special)) hint.SetActive(false);
+        }
+    }
+    ```
+  tips:
+    - Los botones de gamepad necesitan el paquete Input System; con el Input Manager clásico solo funcionan los bindings de teclado y sus ejes.
+    - El teclado no se puede scriptear en tests o demos; escribe un `ICharacterInput` pequeño propio para manejar un personaje desde código.
+    - La pausa no se lee aquí; `PauseManager` tiene su propia tecla (Esc por defecto).

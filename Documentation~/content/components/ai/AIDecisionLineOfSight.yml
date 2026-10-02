@@ -1,0 +1,87 @@
+name: AIDecisionLineOfSight
+clip: true
+related: [AIBrain, AIActionShoot, AIDecisionTargetInRange, EnemyShootOnSight]
+en:
+  summary: AIBrain decision that is true when nothing solid stands between the enemy and its target.
+  clip_caption: A turret only shoots while the sliding door is open; the sight line turns green when the player is visible.
+  description: |
+    Returns true when `AIBrain.Target` is within **Max Distance** and a raycast from this GameObject to
+    the target hits nothing on **Obstacle Layers**. The ray ignores the enemy's own colliders and the
+    target's, and also ignores trigger colliders (water, checkpoints, detection zones), so the default
+    *Everything* mask works out of the box.
+
+    There is no vision cone: the enemy "sees" in every direction. Use it to stop enemies from shooting
+    or chasing through walls, or combine it with a facing check of your own if direction matters (the
+    stand-alone `EnemyShootOnSight` has a cone built in).
+  setup:
+    - Add `AIDecisionLineOfSight` to the enemy with the `AIBrain` (or to a child placed at eye height).
+    - In the idle state, add a transition with it and **True Target State** set to e.g. `Shoot`.
+    - In `Shoot`, add a transition with the same decision and **False Target State** set back to idle.
+  fields:
+    maxDistance: Farthest distance at which the target can be seen, in units. Beyond it the decision is false even with a clear view.
+    obstacleLayers: Layers that block the view. *Everything* is fine because the enemy and the target are ignored; exclude layers like glass or foliage that shouldn't block sight.
+  example: |
+    Draw a debug line in the Scene view that is green when the enemy can see the target:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class SightDebug : MonoBehaviour
+    {
+        [SerializeField] private AIBrain brain;
+        [SerializeField] private AIDecisionLineOfSight sight;
+
+        private void Update()
+        {
+            if (brain.Target == null) return;
+            Color color = sight.Decide(brain) ? Color.green : Color.red;
+            Debug.DrawLine(sight.transform.position, brain.Target.position, color);
+        }
+    }
+    ```
+  tips:
+    - The ray starts at the component's position; put it on a child at head height so low obstacles don't block it.
+    - Pair it with `AIDecisionTargetInRange` in a previous state for "hear, then look" enemies.
+es:
+  summary: Decisión de AIBrain que es verdadera cuando no hay nada sólido entre el enemigo y su objetivo.
+  clip_caption: Una torreta solo dispara mientras la puerta corrediza está abierta; la línea de visión se pone verde cuando el jugador es visible.
+  description: |
+    Devuelve verdadero cuando `AIBrain.Target` está dentro de **Max Distance** y un raycast desde este
+    GameObject hasta el objetivo no choca con nada en **Obstacle Layers**. El rayo ignora los colliders
+    del propio enemigo y los del objetivo, y también los colliders trigger (agua, checkpoints, zonas de
+    detección), por eso la máscara por defecto *Everything* funciona sin tocar nada.
+
+    No hay cono de visión: el enemigo "ve" en todas las direcciones. Úsala para que los enemigos no
+    disparen ni persigan a través de paredes, o combínala con un chequeo de orientación propio si la
+    dirección importa (el componente independiente `EnemyShootOnSight` ya trae un cono).
+  setup:
+    - Agrega `AIDecisionLineOfSight` al enemigo que tiene el `AIBrain` (o a un hijo ubicado a la altura de los ojos).
+    - En el estado de reposo, agrega una transición con ella y **True Target State** en, por ejemplo, `Shoot`.
+    - En `Shoot`, agrega una transición con la misma decisión y **False Target State** de vuelta al reposo.
+  fields:
+    maxDistance: Distancia máxima a la que se puede ver al objetivo, en unidades. Más lejos, la decisión es falsa aunque la vista esté despejada.
+    obstacleLayers: Capas que bloquean la vista. *Everything* sirve porque se ignoran el enemigo y el objetivo; excluye capas como vidrio o follaje que no deban tapar la visión.
+  example: |
+    Dibuja una línea de depuración en la vista Scene que se pone verde cuando el enemigo ve al objetivo:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class SightDebug : MonoBehaviour
+    {
+        [SerializeField] private AIBrain brain;
+        [SerializeField] private AIDecisionLineOfSight sight;
+
+        private void Update()
+        {
+            if (brain.Target == null) return;
+            Color color = sight.Decide(brain) ? Color.green : Color.red;
+            Debug.DrawLine(sight.transform.position, brain.Target.position, color);
+        }
+    }
+    ```
+  tips:
+    - El rayo sale de la posición del componente; ponlo en un hijo a la altura de la cabeza para que los obstáculos bajos no lo tapen.
+    - Combínala con `AIDecisionTargetInRange` en un estado previo para enemigos que "oyen y luego miran".

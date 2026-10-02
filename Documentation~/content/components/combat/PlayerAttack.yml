@@ -1,0 +1,89 @@
+name: PlayerAttack
+clip: true
+related: [WeaponMelee, WeaponHitscan, WeaponProjectile, WeaponInventorySlot, CharacterAimAndOrient]
+en:
+  summary: Connects the attack button to the character's active weapon, with charging and weapon switching.
+  clip_caption: Pressing attack swings the sword towards where the character faces, breaking crates on both sides.
+  description: |
+    `PlayerAttack` is the ability that reads the **Attack** action (J or X/Square by default) and uses
+    the weapon found on the character or its active children. If there are several, the priority is
+    `WeaponCombo`, then `WeaponMelee`, `WeaponHitscan` and `WeaponProjectile`. Ranged weapons fire
+    towards `CharacterAimAndOrient.AimDirection` when there is one, or straight ahead in the direction the
+    character faces otherwise.
+
+    If the active weapon has a `WeaponCharge`, pressing the button starts charging and releasing it
+    attacks with the charged damage. With a `WeaponInventorySlot` on the character, the
+    **Switch Weapon Action** (K by default) equips the next weapon; since inactive children are ignored,
+    only the equipped weapon attacks. Nothing happens while the character is `Dead` or its abilities are
+    suspended (knockback, stun).
+  setup:
+    - Build a character with `CharacterCore` and add `PlayerAttack` (the **Create Player** menu already includes it with a `WeaponMelee`).
+    - Add a weapon to the character or a child — `WeaponMelee`, `WeaponHitscan`, `WeaponProjectile` or a `WeaponCombo`.
+    - Press **Attack** in Play mode. Optionally add `WeaponCharge`, `WeaponInventorySlot` or `CharacterAimAndOrient`.
+  fields:
+    attackAction: Character action that triggers the attack (and charges with `WeaponCharge`).
+    switchWeaponAction: Character action that equips the next weapon when there is a `WeaponInventorySlot`.
+  api:
+    AbilityEnabled: Turn attacking off and on at runtime (cutscenes, safe zones).
+    TryAttackNow: "Attacks right away with the active weapon, bypassing input. The overload with a damage value replaces the weapon's damage (not for combos). Returns false if no weapon fired (cooldown, missing weapon)."
+  example: |
+    Let an on-screen button attack on mobile:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class TouchAttackButton : MonoBehaviour
+    {
+        [SerializeField] private PlayerAttack attack;
+
+        // Hook this to the button's OnClick.
+        public void Press() => attack.TryAttackNow();
+    }
+    ```
+  tips:
+    - Keep only one kind of weapon active at a time; use `WeaponInventorySlot` with child GameObjects to carry several.
+    - Melee weapons always hit towards the facing side; add `CharacterAimAndOrient` only for ranged weapons that should aim freely.
+es:
+  summary: Conecta el botón de ataque con el arma activa del personaje, con carga y cambio de arma.
+  clip_caption: Al pulsar ataque el personaje lanza un espadazo hacia donde mira y rompe cajas a ambos lados.
+  description: |
+    `PlayerAttack` es la habilidad que lee la acción **Attack** (J o X/Cuadrado por defecto) y usa el
+    arma que encuentre en el personaje o en sus hijos activos. Si hay varias, la prioridad es
+    `WeaponCombo`, luego `WeaponMelee`, `WeaponHitscan` y `WeaponProjectile`. Las armas a distancia
+    disparan hacia `CharacterAimAndOrient.AimDirection` si existe, o derecho hacia donde mira el
+    personaje si no.
+
+    Si el arma activa tiene `WeaponCharge`, pulsar el botón empieza a cargar y soltarlo ataca con el
+    daño cargado. Con un `WeaponInventorySlot` en el personaje, la **Switch Weapon Action** (K por
+    defecto) equipa la siguiente arma; como se ignoran los hijos inactivos, solo ataca el arma equipada.
+    No pasa nada mientras el personaje está `Dead` o con sus habilidades suspendidas (knockback,
+    aturdimiento).
+  setup:
+    - Arma un personaje con `CharacterCore` y agrega `PlayerAttack` (el menú **Create Player** ya lo incluye con un `WeaponMelee`).
+    - Agrega un arma al personaje o a un hijo — `WeaponMelee`, `WeaponHitscan`, `WeaponProjectile` o un `WeaponCombo`.
+    - Pulsa **Attack** en modo Play. Si quieres, suma `WeaponCharge`, `WeaponInventorySlot` o `CharacterAimAndOrient`.
+  fields:
+    attackAction: Acción del personaje que dispara el ataque (y carga con `WeaponCharge`).
+    switchWeaponAction: Acción del personaje que equipa la siguiente arma cuando hay un `WeaponInventorySlot`.
+  api:
+    AbilityEnabled: Apaga y enciende el ataque en tiempo de ejecución (cinemáticas, zonas seguras).
+    TryAttackNow: "Ataca al instante con el arma activa, sin pasar por el input. La sobrecarga con un valor de daño reemplaza el daño del arma (no aplica a combos). Devuelve false si ningún arma atacó (cooldown, sin arma)."
+  example: |
+    Deja que un botón en pantalla ataque en móvil:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class TouchAttackButton : MonoBehaviour
+    {
+        [SerializeField] private PlayerAttack attack;
+
+        // Conéctalo al OnClick del botón.
+        public void Press() => attack.TryAttackNow();
+    }
+    ```
+  tips:
+    - Deja activo un solo tipo de arma a la vez; usa `WeaponInventorySlot` con GameObjects hijos para llevar varias.
+    - Las armas cuerpo a cuerpo siempre golpean hacia donde mira el personaje; agrega `CharacterAimAndOrient` solo para armas a distancia que deban apuntar libremente.

@@ -1,0 +1,137 @@
+name: CharacterCore
+clip: true
+related: [CharacterController2D, AbilityBase, KeyboardInputReader, CharacterDeath, CharacterRespawn]
+en:
+  summary: The brain of a character — finds every ability on it and runs them together each frame.
+  clip_caption: Walking, running, jumping and dashing in the air — three independent abilities run side by side by one CharacterCore.
+  description: |
+    Add `CharacterCore` once per character. In `Awake` it creates two state machines (`Movement` for
+    Idle/Walking/Running/Jumping/Falling/Dashing/WallSliding/Crouching/Swimming, `Condition` for
+    Normal/Stunned/Dead/Paused), finds every `AbilityBase` on the GameObject and its children and
+    initializes them. Adding or removing a mechanic is just Add/Remove Component; the core doesn't need to
+    know which abilities exist.
+
+    Each `Update` it runs the ability phases in order — input, early, main, late — each one for all
+    abilities before the next. Abilities with `AbilityEnabled = false` or whose component is unticked in
+    the Inspector are skipped. If no input component is present (`ICharacterInput`, such as your own reader
+    or an AI), it adds a `KeyboardInputReader` automatically, so a fresh character is playable right away.
+    An ability that throws an exception is disabled on its own with a clear error, instead of breaking the
+    rest.
+
+    Systems such as death, stun or knockback pause all abilities with `Suspend(source)` and give them back
+    with `Resume(source)`; several sources can suspend at the same time, and abilities only return when all
+    of them resumed. `ResetCharacter` clears every suspension, returns both state machines to Idle/Normal and
+    calls `ResetAbility` on each ability — `CharacterRespawn` uses it when the character reappears.
+  setup:
+    - Build the character with a `Collider2D` and `CharacterController2D` (`CharacterCore` requires it and adds it if missing).
+    - Add the abilities you want (`PlayerWalkRun`, `PlayerJump`, `PlayerDash`...).
+    - Add `CharacterCore` — last is the safest habit, although in the Editor the order doesn't matter.
+    - Optionally add your own input component; otherwise `KeyboardInputReader` is added on Play.
+  api:
+    Movement: State machine with the current `MovementState`. Read `CurrentState` / `PreviousState` or subscribe to `OnStateChanged(previous, current)`.
+    Condition: State machine with the current `ConditionState` (`Normal`, `Stunned`, `Dead`, `Paused`). Abilities don't run while it is `Paused`.
+    Controller: The character's `CharacterController2D`.
+    AbilitiesSuspended: True while any source keeps the abilities suspended.
+    Suspend: Pauses all abilities on behalf of a source object, without touching their `AbilityEnabled`.
+    Resume: Removes that source's suspension; abilities run again once no source is left.
+    ResetCharacter: Clears suspensions, sets Idle/Normal and calls `ResetAbility` on every ability.
+  example: |
+    Freeze the player during a cutscene and play a sound whenever it starts a jump:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class PlayerHooks : MonoBehaviour
+    {
+        [SerializeField] private CharacterCore player;
+        [SerializeField] private AudioSource jumpSound;
+
+        private void OnEnable() => player.Movement.OnStateChanged += HandleState;
+        private void OnDisable() => player.Movement.OnStateChanged -= HandleState;
+
+        private void HandleState(MovementState previous, MovementState current)
+        {
+            if (current == MovementState.Jumping) jumpSound.Play();
+        }
+
+        public void BeginCutscene()
+        {
+            player.Suspend(this);
+            player.Controller.Move(Vector2.zero); // suspending doesn't stop the body by itself
+        }
+
+        public void EndCutscene() => player.Resume(this);
+    }
+    ```
+  tips:
+    - "`Suspend` stops the abilities, not the physics: the `Rigidbody2D` keeps its last velocity, so zero it with `Controller.Move(Vector2.zero)` if needed."
+    - Abilities added with `AddComponent` after the core's `Awake` are not discovered; create them before, or build the character inactive and activate it at the end.
+    - Pass `this` as the source to `Suspend`/`Resume` so your system never cancels someone else's suspension.
+es:
+  summary: El cerebro de un personaje — encuentra todas sus habilidades y las corre juntas cada frame.
+  clip_caption: Caminar, correr, saltar y hacer dash en el aire — tres habilidades independientes que un solo CharacterCore corre a la vez.
+  description: |
+    Agrega `CharacterCore` una vez por personaje. En `Awake` crea dos máquinas de estados (`Movement` para
+    Idle/Walking/Running/Jumping/Falling/Dashing/WallSliding/Crouching/Swimming, `Condition` para
+    Normal/Stunned/Dead/Paused), encuentra todas las `AbilityBase` del GameObject y de sus hijos y las
+    inicializa. Agregar o quitar una mecánica es solo Add/Remove Component; el core no necesita saber qué
+    habilidades existen.
+
+    En cada `Update` corre las fases de las habilidades en orden — input, temprana, principal, tardía —, cada
+    una para todas las habilidades antes de la siguiente. Se saltan las habilidades con
+    `AbilityEnabled = false` o cuyo componente está desmarcado en el Inspector. Si no hay un componente de input
+    (`ICharacterInput`, como tu propio lector o una IA), agrega solo un `KeyboardInputReader`, así un
+    personaje recién armado se puede jugar de inmediato. Una habilidad que lanza una excepción se desactiva
+    sola con un error claro, en vez de romper las demás.
+
+    Sistemas como la muerte, el aturdimiento o el knockback pausan todas las habilidades con
+    `Suspend(source)` y las devuelven con `Resume(source)`; varias fuentes pueden suspender a la vez y las
+    habilidades solo vuelven cuando todas reanudaron. `ResetCharacter` borra las suspensiones, regresa ambas
+    máquinas a Idle/Normal y llama `ResetAbility` en cada habilidad — `CharacterRespawn` lo usa al reaparecer.
+  setup:
+    - Arma el personaje con un `Collider2D` y `CharacterController2D` (`CharacterCore` lo requiere y lo agrega si falta).
+    - Agrega las habilidades que quieras (`PlayerWalkRun`, `PlayerJump`, `PlayerDash`...).
+    - Agrega `CharacterCore` — al final es la costumbre más segura, aunque en el Editor el orden no importa.
+    - Opcionalmente agrega tu propio componente de input; si no, se agrega `KeyboardInputReader` al darle Play.
+  api:
+    Movement: Máquina de estados con el `MovementState` actual. Lee `CurrentState` / `PreviousState` o suscríbete a `OnStateChanged(previous, current)`.
+    Condition: Máquina de estados con el `ConditionState` actual (`Normal`, `Stunned`, `Dead`, `Paused`). Las habilidades no corren mientras sea `Paused`.
+    Controller: El `CharacterController2D` del personaje.
+    AbilitiesSuspended: Verdadero mientras alguna fuente mantenga las habilidades suspendidas.
+    Suspend: Pausa todas las habilidades a nombre de un objeto fuente, sin tocar su `AbilityEnabled`.
+    Resume: Quita la suspensión de esa fuente; las habilidades vuelven cuando no queda ninguna.
+    ResetCharacter: Borra las suspensiones, pone Idle/Normal y llama `ResetAbility` en cada habilidad.
+  example: |
+    Congela al jugador durante una cinemática y reproduce un sonido cada vez que empieza un salto:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class PlayerHooks : MonoBehaviour
+    {
+        [SerializeField] private CharacterCore player;
+        [SerializeField] private AudioSource jumpSound;
+
+        private void OnEnable() => player.Movement.OnStateChanged += HandleState;
+        private void OnDisable() => player.Movement.OnStateChanged -= HandleState;
+
+        private void HandleState(MovementState previous, MovementState current)
+        {
+            if (current == MovementState.Jumping) jumpSound.Play();
+        }
+
+        public void BeginCutscene()
+        {
+            player.Suspend(this);
+            player.Controller.Move(Vector2.zero); // suspender no detiene el cuerpo por sí solo
+        }
+
+        public void EndCutscene() => player.Resume(this);
+    }
+    ```
+  tips:
+    - "`Suspend` detiene las habilidades, no la física: el `Rigidbody2D` conserva su última velocidad, así que ponla en cero con `Controller.Move(Vector2.zero)` si hace falta."
+    - Las habilidades agregadas con `AddComponent` después del `Awake` del core no se descubren; créalas antes, o arma el personaje inactivo y actívalo al final.
+    - Pasa `this` como fuente a `Suspend`/`Resume` para que tu sistema nunca cancele la suspensión de otro.

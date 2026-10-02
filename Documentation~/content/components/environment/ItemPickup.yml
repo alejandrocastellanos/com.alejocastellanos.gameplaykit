@@ -1,0 +1,93 @@
+name: ItemPickup
+clip: true
+related: [InventoryManager, DoorWithKey, LevelExit, Collectible]
+en:
+  summary: A key or quest item that goes into the inventory of whoever touches it.
+  clip_caption: The player walks over a key and a gem, and both are added to the inventory.
+  description: |
+    `ItemPickup` goes on a trigger collider. When something touches it, it looks for an `IKeyHolder` on that
+    object or its parents (the kit's `InventoryManager` implements it), adds **Item Id** to it, spawns
+    **Pickup Effect Prefab**, fires `OnPickedUp` and destroys itself. Objects that can't hold items (boxes,
+    most enemies) are simply ignored, so no tag is needed.
+
+    It is the other half of `DoorWithKey` and `LevelExit`: use the same id on the pickup and on the door or
+    exit that requires it. `InventoryManager` stores ids as a set, so picking up a second copy of an item
+    you already have still destroys the pickup but doesn't add it twice.
+  setup:
+    - Create a small GameObject with a `BoxCollider2D` marked **Is Trigger** and add `ItemPickup`.
+    - Give the player an `InventoryManager` (the player from **GameplayKit > Create Player** already has one).
+    - Set **Item Id** to the same string the door or exit expects in **Required Item Id**.
+  fields:
+    itemId: Id added to the holder's inventory. Must match the **Required Item Id** of the door or exit it unlocks.
+    pickupEffectPrefab: Prefab spawned where it was picked up (sparkles, a sound). Leave empty for none.
+  events:
+    OnPickedUp: C# event fired when the item is taken, with the GameObject of the collider that touched it.
+  api:
+    ItemId: The id this pickup gives, read-only.
+  example: |
+    React to the inventory instead of each pickup, for example to update a key icon in the HUD:
+
+    ```csharp
+    using GameplayKit.Managers;
+    using UnityEngine;
+
+    public class KeyIcon : MonoBehaviour
+    {
+        [SerializeField] private InventoryManager inventory;
+        [SerializeField] private GameObject icon;
+
+        private void OnEnable()
+        {
+            inventory.OnItemAdded += id => { if (id == "llave_dorada") icon.SetActive(true); };
+            inventory.OnItemRemoved += id => { if (id == "llave_dorada") icon.SetActive(false); };
+        }
+    }
+    ```
+  tips:
+    - For points and coins use `Collectible`; `ItemPickup` is for things the game needs to remember you carry.
+    - The default id (`llave_dorada`) matches `DoorWithKey`'s default, so a door and a key work together with no changes.
+es:
+  summary: Una llave u objeto de misión que va al inventario de quien lo toca.
+  clip_caption: El jugador pasa por una llave y una gema, y ambas se agregan al inventario.
+  description: |
+    `ItemPickup` va en un collider trigger. Cuando algo lo toca, busca un `IKeyHolder` en ese objeto o sus
+    padres (el `InventoryManager` del kit lo implementa), le agrega **Item Id**, instancia
+    **Pickup Effect Prefab**, dispara `OnPickedUp` y se destruye. Los objetos que no pueden guardar ítems
+    (cajas, la mayoría de enemigos) simplemente se ignoran, así que no hace falta tag.
+
+    Es la otra mitad de `DoorWithKey` y `LevelExit`: usa el mismo id en el recogible y en la puerta o salida
+    que lo pide. `InventoryManager` guarda los ids como un conjunto, así que recoger otra copia de un ítem
+    que ya tienes igual destruye el recogible pero no lo agrega dos veces.
+  setup:
+    - Crea un GameObject pequeño con un `BoxCollider2D` marcado como **Is Trigger** y agrégale `ItemPickup`.
+    - Dale al jugador un `InventoryManager` (el de **GameplayKit > Create Player** ya lo trae).
+    - Pon en **Item Id** el mismo texto que la puerta o salida espera en **Required Item Id**.
+  fields:
+    itemId: Id que se agrega al inventario. Debe coincidir con el **Required Item Id** de la puerta o salida que desbloquea.
+    pickupEffectPrefab: Prefab que aparece donde se recogió (brillos, un sonido). Déjalo vacío si no quieres efecto.
+  events:
+    OnPickedUp: Evento C# que se dispara al tomarlo, con el GameObject del collider que lo tocó.
+  api:
+    ItemId: El id que entrega este recogible, de solo lectura.
+  example: |
+    Reacciona al inventario en lugar de a cada recogible, por ejemplo para mostrar el ícono de la llave en el HUD:
+
+    ```csharp
+    using GameplayKit.Managers;
+    using UnityEngine;
+
+    public class KeyIcon : MonoBehaviour
+    {
+        [SerializeField] private InventoryManager inventory;
+        [SerializeField] private GameObject icon;
+
+        private void OnEnable()
+        {
+            inventory.OnItemAdded += id => { if (id == "llave_dorada") icon.SetActive(true); };
+            inventory.OnItemRemoved += id => { if (id == "llave_dorada") icon.SetActive(false); };
+        }
+    }
+    ```
+  tips:
+    - Para puntos y monedas usa `Collectible`; `ItemPickup` es para cosas que el juego debe recordar que llevas.
+    - El id por defecto (`llave_dorada`) coincide con el de `DoorWithKey`, así que una puerta y una llave funcionan juntas sin cambiar nada.

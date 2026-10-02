@@ -1,0 +1,99 @@
+name: CameraShake
+clip: true
+related: [CameraFollow, CameraBounds, CharacterHealth, BreakableObject]
+en:
+  summary: Shakes the camera on demand for impacts, explosions and hard landings.
+  clip_caption: A strong custom shake when a boulder lands, then a light default shake when the player lands from a jump.
+  description: |
+    `CameraShake` doesn't shake by itself: call `Shake()` from your code (or from a UnityEvent in the
+    Inspector) when something heavy happens. Each frame of the shake the camera is moved by a random offset
+    up to the magnitude, and that offset is removed again at the start of the next frame — so it works on
+    top of `CameraFollow` and `CameraBounds` and never drags the camera back to an old position.
+
+    Calling `Shake` while a shake is already running never shortens it: the remaining time and the
+    magnitude keep the larger of the two. The timer uses unscaled time, so a shake also finishes while the
+    game is paused or in slow motion.
+  setup:
+    - Add `CameraShake` to your camera (it can share the object with `CameraFollow` and `CameraBounds`).
+    - Call `Shake()` from your scripts, or hook it to a UnityEvent such as a Button's **On Click**.
+    - Tune **Default Duration** and **Default Magnitude** for the generic `Shake()` call.
+  fields:
+    defaultDuration: Seconds a `Shake()` call lasts when no duration is given.
+    defaultMagnitude: Maximum offset of a `Shake()` call, in world units. 0.1–0.3 is noticeable without being nauseating.
+  api:
+    Shake: "`Shake()` uses the defaults; `Shake(duration, magnitude)` uses your own values for stronger or longer hits."
+    IsShaking: True while a shake is still running.
+  example: |
+    Shake the camera whenever the player takes damage, harder for bigger hits:
+
+    ```csharp
+    using GameplayKit.CameraSystem;
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class ShakeOnHit : MonoBehaviour
+    {
+        [SerializeField] private CharacterHealth health;
+        [SerializeField] private CameraShake cameraShake;
+
+        private void OnEnable() => health.OnDamaged += HandleDamaged;
+        private void OnDisable() => health.OnDamaged -= HandleDamaged;
+
+        private void HandleDamaged(float amount)
+        {
+            if (amount >= 25f) cameraShake.Shake(0.35f, 0.3f);
+            else cameraShake.Shake();
+        }
+    }
+    ```
+  tips:
+    - Keep shakes short (0.1–0.4 s); long shakes hide the action instead of selling it.
+    - Subscribe to C# events like `BreakableObject.OnBroken` or `CharacterHealth.OnDeath` and call `Shake` for instant impact feedback.
+es:
+  summary: Sacude la cámara a pedido para impactos, explosiones y aterrizajes fuertes.
+  clip_caption: Una sacudida fuerte con valores propios cuando cae una roca y luego una suave por defecto cuando el jugador aterriza de un salto.
+  description: |
+    `CameraShake` no sacude por sí solo: llama `Shake()` desde tu código (o desde un UnityEvent en el
+    Inspector) cuando pase algo fuerte. En cada frame del temblor la cámara se desplaza un offset aleatorio
+    de hasta la magnitud, y ese offset se quita al inicio del frame siguiente — así funciona encima de
+    `CameraFollow` y `CameraBounds` y nunca devuelve la cámara a una posición vieja.
+
+    Llamar `Shake` mientras ya hay un temblor nunca lo acorta: el tiempo restante y la magnitud se quedan
+    con el mayor de los dos. El temporizador usa tiempo sin escalar, así un temblor también termina con el
+    juego en pausa o en cámara lenta.
+  setup:
+    - Agrega `CameraShake` a tu cámara (puede compartir objeto con `CameraFollow` y `CameraBounds`).
+    - Llama `Shake()` desde tus scripts, o conéctalo a un UnityEvent como el **On Click** de un Button.
+    - Ajusta **Default Duration** y **Default Magnitude** para la llamada genérica `Shake()`.
+  fields:
+    defaultDuration: Segundos que dura una llamada a `Shake()` sin duración explícita.
+    defaultMagnitude: Desplazamiento máximo de una llamada a `Shake()`, en unidades del mundo. De 0.1 a 0.3 se nota sin marear.
+  api:
+    Shake: "`Shake()` usa los valores por defecto; `Shake(duration, magnitude)` usa los tuyos para golpes más fuertes o largos."
+    IsShaking: Verdadero mientras el temblor sigue activo.
+  example: |
+    Sacude la cámara cada vez que el jugador recibe daño, más fuerte en los golpes grandes:
+
+    ```csharp
+    using GameplayKit.CameraSystem;
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class ShakeOnHit : MonoBehaviour
+    {
+        [SerializeField] private CharacterHealth health;
+        [SerializeField] private CameraShake cameraShake;
+
+        private void OnEnable() => health.OnDamaged += HandleDamaged;
+        private void OnDisable() => health.OnDamaged -= HandleDamaged;
+
+        private void HandleDamaged(float amount)
+        {
+            if (amount >= 25f) cameraShake.Shake(0.35f, 0.3f);
+            else cameraShake.Shake();
+        }
+    }
+    ```
+  tips:
+    - Mantén los temblores cortos (0.1 a 0.4 s); los largos esconden la acción en vez de reforzarla.
+    - Suscríbete a eventos C# como `BreakableObject.OnBroken` o `CharacterHealth.OnDeath` y llama `Shake` para reforzar cada impacto.

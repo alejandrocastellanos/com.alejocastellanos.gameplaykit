@@ -1,0 +1,136 @@
+name: AIBrain
+clip: true
+related: [AIActionBase, AIDecisionBase, AIActionPatrolPoints, AIDecisionTargetInRange, EnemySpawner]
+en:
+  summary: State machine for enemies — combine ready-made actions and decisions in the Inspector to build behaviours without code.
+  clip_caption: An enemy patrols, switches to Chase when the player enters the outer ring, shoots from the inner ring and goes back to patrolling when the player runs away.
+  description: |
+    `AIBrain` keeps one active **state** and switches between states by asking **decisions**. Each state
+    (an `AIState`) has a **Name**, a list of **Actions** (what the enemy *does*: patrol, chase, shoot,
+    wait...) and a list of **Transitions** (when it moves to another state). Actions and decisions are
+    ordinary components (`AIActionBase` / `AIDecisionBase` subclasses) that you add to the enemy and
+    then drag into the state lists, so one enemy is just a composition of small, reusable pieces.
+
+    Every frame the brain calls `PerformAction` on each action of the current state, then walks its
+    transitions in order. An `AITransition` holds a **Decision**, a **True Target State** and a
+    **False Target State**: the decision's result picks one of the two names, and if that name is not
+    empty and is not the current state, the brain switches to it and stops checking transitions for
+    that frame. Leaving one side empty means "stay here", so a transition with only **True Target
+    State** = `Chase` fires when the decision becomes true, and one with only **False Target State** =
+    `Patrol` fires when it becomes false.
+
+    When switching, the brain calls `OnExitState` on every action of the old state, resets the state
+    timer (`TimeInCurrentState`) and calls `OnEnterState` on every action of the new one. On `Start` it
+    enters **Initial State**, or the first state of the list when that field is empty; with no states it
+    simply does nothing. **Target** is the shared object (normally the player) that actions and
+    decisions read through `brain.Target`.
+  setup:
+    - Add a `Rigidbody2D` (Freeze Rotation Z) and a `Collider2D` to your enemy; movement actions need the body.
+    - Add the action and decision components you need, e.g. `AIActionPatrolPoints`, `AIActionMoveToTarget` and `AIDecisionTargetInRange`.
+    - Add `AIBrain` and create the **States**, e.g. `Patrol` (action `AIActionPatrolPoints`, transition `AIDecisionTargetInRange` → **True Target State** `Chase`) and `Chase` (action `AIActionMoveToTarget`, same decision → **False Target State** `Patrol`).
+    - Drag the player into **Target** (or let `EnemySpawner` assign it) and press Play.
+  fields:
+    states: The list of states. Each one has a **Name**, the **Actions** it runs every frame and the **Transitions** checked after them, in order. Keep names unique.
+    initialState: Name of the state to start in. Leave it empty to start in the first state of the list.
+    target: The object actions and decisions work with (chase it, shoot at it, measure the distance to it). Usually the player; can be changed from code through `Target`.
+  api:
+    CurrentState: The active `AIState`; read `CurrentState.name` to show it in a debug label or drive animations. Null until `Start` runs.
+    Target: Gets or sets the shared target at runtime, e.g. when the player respawns as a new object.
+    TimeInCurrentState: Seconds (scaled time) since the brain entered the current state.
+    TransitionTo: Forces a switch to the named state, running the exit and enter callbacks. Unknown names log a warning and change nothing.
+  example: |
+    Play an Animator state with the same name as the current AI state, and force a `Stunned` state from
+    your own code:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class EnemyAnimationSync : MonoBehaviour
+    {
+        [SerializeField] private AIBrain brain;
+        [SerializeField] private Animator animator;
+        private string _lastState;
+
+        private void Update()
+        {
+            if (brain.CurrentState == null || brain.CurrentState.name == _lastState) return;
+            _lastState = brain.CurrentState.name;
+            animator.Play(_lastState); // one Animator state per AI state, same names
+        }
+
+        public void Stun() => brain.TransitionTo("Stunned");
+    }
+    ```
+  tips:
+    - Transition order matters; the first transition that picks a different state wins that frame, so put the most urgent checks (low health, player in melee range) first.
+    - One decision can be reused in several transitions, for example the same `AIDecisionTargetInRange` to enter `Chase` (true) and to leave it (false). Add a second copy of a decision when you need a different value, like two ranges.
+    - Untick an action or decision component in the Inspector to switch it off temporarily; the brain skips it until you tick it again.
+    - Simple enemies don't always need a brain. `EnemyPatrol`, `EnemyChase` or `EnemyShootOnSight` work alone.
+es:
+  summary: Máquina de estados para enemigos — combina acciones y decisiones ya hechas en el Inspector para armar comportamientos sin código.
+  clip_caption: Un enemigo patrulla, pasa a Chase cuando el jugador entra al anillo exterior, dispara desde el interior y vuelve a patrullar cuando el jugador escapa.
+  description: |
+    `AIBrain` mantiene un **estado** activo y cambia entre estados preguntándole a **decisiones**. Cada
+    estado (un `AIState`) tiene un **Name**, una lista de **Actions** (lo que el enemigo *hace*:
+    patrullar, perseguir, disparar, esperar...) y una lista de **Transitions** (cuándo pasa a otro
+    estado). Acciones y decisiones son componentes normales (subclases de `AIActionBase` /
+    `AIDecisionBase`) que agregas al enemigo y luego arrastras a las listas del estado; así un enemigo
+    es solo una combinación de piezas pequeñas y reutilizables.
+
+    En cada frame el cerebro llama a `PerformAction` en cada acción del estado actual y después recorre
+    sus transiciones en orden. Un `AITransition` tiene una **Decision**, un **True Target State** y un
+    **False Target State**: el resultado de la decisión elige uno de los dos nombres y, si ese nombre no
+    está vacío y no es el estado actual, el cerebro cambia a él y deja de revisar transiciones en ese
+    frame. Dejar un lado vacío significa "quedarse aquí": una transición con solo **True Target State** =
+    `Chase` se dispara cuando la decisión se vuelve verdadera, y una con solo **False Target State** =
+    `Patrol` cuando se vuelve falsa.
+
+    Al cambiar, el cerebro llama a `OnExitState` en todas las acciones del estado anterior, reinicia el
+    cronómetro del estado (`TimeInCurrentState`) y llama a `OnEnterState` en las del nuevo. En `Start`
+    entra a **Initial State**, o al primer estado de la lista si ese campo está vacío; sin estados
+    simplemente no hace nada. **Target** es el objeto compartido (normalmente el jugador) que acciones y
+    decisiones leen con `brain.Target`.
+  setup:
+    - Agrega un `Rigidbody2D` (Freeze Rotation Z) y un `Collider2D` a tu enemigo; las acciones de movimiento necesitan el cuerpo.
+    - Agrega los componentes de acción y decisión que necesites, por ejemplo `AIActionPatrolPoints`, `AIActionMoveToTarget` y `AIDecisionTargetInRange`.
+    - Agrega `AIBrain` y crea los **States**, por ejemplo `Patrol` (acción `AIActionPatrolPoints`, transición `AIDecisionTargetInRange` → **True Target State** `Chase`) y `Chase` (acción `AIActionMoveToTarget`, misma decisión → **False Target State** `Patrol`).
+    - Arrastra al jugador a **Target** (o deja que `EnemySpawner` lo asigne) y dale Play.
+  fields:
+    states: La lista de estados. Cada uno tiene un **Name**, las **Actions** que ejecuta en cada frame y las **Transitions** que revisa después, en orden. Usa nombres únicos.
+    initialState: Nombre del estado inicial. Déjalo vacío para empezar en el primer estado de la lista.
+    target: El objeto con el que trabajan acciones y decisiones (perseguirlo, dispararle, medir la distancia). Suele ser el jugador; se puede cambiar por código con `Target`.
+  api:
+    CurrentState: El `AIState` activo; lee `CurrentState.name` para mostrarlo en una etiqueta de depuración o manejar animaciones. Es null hasta que corre `Start`.
+    Target: Lee o cambia el objetivo compartido en runtime, por ejemplo cuando el jugador reaparece como un objeto nuevo.
+    TimeInCurrentState: Segundos (tiempo escalado) desde que el cerebro entró al estado actual.
+    TransitionTo: Fuerza el cambio al estado indicado, ejecutando los callbacks de salida y entrada. Si el nombre no existe registra una advertencia y no cambia nada.
+  example: |
+    Reproduce en el Animator un estado con el mismo nombre que el estado de IA actual, y fuerza un estado
+    `Stunned` desde tu propio código:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class EnemyAnimationSync : MonoBehaviour
+    {
+        [SerializeField] private AIBrain brain;
+        [SerializeField] private Animator animator;
+        private string _lastState;
+
+        private void Update()
+        {
+            if (brain.CurrentState == null || brain.CurrentState.name == _lastState) return;
+            _lastState = brain.CurrentState.name;
+            animator.Play(_lastState); // un estado del Animator por estado de IA, con el mismo nombre
+        }
+
+        public void Stun() => brain.TransitionTo("Stunned");
+    }
+    ```
+  tips:
+    - El orden de las transiciones importa; la primera que elige otro estado gana en ese frame, así que pon primero los chequeos más urgentes (poca vida, jugador a distancia de golpe).
+    - Una decisión se puede reutilizar en varias transiciones, por ejemplo el mismo `AIDecisionTargetInRange` para entrar a `Chase` (true) y para salir (false). Agrega otra copia de la decisión cuando necesites otro valor, como dos rangos.
+    - Desmarca un componente de acción o decisión en el Inspector para apagarlo temporalmente; el cerebro se lo salta hasta que lo vuelvas a marcar.
+    - Los enemigos simples no siempre necesitan un cerebro. `EnemyPatrol`, `EnemyChase` o `EnemyShootOnSight` funcionan solos.

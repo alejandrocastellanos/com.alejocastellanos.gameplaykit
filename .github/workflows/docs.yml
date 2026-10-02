@@ -1,0 +1,54 @@
+name: Docs
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "Documentation~/**"
+      - "CHANGELOG.md"
+      - ".github/workflows/docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "Documentation~"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: "Documentation~/requirements.txt"
+      - id: pages
+        uses: actions/configure-pages@v5
+      - run: pip install -r requirements.txt
+      - run: python tools/generate.py
+      - run: mkdocs build --strict
+        env:
+          SITE_URL: ${{ steps.pages.outputs.base_url }}/
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: "Documentation~/site"
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

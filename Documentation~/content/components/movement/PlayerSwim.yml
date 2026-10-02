@@ -1,0 +1,107 @@
+name: PlayerSwim
+clip: true
+related: [WaterZone, PlayerWalkRun, PlayerJump, PlayerFly]
+en:
+  summary: Swim freely in four directions inside water zones, with reduced gravity instead of sinking like a rock.
+  clip_caption: Walking off the bank into a pool, diving down, swimming underwater and rising back to the surface.
+  description: |
+    When the character enters a trigger that has a `WaterZone` component (or whose tag matches **Water
+    Tag**), it switches to swimming: gravity is overridden to **Water Gravity Scale** and every frame its
+    velocity becomes the movement input times **Swim Speed**, in all four directions. The movement state is
+    set to `Swimming` so an Animator can show the swim cycle. Leaving the trigger restores normal gravity.
+
+    With no input the character doesn't sink: its velocity is reset each frame, so it barely drifts. A
+    `WaterZone` also adds drag and an upward buoyancy force, which nudges an idle swimmer slowly towards
+    the surface. At the surface the character leaves the trigger, falls back in and bobs there.
+
+    Because swimming writes the whole velocity, put `PlayerSwim` after `PlayerWalkRun` in the component list
+    so swim speed wins over walk speed while in water. The tag check is tolerant, so a fresh project only
+    needs `WaterZone`.
+  setup:
+    - Build a character with `CharacterController2D` and `PlayerWalkRun`.
+    - Add `PlayerSwim` after `PlayerWalkRun` and before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Create the water - a `BoxCollider2D` with **Is Trigger** enabled - and add `WaterZone` to it (or give it the **Water Tag**).
+    - Walk into the water and steer with the movement input, including up and down.
+  fields:
+    waterTag: Optional tag that also marks triggers as water, on top of any `WaterZone`. Missing tags are ignored safely.
+    swimSpeed: Swimming speed at full input, in units per second.
+    waterGravityScale: Gravity scale applied while in water (normal is 1). Low values feel floaty; 0 removes gravity entirely.
+  api:
+    IsInWater: True while the character is inside water.
+  example: |
+    Show bubbles and muffle the music while the player is underwater:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class UnderwaterEffects : MonoBehaviour
+    {
+        [SerializeField] private PlayerSwim swimmer;
+        [SerializeField] private ParticleSystem bubbles;
+        [SerializeField] private AudioLowPassFilter musicFilter;
+
+        private void Update()
+        {
+            musicFilter.enabled = swimmer.IsInWater;
+            if (swimmer.IsInWater && !bubbles.isPlaying) bubbles.Play();
+            else if (!swimmer.IsInWater && bubbles.isPlaying) bubbles.Stop();
+        }
+    }
+    ```
+  tips:
+    - To let players jump out of the water, make the water trigger stop a little below the bank so the character can stand or jump from the edge.
+    - Pair it with a breath timer of your own using `IsInWater` if you want drowning.
+es:
+  summary: Nada libremente en cuatro direcciones dentro de zonas de agua, con gravedad reducida en vez de hundirte como una piedra.
+  clip_caption: Camina desde la orilla hacia una piscina, se sumerge, nada bajo el agua y vuelve a subir a la superficie.
+  description: |
+    Cuando el personaje entra en un trigger con un componente `WaterZone` (o cuyo tag coincide con **Water
+    Tag**), pasa a nadar: la gravedad se fija en **Water Gravity Scale** y en cada frame su velocidad es el
+    input de movimiento multiplicado por **Swim Speed**, en las cuatro direcciones. El estado de movimiento
+    cambia a `Swimming` para que un Animator muestre el ciclo de nado. Al salir del trigger vuelve la
+    gravedad normal.
+
+    Sin input el personaje no se hunde: su velocidad se reinicia en cada frame, así que apenas deriva. Un
+    `WaterZone` además agrega arrastre y una fuerza de flotación hacia arriba, que empuja despacio a un
+    nadador quieto hacia la superficie. En la superficie el personaje sale del trigger, vuelve a caer al agua
+    y se queda flotando ahí.
+
+    Como nadar escribe la velocidad completa, pon `PlayerSwim` después de `PlayerWalkRun` en la lista de
+    componentes para que en el agua gane la velocidad de nado. El chequeo del tag es tolerante, así que en un
+    proyecto nuevo basta con `WaterZone`.
+  setup:
+    - Arma un personaje con `CharacterController2D` y `PlayerWalkRun`.
+    - Agrega `PlayerSwim` después de `PlayerWalkRun` y antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Crea el agua - un `BoxCollider2D` con **Is Trigger** activado - y agrégale `WaterZone` (o ponle el **Water Tag**).
+    - Entra al agua y dirige con el input de movimiento, también arriba y abajo.
+  fields:
+    waterTag: Tag opcional que también marca triggers como agua, además de cualquier `WaterZone`. Si el tag no existe se ignora sin errores.
+    swimSpeed: Velocidad de nado con el input al máximo, en unidades por segundo.
+    waterGravityScale: Escala de gravedad dentro del agua (la normal es 1). Valores bajos se sienten flotantes; 0 quita la gravedad por completo.
+  api:
+    IsInWater: Verdadero mientras el personaje está dentro del agua.
+  example: |
+    Muestra burbujas y apaga la música mientras el jugador está bajo el agua:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class UnderwaterEffects : MonoBehaviour
+    {
+        [SerializeField] private PlayerSwim swimmer;
+        [SerializeField] private ParticleSystem bubbles;
+        [SerializeField] private AudioLowPassFilter musicFilter;
+
+        private void Update()
+        {
+            musicFilter.enabled = swimmer.IsInWater;
+            if (swimmer.IsInWater && !bubbles.isPlaying) bubbles.Play();
+            else if (!swimmer.IsInWater && bubbles.isPlaying) bubbles.Stop();
+        }
+    }
+    ```
+  tips:
+    - Para que el jugador pueda salir del agua, haz que el trigger termine un poco por debajo de la orilla, así el personaje puede pararse o saltar desde el borde.
+    - Si quieres que se ahogue, combínalo con tu propio temporizador de aire usando `IsInWater`.

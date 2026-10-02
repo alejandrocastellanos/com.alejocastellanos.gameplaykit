@@ -1,0 +1,41 @@
+name: LadderZone
+clip: true
+related: [PlayerClimbLadder, PlayerWalkRun]
+en:
+  summary: Marks a trigger collider as a climbable ladder for PlayerClimbLadder, with no tags to set up.
+  clip_caption: Walking through a ladder zone does nothing; pressing up climbs it, letting go holds still, pressing down returns to the floor.
+  description: |
+    `LadderZone` is an empty marker component. Put it on a GameObject with a trigger `Collider2D` and every
+    character with `PlayerClimbLadder` treats that area as a ladder. It exists so you don't have to create a
+    "Ladder" tag in the Tag Manager; the tag still works as an alternative through
+    **Ladder Tag** on `PlayerClimbLadder`.
+
+    The zone itself has no settings and no behaviour: the collider's shape is the climbable area. Characters
+    can walk straight through it without attaching; they only start climbing when the player presses up or
+    down inside it, and they let go when they leave the shape.
+  setup:
+    - Create a GameObject where the ladder goes and add a `BoxCollider2D` with **Is Trigger** enabled, sized to the ladder.
+    - Add `LadderZone` to the same GameObject.
+    - Make sure the character has `PlayerClimbLadder`, walk into the zone and press up.
+  tips:
+    - Size the trigger a little taller than the platform it leads to, so the character can step off sideways at the top instead of falling back down.
+    - Keep the trigger narrow (about the width of the ladder art); a wide zone lets the player start climbing far from the ladder.
+es:
+  summary: Marca un collider trigger como escalera trepable para PlayerClimbLadder, sin configurar tags.
+  clip_caption: Atravesar la zona de escalera no hace nada; arriba la trepa, al soltar se queda quieto y abajo vuelve al piso.
+  description: |
+    `LadderZone` es un componente marcador vacío. Ponlo en un GameObject con un `Collider2D` trigger y todo
+    personaje con `PlayerClimbLadder` tratará esa área como escalera. Existe para que no tengas que crear un
+    tag "Ladder" en el Tag Manager; el tag sigue funcionando como alternativa mediante **Ladder Tag** en
+    `PlayerClimbLadder`.
+
+    La zona no tiene ajustes ni comportamiento propio: la forma del collider es el área trepable. Los
+    personajes pueden atravesarla sin engancharse; solo empiezan a trepar cuando el jugador pulsa arriba o
+    abajo dentro de ella, y se sueltan al salir de la forma.
+  setup:
+    - Crea un GameObject donde va la escalera y agrégale un `BoxCollider2D` con **Is Trigger** activado, del tamaño de la escalera.
+    - Agrega `LadderZone` al mismo GameObject.
+    - Asegúrate de que el personaje tenga `PlayerClimbLadder`, entra en la zona y pulsa arriba.
+  tips:
+    - Haz el trigger un poco más alto que la plataforma a la que lleva, para que el personaje pueda bajarse de lado arriba en vez de volver a caer.
+    - Mantén el trigger angosto (más o menos el ancho del arte de la escalera); una zona ancha deja empezar a trepar lejos de la escalera.

@@ -1,0 +1,63 @@
+name: UIPauseMenu
+clip: true
+related: [PauseManager, SceneTransitionManager, GameManager]
+en:
+  summary: A basic pause menu (resume, restart, quit) that appears and hides with the PauseManager.
+  clip_caption: The game pauses and the menu panel appears; pressing Resume hides it and the world moves again.
+  description: |
+    `UIPauseMenu` listens to `PauseManager.OnPauseChanged` and shows **Menu Root** while the game is paused,
+    hiding it when it resumes. On `Start` it syncs the panel with the current pause state, so the menu starts
+    hidden. Put the component on an object that is always active (typically the Canvas) — not on the panel
+    itself, which gets switched off.
+
+    It exposes three methods for your buttons' **On Click**: `OnResumeButtonPressed` unpauses;
+    `OnRestartButtonPressed` unpauses and reloads the active scene (in the Editor it also works for scenes
+    that aren't in the build list); `OnQuitButtonPressed` unpauses and loads **Main Menu Scene Name**, or
+    logs a warning if that scene isn't in the build. All three unpause through `PauseManager`, so a
+    `GameManager` in `Paused` goes back to `Playing` too. The menu **GameplayKit > Create HUD** builds a ready
+    panel with Resume and Restart already wired.
+  setup:
+    - Add a `PauseManager` to the scene.
+    - In your HUD canvas, create a panel with your title and buttons, and leave it disabled.
+    - Add `UIPauseMenu` to the canvas and drag the panel into **Menu Root**.
+    - Hook each button's **On Click** to `OnResumeButtonPressed`, `OnRestartButtonPressed` or `OnQuitButtonPressed`.
+  fields:
+    menuRoot: Panel shown while paused and hidden otherwise. Must not be the object that holds this component.
+    mainMenuSceneName: Scene loaded by the quit button. It must be in the build's scene list.
+  api:
+    OnResumeButtonPressed: Resumes the game through `PauseManager.SetPaused(false)`.
+    OnRestartButtonPressed: Resumes and reloads the active scene.
+    OnQuitButtonPressed: Resumes and loads **Main Menu Scene Name** if it's in the build.
+  tips:
+    - Add an **EventSystem** to the scene so the buttons can be clicked (Create HUD adds one if missing).
+    - The buttons keep working while `Time.timeScale` is 0, but animations on the panel need **Unscaled Time** on their Animator.
+es:
+  summary: Un menú de pausa básico (reanudar, reiniciar, salir) que aparece y se oculta con el PauseManager.
+  clip_caption: El juego se pausa y aparece el panel del menú; al pulsar Resume se oculta y el mundo vuelve a moverse.
+  description: |
+    `UIPauseMenu` escucha `PauseManager.OnPauseChanged` y muestra **Menu Root** mientras el juego está en
+    pausa, ocultándolo al reanudar. En `Start` sincroniza el panel con el estado actual, así el menú empieza
+    oculto. Pon el componente en un objeto que siempre esté activo (normalmente el Canvas) — no en el panel,
+    que se apaga.
+
+    Expone tres métodos para el **On Click** de tus botones: `OnResumeButtonPressed` quita la pausa;
+    `OnRestartButtonPressed` quita la pausa y recarga la escena activa (en el Editor funciona incluso con
+    escenas que no están en la lista del build); `OnQuitButtonPressed` quita la pausa y carga **Main Menu
+    Scene Name**, o registra una advertencia si esa escena no está en el build. Los tres quitan la pausa con
+    `PauseManager`, así que un `GameManager` en `Paused` también vuelve a `Playing`. El menú **GameplayKit >
+    Create HUD** arma un panel listo con Reanudar y Reiniciar ya conectados.
+  setup:
+    - Agrega un `PauseManager` a la escena.
+    - En el canvas de tu HUD, crea un panel con tu título y botones, y déjalo desactivado.
+    - Agrega `UIPauseMenu` al canvas y arrastra el panel a **Menu Root**.
+    - Conecta el **On Click** de cada botón a `OnResumeButtonPressed`, `OnRestartButtonPressed` u `OnQuitButtonPressed`.
+  fields:
+    menuRoot: Panel que se muestra en pausa y se oculta el resto del tiempo. No debe ser el objeto que tiene este componente.
+    mainMenuSceneName: Escena que carga el botón de salir. Debe estar en la lista de escenas del build.
+  api:
+    OnResumeButtonPressed: Reanuda el juego con `PauseManager.SetPaused(false)`.
+    OnRestartButtonPressed: Reanuda y recarga la escena activa.
+    OnQuitButtonPressed: Reanuda y carga **Main Menu Scene Name** si está en el build.
+  tips:
+    - Agrega un **EventSystem** a la escena para poder hacer clic en los botones (Create HUD agrega uno si falta).
+    - Los botones siguen funcionando con `Time.timeScale` en 0, pero las animaciones del panel necesitan **Unscaled Time** en su Animator.

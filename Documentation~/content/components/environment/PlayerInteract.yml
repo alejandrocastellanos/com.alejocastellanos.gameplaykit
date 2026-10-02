@@ -1,0 +1,100 @@
+name: PlayerInteract
+clip: true
+related: [Lever, CharacterCore, Elevator, DoorWithKey]
+en:
+  summary: Lets the character use the closest lever, chest or NPC within reach by pressing the interact button.
+  clip_caption: Pressing E with nothing in reach does nothing; next to the lever it flips it, next to a chest it opens it.
+  description: |
+    `PlayerInteract` is an ability: when **Interact** is pressed (**E** by default), it searches a circle of
+    **Interact Radius** around the character's position and calls `Interact` on the closest `IInteractable`
+    it finds. Distance is measured to the nearest point of each collider, so a long object counts as close
+    as soon as any part of it is in reach. Triggers are included and the character's own colliders are
+    ignored, and the interactable component can sit on the collider's object or any parent.
+
+    The kit's `Lever` is an `IInteractable`, but so can be anything you write: implement the one-method
+    interface on a chest, a sign or an NPC and it works with no extra setup. Only one object is used per
+    press. Like every ability it runs through `CharacterCore`, so it stops while the character is dead or
+    stunned. Select the character to see the radius as a cyan gizmo.
+  setup:
+    - Add `PlayerInteract` to a character with `CharacterCore` (add it before `CharacterCore`, or anywhere if `CharacterCore` is added last).
+    - Place a `Lever` or your own `IInteractable` with a collider near the character.
+    - Press **E** (or your input's interact button) within **Interact Radius**.
+  fields:
+    interactRadius: Reach of the interaction, in units, measured from the character's position to the closest point of each collider.
+  api:
+    FindClosest: Returns the closest `IInteractable` currently within reach, or `null`. Handy for showing a "Press E" prompt.
+    AbilityEnabled: Turn it off to block interaction temporarily (during dialogue or cutscenes).
+  example: |
+    Any script can become interactable. This chest opens once when the player presses E next to it:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class Chest : MonoBehaviour, IInteractable
+    {
+        [SerializeField] private GameObject openVisual;
+        [SerializeField] private GameObject loot;
+        private bool _opened;
+
+        public void Interact(GameObject interactor)
+        {
+            if (_opened) return;
+            _opened = true;
+            openVisual.SetActive(true);
+            Instantiate(loot, transform.position + Vector3.up, Quaternion.identity);
+        }
+    }
+    ```
+  tips:
+    - Show a prompt by checking `FindClosest() != null` every frame and toggling a small "E" icon above the character.
+    - If two interactables overlap, the one whose collider edge is nearest wins; space them out or shrink their colliders.
+es:
+  summary: Permite usar la palanca, cofre o NPC más cercano al alcance pulsando el botón de interactuar.
+  clip_caption: Pulsar E sin nada cerca no hace nada; junto a la palanca la acciona y junto a un cofre lo abre.
+  description: |
+    `PlayerInteract` es una habilidad: al pulsar **Interactuar** (**E** por defecto), busca en un círculo de
+    **Interact Radius** alrededor de la posición del personaje y llama a `Interact` en el `IInteractable`
+    más cercano. La distancia se mide al punto más cercano de cada collider, así que un objeto largo cuenta
+    como cercano en cuanto cualquier parte entra en el alcance. Incluye triggers, ignora los colliders del
+    propio personaje, y el componente interactuable puede estar en el objeto del collider o en un padre.
+
+    La `Lever` del kit es un `IInteractable`, pero también puede serlo cualquier cosa que escribas:
+    implementa la interfaz de un solo método en un cofre, un cartel o un NPC y funciona sin configurar nada
+    más. Se usa un solo objeto por pulsación. Como toda habilidad corre a través de `CharacterCore`, así
+    que se detiene mientras el personaje está muerto o aturdido. Selecciona el personaje para ver el radio
+    como un gizmo cian.
+  setup:
+    - Agrega `PlayerInteract` a un personaje con `CharacterCore` (antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final).
+    - Pon cerca una `Lever` o tu propio `IInteractable` con un collider.
+    - Pulsa **E** (o el botón de interactuar de tu input) dentro de **Interact Radius**.
+  fields:
+    interactRadius: Alcance de la interacción, en unidades, medido desde la posición del personaje hasta el punto más cercano de cada collider.
+  api:
+    FindClosest: Devuelve el `IInteractable` más cercano al alcance en este momento, o `null`. Útil para mostrar un aviso de "Pulsa E".
+    AbilityEnabled: Desactívalo para bloquear la interacción temporalmente (durante diálogos o cinemáticas).
+  example: |
+    Cualquier script puede ser interactuable. Este cofre se abre una vez cuando el jugador pulsa E a su lado:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class Chest : MonoBehaviour, IInteractable
+    {
+        [SerializeField] private GameObject openVisual;
+        [SerializeField] private GameObject loot;
+        private bool _opened;
+
+        public void Interact(GameObject interactor)
+        {
+            if (_opened) return;
+            _opened = true;
+            openVisual.SetActive(true);
+            Instantiate(loot, transform.position + Vector3.up, Quaternion.identity);
+        }
+    }
+    ```
+  tips:
+    - Muestra un aviso revisando `FindClosest() != null` cada frame y activando un pequeño ícono "E" sobre el personaje.
+    - Si dos interactuables se superponen, gana el que tenga el borde del collider más cerca; sepáralos o achica sus colliders.

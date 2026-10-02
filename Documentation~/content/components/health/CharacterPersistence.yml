@@ -1,0 +1,47 @@
+name: CharacterPersistence
+clip: false
+related: [SceneTransitionManager, GameManager, CharacterRespawn, UIHealthBar]
+en:
+  summary: Keeps the player (or any object) alive across scene loads without creating duplicates.
+  description: |
+    `CharacterPersistence` calls `DontDestroyOnLoad` on its GameObject in `Awake`, so the object and
+    everything on it — health, lives, inventory, abilities — survives when a new scene is loaded. Since
+    `DontDestroyOnLoad` only works on root objects, a persistent child is detached from its parent first
+    (keeping its world position).
+
+    Duplicates are avoided with **Persistence Id**: only one object per id is kept. If you place a player
+    in every level, the one that came from the previous scene survives and the new copy destroys itself.
+    Use a different id for each kind of persistent object (`Player`, `Companion`...). When the kept
+    object is destroyed, its id becomes free again.
+  setup:
+    - Add `CharacterPersistence` to the root of your player.
+    - Leave **Persistence Id** as `Player`, or give each persistent object its own id.
+    - Put the same player prefab in every scene so each level can also be played on its own; only the first one survives.
+  fields:
+    persistenceId: Identifier used to detect duplicates. Objects with the same id are treated as the same object across scenes.
+  tips:
+    - The surviving player keeps its position from the previous scene; move it to the level's start point yourself after loading (for example from a script listening to `SceneManager.sceneLoaded`).
+    - "Checkpoints from the old scene are destroyed with it, so after a load call `CharacterRespawn.SetCheckpoint` with a point of the new level."
+    - "`UIHealthBar` re-finds the object tagged `Player` when the linked one disappears, so a HUD in each scene keeps working with the persistent player."
+es:
+  summary: Mantiene vivo al jugador (o cualquier objeto) entre cargas de escena sin crear duplicados.
+  description: |
+    `CharacterPersistence` llama a `DontDestroyOnLoad` sobre su GameObject en `Awake`, así el objeto y
+    todo lo que tiene — vida, vidas, inventario, habilidades — sobrevive cuando se carga otra escena.
+    Como `DontDestroyOnLoad` solo funciona con objetos raíz, si el objeto es hijo de otro primero se
+    suelta de su padre (conservando su posición en el mundo).
+
+    Los duplicados se evitan con **Persistence Id**: solo se conserva un objeto por id. Si pones un
+    jugador en cada nivel, sobrevive el que venía de la escena anterior y la copia nueva se destruye
+    sola. Usa un id distinto para cada tipo de objeto persistente (`Player`, `Companion`...). Cuando el
+    objeto conservado se destruye, su id queda libre otra vez.
+  setup:
+    - Agrega `CharacterPersistence` a la raíz de tu jugador.
+    - Deja **Persistence Id** en `Player`, o dale a cada objeto persistente su propio id.
+    - Pon el mismo prefab de jugador en cada escena para poder probar cada nivel por separado; solo sobrevive el primero.
+  fields:
+    persistenceId: Identificador para detectar duplicados. Los objetos con el mismo id se consideran el mismo objeto entre escenas.
+  tips:
+    - El jugador que sobrevive conserva la posición de la escena anterior; muévelo tú al punto de inicio del nivel tras la carga (por ejemplo desde un script que escuche `SceneManager.sceneLoaded`).
+    - "Los checkpoints de la escena vieja se destruyen con ella, así que tras una carga llama a `CharacterRespawn.SetCheckpoint` con un punto del nivel nuevo."
+    - "`UIHealthBar` vuelve a buscar el objeto con tag `Player` cuando el enlazado desaparece, así que un HUD en cada escena sigue funcionando con el jugador persistente."

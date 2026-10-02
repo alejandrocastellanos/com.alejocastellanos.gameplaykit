@@ -1,0 +1,95 @@
+name: EnemyChase
+clip: true
+related: [EnemyPatrol, EnemyMeleeOnContact, AIActionMoveToTarget, AIBrain]
+en:
+  summary: Stand-alone enemy behaviour that chases a target while it's within detection range.
+  clip_caption: The enemy waits until the player enters its detection ring, chases and stops close by, then gives up when the player runs out of range.
+  description: |
+    Every frame it measures the straight-line distance to **Target**. Within **Detection Range** the
+    enemy walks horizontally towards it at **Speed**, flipping `localScale.x` to face it, and stops once
+    it is within **Stopping Distance**. Outside the range, or while there is no target, it stands still.
+    Only the X velocity of the `Rigidbody2D` is set, so gravity keeps working.
+
+    If **Target** is empty it looks for the GameObject tagged `Player` on its own (at most every half
+    second, through `PlayerLocator`), so prefabs and enemies spawned at runtime work without a scene
+    reference. It needs no `AIBrain`: drop it on an enemy and tag your player `Player`. Because it drives the velocity on
+    its own every frame, don't combine it with `EnemyPatrol` or other movement components on the same
+    object. For "patrol, then chase" use an `AIBrain` with `AIActionPatrolPoints` and
+    `AIActionMoveToTarget`.
+  setup:
+    - Give the enemy a `Collider2D` and a `Rigidbody2D` (Freeze Rotation Z); `EnemyChase` requires the body.
+    - Add `EnemyChase` and tag your player `Player` (or drag another object into **Target**).
+    - Adjust **Detection Range** and **Speed**; add `EnemyMeleeOnContact` so touching the player hurts.
+  fields:
+    target: What to chase. Empty means the GameObject tagged `Player`, found automatically, which also works in prefabs and spawned enemies.
+    detectionRange: Radius in units within which the enemy notices and chases the target.
+    speed: Horizontal chase speed in units per second.
+    stoppingDistance: Distance at which the enemy stops moving towards the target.
+  api:
+    IsChasing: True while the target is within **Detection Range** (also while stopped next to it).
+    Target: Gets or sets the current target from code. Set it to `null` to go back to the `Player`-tagged object.
+  example: |
+    Switch the enemy's sprite while it's chasing:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class ChaseSprite : MonoBehaviour
+    {
+        [SerializeField] private EnemyChase chase;
+        [SerializeField] private SpriteRenderer body;
+        [SerializeField] private Sprite idle, angry;
+
+        private void Update() => body.sprite = chase.IsChasing ? angry : idle;
+    }
+    ```
+  tips:
+    - Detection ignores walls; an `AIBrain` with `AIDecisionLineOfSight` gives you enemies that need to see the player.
+    - Keep **Speed** below the player's walk speed (4 by default) so players can escape.
+es:
+  summary: Comportamiento de enemigo independiente que persigue a un objetivo mientras esté dentro del rango de detección.
+  clip_caption: El enemigo espera hasta que el jugador entra en su anillo de detección, lo persigue y se detiene cerca, y se rinde cuando el jugador sale del rango.
+  description: |
+    En cada frame mide la distancia en línea recta hasta **Target**. Dentro de **Detection Range** el
+    enemigo camina en horizontal hacia él a **Speed**, volteando `localScale.x` para mirarlo, y se detiene
+    al quedar dentro de **Stopping Distance**. Fuera del rango, o sin objetivo, se queda quieto. Solo se
+    fija la velocidad X del `Rigidbody2D`, así que la gravedad sigue funcionando.
+
+    Si **Target** está vacío, busca solo el GameObject con tag `Player` (como mucho cada medio segundo,
+    con `PlayerLocator`), así los prefabs y los enemigos generados en runtime funcionan sin referencias a
+    la escena. No necesita `AIBrain`: ponlo en un enemigo y ponle el tag `Player` a tu jugador. Como controla la velocidad por su
+    cuenta en cada frame, no lo combines con `EnemyPatrol` ni otros componentes de movimiento en el mismo
+    objeto. Para "patrullar y luego perseguir" usa un `AIBrain` con `AIActionPatrolPoints` y
+    `AIActionMoveToTarget`.
+  setup:
+    - Dale al enemigo un `Collider2D` y un `Rigidbody2D` (Freeze Rotation Z); `EnemyChase` requiere el cuerpo.
+    - Agrega `EnemyChase` y ponle el tag `Player` a tu jugador (o arrastra otro objeto a **Target**).
+    - Ajusta **Detection Range** y **Speed**; agrega `EnemyMeleeOnContact` para que tocar al jugador lo dañe.
+  fields:
+    target: Qué perseguir. Vacío significa el GameObject con tag `Player`, que se busca solo; funciona también en prefabs y enemigos generados.
+    detectionRange: Radio en unidades dentro del cual el enemigo nota al objetivo y lo persigue.
+    speed: Velocidad horizontal de persecución en unidades por segundo.
+    stoppingDistance: Distancia a la que el enemigo deja de acercarse al objetivo.
+  api:
+    IsChasing: Verdadero mientras el objetivo está dentro de **Detection Range** (también mientras está detenido a su lado).
+    Target: Lee o cambia el objetivo actual desde código. Ponlo en `null` para volver al objeto con tag `Player`.
+  example: |
+    Cambia el sprite del enemigo mientras persigue:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class ChaseSprite : MonoBehaviour
+    {
+        [SerializeField] private EnemyChase chase;
+        [SerializeField] private SpriteRenderer body;
+        [SerializeField] private Sprite idle, angry;
+
+        private void Update() => body.sprite = chase.IsChasing ? angry : idle;
+    }
+    ```
+  tips:
+    - La detección ignora las paredes; un `AIBrain` con `AIDecisionLineOfSight` te da enemigos que necesitan ver al jugador.
+    - Mantén **Speed** por debajo de la velocidad de caminata del jugador (4 por defecto) para que se pueda escapar.

@@ -1,0 +1,53 @@
+name: MovingPlatform
+clip: true
+related: [Elevator, ConveyorBelt, FallingPlatform, OneWayPlatform]
+en:
+  summary: A platform that travels along waypoints on its own and carries whoever stands on it.
+  clip_caption: The player rides the platform across the gap and steps off; the platform heads back on its own.
+  description: |
+    `MovingPlatform` moves a *Kinematic* `Rigidbody2D` (added and configured automatically) through its
+    **Waypoints** at **Speed**, using `MovePosition` in the physics step. It heads to the first waypoint,
+    then the next one; at the end it either reverses (**Ping Pong**) or jumps back to the start of the list
+    (**Loop**). A waypoint counts as reached when the platform is within **Waypoint Threshold** of it.
+
+    Waypoint positions are copied on start, so the points can be children of the platform without moving
+    with it. With fewer than two waypoints it stays still. Dynamic bodies standing on its top face are
+    moved by exactly the same amount each step, so the player rides it while still walking and jumping
+    normally; bumping it from the side or from below doesn't attach you.
+  setup:
+    - Create a GameObject with a solid `BoxCollider2D` and add `MovingPlatform` (a `Rigidbody2D` is added for you).
+    - Create empty GameObjects for the stops (children of the platform are fine) and drag them into **Waypoints** in order.
+    - Choose **Loop Mode** and **Speed**.
+  fields:
+    waypoints: Points the platform travels through, in order. Positions are captured on start; at least two are needed.
+    speed: Travel speed in units per second.
+    loopMode: "**Ping Pong** goes back and forth along the list; **Loop** goes from the last point straight back to the first (good for circuits)."
+    waypointThreshold: Distance at which a waypoint counts as reached, in units. Rarely needs changing.
+  tips:
+    - Put the platform's starting position on the first waypoint; otherwise its first move is towards that point.
+    - Add `OneWayPlatform` to the same object so the player can jump onto it from below.
+es:
+  summary: Una plataforma que recorre waypoints por su cuenta y lleva consigo a quien esté encima.
+  clip_caption: El jugador cruza el vacío sobre la plataforma y se baja; la plataforma regresa sola.
+  description: |
+    `MovingPlatform` mueve un `Rigidbody2D` *Kinematic* (se agrega y configura solo) por sus **Waypoints** a
+    **Speed**, usando `MovePosition` en el paso de física. Va al primer waypoint y luego al siguiente; al
+    final, o se devuelve (**Ping Pong**) o salta al inicio de la lista (**Loop**). Un waypoint cuenta como
+    alcanzado cuando la plataforma está a menos de **Waypoint Threshold**.
+
+    Las posiciones de los waypoints se copian al iniciar, así que pueden ser hijos de la plataforma sin
+    moverse con ella. Con menos de dos waypoints se queda quieta. Los cuerpos dinámicos parados sobre su
+    cara superior se desplazan exactamente lo mismo en cada paso, así que el jugador viaja encima mientras
+    sigue caminando y saltando normalmente; chocarla de lado o desde abajo no te engancha.
+  setup:
+    - Crea un GameObject con un `BoxCollider2D` sólido y agrégale `MovingPlatform` (el `Rigidbody2D` se agrega solo).
+    - Crea GameObjects vacíos para las paradas (pueden ser hijos de la plataforma) y arrástralos a **Waypoints** en orden.
+    - Elige **Loop Mode** y **Speed**.
+  fields:
+    waypoints: Puntos por los que pasa, en orden. Sus posiciones se capturan al iniciar; hacen falta al menos dos.
+    speed: Velocidad del recorrido en unidades por segundo.
+    loopMode: "**Ping Pong** va y vuelve por la lista; **Loop** pasa del último punto directo al primero (ideal para circuitos)."
+    waypointThreshold: Distancia a la que un waypoint cuenta como alcanzado, en unidades. Casi nunca hay que tocarla.
+  tips:
+    - Pon la posición inicial de la plataforma sobre el primer waypoint; si no, su primer movimiento será hacia ese punto.
+    - Agrega `OneWayPlatform` al mismo objeto para que el jugador pueda subirse saltando desde abajo.

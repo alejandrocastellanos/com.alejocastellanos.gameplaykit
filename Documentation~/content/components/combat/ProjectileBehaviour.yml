@@ -1,0 +1,103 @@
+name: ProjectileBehaviour
+clip: true
+related: [WeaponProjectile, DamageableObject, CharacterHealth, EnemyShootOnSight]
+en:
+  summary: Makes a prefab fly as a projectile that damages what it hits, with optional bounces and gravity.
+  clip_caption: A straight bolt bounces twice between two walls before vanishing, while a grenade arcs down with gravity onto a dummy.
+  description: |
+    `ProjectileBehaviour` goes on the projectile prefab that `WeaponProjectile` spawns. `Launch` sets its
+    velocity, damage and instigator; it flies straight (gravity scale set to 0) unless
+    **Affected By Gravity** is on, in which case the `Rigidbody2D` gravity makes it arc like a grenade. It
+    is destroyed after **Lifetime** seconds no matter what.
+
+    Impacts are detected with `OnTriggerEnter2D`, so the projectile's collider must be a trigger. When it
+    touches something `IDamageable` (other than whoever fired it) it deals its damage along its flight
+    direction and disappears. Other trigger zones (water, wind, checkpoints) are ignored. Solid
+    colliders on **Collidable Layers** make it bounce while it has bounces left (**Max Bounces**) and
+    destroy it after that; solids on other layers are passed through.
+  setup:
+    - "Create a projectile object: a sprite, a `Rigidbody2D` (required) and a small `Collider2D` with **Is Trigger** checked."
+    - Add `ProjectileBehaviour`, set **Lifetime**, **Max Bounces** and **Affected By Gravity**, and save it as a prefab.
+    - Assign the prefab to a `WeaponProjectile`, or spawn it yourself and call `Launch`.
+  fields:
+    lifetime: Seconds before the projectile destroys itself even if it hit nothing.
+    maxBounces: How many times it bounces off solid colliders before being destroyed. 0 = destroyed on the first wall.
+    collidableLayers: Layers of solid colliders that stop (or bounce) the projectile. Damageable targets are hit regardless of this mask.
+    affectedByGravity: Off = straight flight (bullet, arrow). On = it falls with the Rigidbody's gravity (grenade).
+  api:
+    Launch: "Sets direction, speed, damage and instigator and starts the flight. Call it right after `Instantiate`; the instigator's colliders are never hit."
+  example: |
+    Fire a projectile without a weapon component, for example from a boss pattern:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class BossVolley : MonoBehaviour
+    {
+        [SerializeField] private ProjectileBehaviour fireball;
+
+        public void Volley()
+        {
+            for (int i = -2; i <= 2; i++)
+            {
+                var dir = Quaternion.Euler(0f, 0f, i * 15f) * Vector2.left;
+                var p = Instantiate(fireball, transform.position, Quaternion.identity);
+                p.Launch(dir, 8f, 10f, gameObject);
+            }
+        }
+    }
+    ```
+  tips:
+    - If projectiles push things around instead of hitting them, the collider isn't marked as trigger.
+    - Projectiles damage any `IDamageable` except their shooter — including other enemies — so place enemy turrets with that in mind.
+es:
+  summary: Hace que un prefab vuele como proyectil y dañe lo que toca, con rebotes y gravedad opcionales.
+  clip_caption: Un proyectil recto rebota dos veces entre dos paredes antes de desaparecer, mientras una granada cae en arco con la gravedad sobre un muñeco.
+  description: |
+    `ProjectileBehaviour` va en el prefab de proyectil que crea `WeaponProjectile`. `Launch` define su
+    velocidad, daño e instigador; vuela en línea recta (gravity scale en 0) salvo que
+    **Affected By Gravity** esté activado, en cuyo caso la gravedad del `Rigidbody2D` lo hace caer en
+    arco como una granada. Se destruye tras **Lifetime** segundos pase lo que pase.
+
+    Los impactos se detectan con `OnTriggerEnter2D`, así que el collider del proyectil debe ser trigger.
+    Al tocar algo `IDamageable` (que no sea quien lo disparó) hace su daño en la dirección de vuelo y
+    desaparece. Las demás zonas trigger (agua, viento, checkpoints) se ignoran. Los colliders sólidos de
+    **Collidable Layers** lo hacen rebotar mientras le queden rebotes (**Max Bounces**) y después lo
+    destruyen; los sólidos de otras capas se atraviesan.
+  setup:
+    - "Crea el objeto del proyectil: un sprite, un `Rigidbody2D` (obligatorio) y un `Collider2D` pequeño con **Is Trigger** marcado."
+    - Agrega `ProjectileBehaviour`, ajusta **Lifetime**, **Max Bounces** y **Affected By Gravity**, y guárdalo como prefab.
+    - Asigna el prefab a un `WeaponProjectile`, o créalo tú y llama a `Launch`.
+  fields:
+    lifetime: Segundos antes de que el proyectil se destruya aunque no haya tocado nada.
+    maxBounces: Cuántas veces rebota en colliders sólidos antes de destruirse. 0 = se destruye en la primera pared.
+    collidableLayers: Capas de colliders sólidos que frenan (o hacen rebotar) el proyectil. Los objetivos dañables se golpean igual, sin importar esta máscara.
+    affectedByGravity: Desactivado = vuelo recto (bala, flecha). Activado = cae con la gravedad del Rigidbody (granada).
+  api:
+    Launch: "Define dirección, velocidad, daño e instigador y empieza el vuelo. Llámalo justo después de `Instantiate`; los colliders del instigador nunca se golpean."
+  example: |
+    Lanza proyectiles sin un componente de arma, por ejemplo desde el patrón de un jefe:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class BossVolley : MonoBehaviour
+    {
+        [SerializeField] private ProjectileBehaviour fireball;
+
+        public void Volley()
+        {
+            for (int i = -2; i <= 2; i++)
+            {
+                var dir = Quaternion.Euler(0f, 0f, i * 15f) * Vector2.left;
+                var p = Instantiate(fireball, transform.position, Quaternion.identity);
+                p.Launch(dir, 8f, 10f, gameObject);
+            }
+        }
+    }
+    ```
+  tips:
+    - Si los proyectiles empujan cosas en vez de golpearlas, su collider no está marcado como trigger.
+    - Los proyectiles dañan a cualquier `IDamageable` salvo a quien dispara — también a otros enemigos —, tenlo en cuenta al colocar torretas.

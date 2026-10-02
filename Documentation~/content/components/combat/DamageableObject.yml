@@ -1,0 +1,101 @@
+name: DamageableObject
+clip: true
+related: [CharacterHealth, DamageFlash, BreakableObject, DamagePopupSpawner, WeaponMelee]
+en:
+  summary: Simple health for props, crates, turrets and basic enemies that can be damaged and destroyed.
+  clip_caption: Three sword hits take a 30 HP crate down to zero and destroy it.
+  description: |
+    `DamageableObject` is a lightweight alternative to `CharacterHealth` for things that aren't
+    characters. Any kit weapon or hazard damages it through `IDamageable`; health starts at
+    **Max Health** and, when it reaches 0, `OnDestroyedByDamage` fires and the GameObject is destroyed if
+    **Destroy On Death** is on.
+
+    There is no invulnerability, healing or knockback: every hit counts, and hits after reaching 0 are
+    ignored. It also works as an `IHealthSource`, so `DamageFlash`, `DamagePopupSpawner` and
+    `AIDecisionHealthThreshold` react to it. The **GameplayKit > Create Enemy** menu uses it for the
+    default patrolling enemy.
+  setup:
+    - Add a `Collider2D` to the object (so weapons can find it) and add `DamageableObject`.
+    - Set **Max Health** and decide whether it should disappear with **Destroy On Death**.
+    - Optionally add `DamageFlash` for hit feedback, and listen to `OnDestroyedByDamage` to drop loot or play an effect.
+  fields:
+    maxHealth: Starting and maximum health.
+    destroyOnDeath: When on, the GameObject is destroyed as soon as health reaches 0. Turn it off to keep it (for example to swap to a broken sprite yourself).
+  events:
+    OnDamaged: "C# event fired on each hit with `(amount, instigator)`; the instigator is the weapon or hazard GameObject that dealt the damage."
+    OnDestroyedByDamage: C# event fired once when health reaches 0, right before the object is destroyed.
+  api:
+    MaxHealth: The configured maximum health.
+    CurrentHealth: Current health, between 0 and `MaxHealth`.
+    ApplyDamage: "Damages the object (the `IDamageable` entry point used by weapons). Amounts of 0 or less are ignored."
+  example: |
+    Drop a coin when the crate breaks:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class LootDrop : MonoBehaviour
+    {
+        [SerializeField] private GameObject coinPrefab;
+        private DamageableObject _target;
+
+        private void Awake() => _target = GetComponent<DamageableObject>();
+        private void OnEnable() => _target.OnDestroyedByDamage += Drop;
+        private void OnDisable() => _target.OnDestroyedByDamage -= Drop;
+
+        private void Drop() => Instantiate(coinPrefab, transform.position, Quaternion.identity);
+    }
+    ```
+  tips:
+    - "`OnDamaged` here passes `(amount, instigator)`, unlike `CharacterHealth.OnDamaged` which only passes the amount."
+    - Use `CharacterHealth` instead when the object needs invulnerability frames, healing, knockback or `CharacterDeath`.
+es:
+  summary: Vida simple para objetos, cajas, torretas y enemigos básicos que se pueden dañar y destruir.
+  clip_caption: Tres espadazos bajan a cero la vida de una caja de 30 HP y la destruyen.
+  description: |
+    `DamageableObject` es una alternativa liviana a `CharacterHealth` para cosas que no son personajes.
+    Cualquier arma o trampa del kit lo daña a través de `IDamageable`; la vida empieza en
+    **Max Health** y, cuando llega a 0, se dispara `OnDestroyedByDamage` y el GameObject se destruye si
+    **Destroy On Death** está activado.
+
+    No hay invulnerabilidad, curación ni empujón: cada golpe cuenta, y los golpes después de llegar a 0
+    se ignoran. También funciona como `IHealthSource`, así que `DamageFlash`, `DamagePopupSpawner` y
+    `AIDecisionHealthThreshold` reaccionan a él. El menú **GameplayKit > Create Enemy** lo usa en el
+    enemigo patrullero por defecto.
+  setup:
+    - Agrega un `Collider2D` al objeto (para que las armas lo encuentren) y agrega `DamageableObject`.
+    - Ajusta **Max Health** y decide si debe desaparecer con **Destroy On Death**.
+    - Si quieres, agrega `DamageFlash` para el feedback y escucha `OnDestroyedByDamage` para soltar botín o un efecto.
+  fields:
+    maxHealth: Vida inicial y máxima.
+    destroyOnDeath: Activado, el GameObject se destruye en cuanto la vida llega a 0. Desactívalo para conservarlo (por ejemplo, para cambiar tú a un sprite roto).
+  events:
+    OnDamaged: "Evento C# en cada golpe con `(amount, instigator)`; el instigador es el GameObject del arma o trampa que hizo el daño."
+    OnDestroyedByDamage: Evento C# que se dispara una vez cuando la vida llega a 0, justo antes de destruir el objeto.
+  api:
+    MaxHealth: La vida máxima configurada.
+    CurrentHealth: Vida actual, entre 0 y `MaxHealth`.
+    ApplyDamage: "Daña el objeto (el punto de entrada de `IDamageable` que usan las armas). Cantidades de 0 o menos se ignoran."
+  example: |
+    Suelta una moneda cuando se rompe la caja:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class LootDrop : MonoBehaviour
+    {
+        [SerializeField] private GameObject coinPrefab;
+        private DamageableObject _target;
+
+        private void Awake() => _target = GetComponent<DamageableObject>();
+        private void OnEnable() => _target.OnDestroyedByDamage += Drop;
+        private void OnDisable() => _target.OnDestroyedByDamage -= Drop;
+
+        private void Drop() => Instantiate(coinPrefab, transform.position, Quaternion.identity);
+    }
+    ```
+  tips:
+    - "Aquí `OnDamaged` pasa `(amount, instigator)`, a diferencia de `CharacterHealth.OnDamaged`, que solo pasa la cantidad."
+    - Usa `CharacterHealth` cuando el objeto necesite invulnerabilidad, curación, empujón o `CharacterDeath`.

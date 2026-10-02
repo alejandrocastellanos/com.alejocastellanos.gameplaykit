@@ -1,0 +1,119 @@
+name: InventoryManager
+clip: true
+related: [ItemPickup, DoorWithKey, LevelExit, ScoreManager]
+en:
+  summary: Holds the player's keys and items so doors, exits and pickups can check for them.
+  clip_caption: The locked door blocks the player; after grabbing the key it opens and the key is used up.
+  description: |
+    `InventoryManager` stores a set of item IDs (plain strings such as `gold_key`). Each ID is stored once:
+    adding an item you already have does nothing, and empty IDs are ignored. `OnItemAdded` and
+    `OnItemRemoved` fire only when the inventory really changes.
+
+    It implements `IKeyHolder`, the interface environment pieces use to ask about items without knowing
+    this class: `ItemPickup` gives its item to whatever `IKeyHolder` touches it, `DoorWithKey` opens only if
+    the toucher has the required item (and consumes it by default), and `LevelExit` can require one. Those
+    pieces look for the holder with `GetComponentInParent`, so put the inventory on the player itself.
+  setup:
+    - Add `InventoryManager` to the player GameObject (the one with the collider, or a parent of it).
+    - Add `ItemPickup` to a key object and `DoorWithKey` to a door, both with the same **Item Id**.
+    - Read or change the inventory from your scripts with `HasItem`, `AddItem` and `RemoveItem`.
+  events:
+    OnItemAdded: "C# event (`Action<string>`) raised with the ID when a new item is added."
+    OnItemRemoved: "C# event (`Action<string>`) raised with the ID when an item is removed (for example when a door consumes a key)."
+  api:
+    AddItem: Adds an item ID; does nothing if it's empty or already in the inventory.
+    HasItem: True if the inventory contains the ID.
+    RemoveItem: Removes the ID if present.
+    AddKey: Same as `AddItem` (part of `IKeyHolder`).
+    HasKey: Same as `HasItem` (part of `IKeyHolder`).
+    RemoveKey: Same as `RemoveItem` (part of `IKeyHolder`).
+  example: |
+    Show a key icon on the HUD while the player carries the golden key:
+
+    ```csharp
+    using GameplayKit.Managers;
+    using UnityEngine;
+
+    public class KeyIcon : MonoBehaviour
+    {
+        [SerializeField] private InventoryManager inventory;
+        [SerializeField] private GameObject icon;
+        [SerializeField] private string keyId = "llave_dorada";
+
+        private void OnEnable()
+        {
+            inventory.OnItemAdded += Refresh;
+            inventory.OnItemRemoved += Refresh;
+            Refresh(keyId);
+        }
+
+        private void OnDisable()
+        {
+            inventory.OnItemAdded -= Refresh;
+            inventory.OnItemRemoved -= Refresh;
+        }
+
+        private void Refresh(string _) => icon.SetActive(inventory.HasItem(keyId));
+    }
+    ```
+  tips:
+    - IDs are case-sensitive — `Gold_Key` and `gold_key` are different items. The kit's default door and pickup ID is `llave_dorada`.
+    - It holds item IDs only, not counts; use `ScoreManager` or your own counter for stackable things like coins.
+es:
+  summary: Guarda las llaves e ítems del jugador para que puertas, salidas y recogibles puedan consultarlos.
+  clip_caption: La puerta cerrada bloquea al jugador; tras tomar la llave se abre y la llave se gasta.
+  description: |
+    `InventoryManager` guarda un conjunto de IDs de ítems (strings simples como `gold_key`). Cada ID se guarda
+    una sola vez: agregar un ítem que ya tienes no hace nada y los IDs vacíos se ignoran. `OnItemAdded` y
+    `OnItemRemoved` solo se disparan cuando el inventario cambia de verdad.
+
+    Implementa `IKeyHolder`, la interfaz que usan las piezas del entorno para preguntar por ítems sin conocer
+    esta clase: `ItemPickup` le da su ítem a cualquier `IKeyHolder` que lo toque, `DoorWithKey` se abre solo
+    si quien la toca tiene el ítem requerido (y lo consume por defecto) y `LevelExit` puede exigir uno. Esas
+    piezas buscan al portador con `GetComponentInParent`, así que pon el inventario en el propio jugador.
+  setup:
+    - Agrega `InventoryManager` al GameObject del jugador (el que tiene el collider, o un padre de él).
+    - Agrega `ItemPickup` a un objeto llave y `DoorWithKey` a una puerta, ambos con el mismo **Item Id**.
+    - Lee o cambia el inventario desde tus scripts con `HasItem`, `AddItem` y `RemoveItem`.
+  events:
+    OnItemAdded: "Evento C# (`Action<string>`) que se dispara con el ID cuando se agrega un ítem nuevo."
+    OnItemRemoved: "Evento C# (`Action<string>`) que se dispara con el ID cuando se quita un ítem (por ejemplo cuando una puerta consume una llave)."
+  api:
+    AddItem: Agrega un ID de ítem; no hace nada si está vacío o ya está en el inventario.
+    HasItem: Verdadero si el inventario contiene el ID.
+    RemoveItem: Quita el ID si está.
+    AddKey: Igual que `AddItem` (parte de `IKeyHolder`).
+    HasKey: Igual que `HasItem` (parte de `IKeyHolder`).
+    RemoveKey: Igual que `RemoveItem` (parte de `IKeyHolder`).
+  example: |
+    Muestra un ícono de llave en el HUD mientras el jugador lleva la llave dorada:
+
+    ```csharp
+    using GameplayKit.Managers;
+    using UnityEngine;
+
+    public class KeyIcon : MonoBehaviour
+    {
+        [SerializeField] private InventoryManager inventory;
+        [SerializeField] private GameObject icon;
+        [SerializeField] private string keyId = "llave_dorada";
+
+        private void OnEnable()
+        {
+            inventory.OnItemAdded += Refresh;
+            inventory.OnItemRemoved += Refresh;
+            Refresh(keyId);
+        }
+
+        private void OnDisable()
+        {
+            inventory.OnItemAdded -= Refresh;
+            inventory.OnItemRemoved -= Refresh;
+        }
+
+        private void Refresh(string _) => icon.SetActive(inventory.HasItem(keyId));
+    }
+    ```
+  tips:
+    - Los IDs distinguen mayúsculas — `Gold_Key` y `gold_key` son ítems distintos. El ID por defecto de la puerta y el recogible del kit es `llave_dorada`.
+    - Solo guarda IDs, no cantidades; usa `ScoreManager` o tu propio contador para cosas acumulables como monedas.

@@ -1,0 +1,51 @@
+name: CameraBounds
+clip: true
+related: [CameraFollow, LevelManager, CameraShake, CameraZoomBySpeed]
+en:
+  summary: Keeps the camera inside the level's rectangle so players never see past its edges.
+  clip_caption: The camera follows the player but stops at the level's edges, letting the player reach the walls at the screen border.
+  description: |
+    `CameraBounds` clamps the camera's position every `LateUpdate` so its whole view stays inside the
+    rectangle from **Min Bounds** to **Max Bounds**. It takes the orthographic size and aspect ratio into
+    account, so the edge of the *screen* — not the camera's center — stops at the edge of the level. It runs
+    after `CameraFollow` (execution order 50), so the follow moves the camera and the bounds have the last
+    word.
+
+    If the level is smaller than the view on one axis, the camera is centered on that axis instead of
+    jittering between both limits. When the bounds are left unconfigured (max not greater than min), it
+    uses the bounds of the scene's `LevelManager` if it has some; without either, it doesn't clamp at all.
+    It only works with orthographic cameras.
+  setup:
+    - Add `CameraBounds` to the camera that has `CameraFollow`.
+    - Set **Min Bounds** (bottom-left corner) and **Max Bounds** (top-right corner) in world units; the yellow gizmo shows the rectangle when the camera is selected.
+    - Or leave both at zero and set **Level Min Bounds** / **Level Max Bounds** on a `LevelManager` instead.
+  fields:
+    minBounds: Bottom-left corner of the level, in world units. Leave both corners at zero to use the `LevelManager` bounds.
+    maxBounds: Top-right corner of the level, in world units. Must be greater than **Min Bounds** on both axes to take effect.
+  tips:
+    - Set the bounds to the outer edges of your walls and floor, so the solid edges are visible at the screen border.
+    - Combine with `CameraZoomBySpeed`: the clamp uses the current orthographic size, so zooming out near an edge pushes the camera inwards automatically.
+es:
+  summary: Mantiene la cámara dentro del rectángulo del nivel para que nunca se vea más allá de sus bordes.
+  clip_caption: La cámara sigue al jugador pero se detiene en los bordes del nivel, dejando que el jugador llegue a las paredes en el borde de la pantalla.
+  description: |
+    `CameraBounds` limita la posición de la cámara en cada `LateUpdate` para que toda su vista quede dentro
+    del rectángulo de **Min Bounds** a **Max Bounds**. Tiene en cuenta el tamaño ortográfico y la relación de
+    aspecto, así el borde de la *pantalla* — no el centro de la cámara — se detiene en el borde del nivel.
+    Corre después de `CameraFollow` (orden de ejecución 50): el seguimiento mueve la cámara y los límites
+    tienen la última palabra.
+
+    Si el nivel es más chico que la vista en un eje, la cámara se centra en ese eje en vez de temblar entre
+    ambos límites. Si los límites quedan sin configurar (máximo no mayor que mínimo), usa los del
+    `LevelManager` de la escena si los tiene; sin ninguno de los dos, no limita nada. Solo funciona con
+    cámaras ortográficas.
+  setup:
+    - Agrega `CameraBounds` a la cámara que tiene `CameraFollow`.
+    - Define **Min Bounds** (esquina inferior izquierda) y **Max Bounds** (esquina superior derecha) en unidades del mundo; el gizmo amarillo muestra el rectángulo al seleccionar la cámara.
+    - O deja ambos en cero y define **Level Min Bounds** / **Level Max Bounds** en un `LevelManager`.
+  fields:
+    minBounds: Esquina inferior izquierda del nivel, en unidades del mundo. Deja ambas esquinas en cero para usar los límites del `LevelManager`.
+    maxBounds: Esquina superior derecha del nivel, en unidades del mundo. Debe ser mayor que **Min Bounds** en ambos ejes para tener efecto.
+  tips:
+    - Pon los límites en los bordes exteriores de tus paredes y suelo, así los bordes sólidos se ven en el borde de la pantalla.
+    - Combínalo con `CameraZoomBySpeed`: el límite usa el tamaño ortográfico actual, así que alejar el zoom cerca de un borde empuja la cámara hacia adentro sola.

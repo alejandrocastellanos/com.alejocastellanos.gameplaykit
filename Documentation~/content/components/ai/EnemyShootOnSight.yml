@@ -1,0 +1,110 @@
+name: EnemyShootOnSight
+clip: true
+related: [WeaponHitscan, WeaponProjectile, EnemyPatrolWithinBounds, AIActionShoot, AIDecisionLineOfSight]
+en:
+  summary: Fires the enemy's weapon at a target that enters its vision cone with nothing in between.
+  clip_caption: A pacing guard shoots only while its vision cone faces the player, and stops when it turns away.
+  description: |
+    Every frame it checks whether **Target** is visible: within **Sight Range**, inside a cone of **Sight
+    Angle** degrees centred on the direction the enemy faces (right when `localScale.x` is positive, left
+    when negative), and with no collider on **Obstacle Layers** between them. The ray ignores the
+    enemy's and the target's own colliders, and triggers. If **Target** is empty it uses the GameObject
+    tagged `Player`, searching at most every half second, so prefabs and spawned enemies work too.
+
+    While the target is visible, the enemy calls `TryFire` towards it on a `WeaponHitscan` on the same
+    GameObject, or on a `WeaponProjectile` as a fallback, waiting **Fire Interval** seconds after each
+    successful shot. The interval only counts down while the target is in sight, and the first shot
+    after spotting it goes off immediately. The component never turns the enemy; pair it with something
+    that does, like `EnemyPatrol` or `EnemyPatrolWithinBounds`.
+  setup:
+    - Add a `WeaponHitscan` or a `WeaponProjectile` (with a projectile prefab) to the enemy.
+    - Add `EnemyShootOnSight` and tag your player `Player` (or drag another object into **Target**).
+    - Optional — add `EnemyPatrolWithinBounds` or `EnemyPatrol` so the enemy turns and sweeps its cone.
+  fields:
+    target: What to shoot at. Empty means the GameObject tagged `Player`, found automatically.
+    sightRange: Maximum distance in units at which the target can be seen.
+    sightAngle: Total width of the vision cone in degrees (60 = 30° above and below the facing direction). 360 sees all around.
+    obstacleLayers: Layers that block the view. *Everything* works since the enemy and target are ignored.
+    fireInterval: Seconds between shots while the target stays visible. The weapon's own cooldown also applies.
+  api:
+    Target: Gets or sets what the enemy shoots at from code. `null` goes back to the `Player`-tagged object.
+  example: |
+    Draw a laser trail for each hitscan shot the enemy fires:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class ShotTrail : MonoBehaviour
+    {
+        [SerializeField] private WeaponHitscan gun;
+        [SerializeField] private LineRenderer line;
+
+        private void OnEnable() => gun.OnShotFired += Show;
+        private void OnDisable() => gun.OnShotFired -= Show;
+
+        private void Show(Vector2 origin, Vector2 end)
+        {
+            line.positionCount = 2;
+            line.SetPosition(0, origin);
+            line.SetPosition(1, end);
+        }
+    }
+    ```
+  tips:
+    - The cone follows `localScale.x`, so flip enemies by scale (as the kit's patrol components do), not by rotating them.
+    - For more control (alert states, bursts) build the same thing with `AIBrain`, `AIDecisionLineOfSight` and `AIActionShoot`.
+es:
+  summary: Dispara el arma del enemigo contra un objetivo que entra en su cono de visión sin obstáculos en medio.
+  clip_caption: Un guardia que va y viene solo dispara mientras su cono de visión apunta al jugador, y se detiene cuando se da vuelta.
+  description: |
+    En cada frame revisa si **Target** es visible: dentro de **Sight Range**, dentro de un cono de **Sight
+    Angle** grados centrado en la dirección en que mira el enemigo (derecha si `localScale.x` es positivo,
+    izquierda si es negativo) y sin colliders de **Obstacle Layers** entre ambos. El rayo ignora los
+    colliders del enemigo y del objetivo, y los triggers. Si **Target** está vacío usa el GameObject con tag
+    `Player`, buscándolo como mucho cada medio segundo, así que también funciona en prefabs y enemigos
+    generados.
+
+    Mientras el objetivo es visible, el enemigo llama a `TryFire` hacia él en un `WeaponHitscan` del mismo
+    GameObject, o en un `WeaponProjectile` como alternativa, y espera **Fire Interval** segundos después de
+    cada disparo exitoso. El intervalo solo corre mientras ve al objetivo, y el primer disparo después de
+    detectarlo sale de inmediato. El componente nunca gira al enemigo; combínalo con algo que lo haga,
+    como `EnemyPatrol` o `EnemyPatrolWithinBounds`.
+  setup:
+    - Agrega un `WeaponHitscan` o un `WeaponProjectile` (con un prefab de proyectil) al enemigo.
+    - Agrega `EnemyShootOnSight` y ponle el tag `Player` a tu jugador (o arrastra otro objeto a **Target**).
+    - Opcional — agrega `EnemyPatrolWithinBounds` o `EnemyPatrol` para que el enemigo se dé vuelta y barra su cono.
+  fields:
+    target: A qué disparar. Vacío significa el GameObject con tag `Player`, que se busca solo.
+    sightRange: Distancia máxima en unidades a la que puede ver al objetivo.
+    sightAngle: Ancho total del cono de visión en grados (60 = 30° arriba y abajo de la dirección en que mira). 360 ve alrededor.
+    obstacleLayers: Capas que bloquean la vista. *Everything* funciona porque se ignoran el enemigo y el objetivo.
+    fireInterval: Segundos entre disparos mientras el objetivo sigue visible. El cooldown propio del arma también aplica.
+  api:
+    Target: Lee o cambia a qué dispara el enemigo desde código. `null` vuelve al objeto con tag `Player`.
+  example: |
+    Dibuja un rastro láser por cada disparo hitscan del enemigo:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class ShotTrail : MonoBehaviour
+    {
+        [SerializeField] private WeaponHitscan gun;
+        [SerializeField] private LineRenderer line;
+
+        private void OnEnable() => gun.OnShotFired += Show;
+        private void OnDisable() => gun.OnShotFired -= Show;
+
+        private void Show(Vector2 origin, Vector2 end)
+        {
+            line.positionCount = 2;
+            line.SetPosition(0, origin);
+            line.SetPosition(1, end);
+        }
+    }
+    ```
+  tips:
+    - El cono sigue a `localScale.x`, así que voltea a los enemigos con la escala (como hacen los componentes de patrulla del kit), no rotándolos.
+    - Para más control (estados de alerta, ráfagas) arma lo mismo con `AIBrain`, `AIDecisionLineOfSight` y `AIActionShoot`.

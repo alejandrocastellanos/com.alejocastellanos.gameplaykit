@@ -1,0 +1,103 @@
+name: PauseManager
+clip: true
+related: [UIPauseMenu, GameManager, AudioManager, KeyboardInputReader]
+en:
+  summary: Pauses and resumes the game with Esc (or Start on a gamepad) by freezing time.
+  clip_caption: The world freezes mid-bounce while paused and picks up exactly where it was when resumed.
+  description: |
+    `PauseManager` pauses the game by setting `Time.timeScale` to 0 and resumes it by setting it back to 1,
+    then raises `OnPauseChanged` so menus and other systems can react. Physics, movement, timers and
+    animations that use scaled time stop; things that use unscaled time (the `AudioManager` crossfade, the
+    `SceneTransitionManager` fade, `CameraShake`) keep going.
+
+    It toggles with **Pause Key** (Esc) or **Pause Pad Button** (Start). To avoid surprise pauses, it ignores
+    input during the first second after it's enabled and only arms itself once the key has been seen
+    released. On `Awake` it forces `Time.timeScale` back to 1 (in the Editor a 0 can survive a previous
+    session), and if it's destroyed while paused — for example on a scene change — it unfreezes the game.
+    It's a singleton available as `PauseManager.Instance`.
+
+    If the scene has a `GameManager`, pausing also switches its state from `Playing` to `Paused`, and
+    resuming switches `Paused` back to `Playing`. A `GameOver` state is never overwritten, so pausing on the
+    game-over screen keeps it `GameOver`.
+  setup:
+    - Add `PauseManager` to a manager object in your scene.
+    - Add a `UIPauseMenu` to your HUD to show a menu while paused.
+    - Set **Pause Key** to *None* if pausing should only happen from code or UI buttons.
+  fields:
+    pauseKey: Keyboard key that toggles pause. *None* disables the keyboard shortcut.
+    pausePadButton: Gamepad button that toggles pause (requires the Input System package). *None* disables it.
+  events:
+    OnPauseChanged: "C# event (`Action<bool>`) raised on every pause change; the argument is true when the game just paused."
+  api:
+    Instance: The active PauseManager (null if none).
+    IsPaused: True while the game is paused.
+    TogglePause: Pauses if running, resumes if paused.
+    SetPaused: Pauses (`true`) or resumes (`false`) explicitly, and always raises `OnPauseChanged`.
+  example: |
+    Pause automatically when the window loses focus:
+
+    ```csharp
+    using GameplayKit.Managers;
+    using UnityEngine;
+
+    public class PauseOnFocusLoss : MonoBehaviour
+    {
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (!hasFocus && PauseManager.Instance != null) PauseManager.Instance.SetPaused(true);
+        }
+    }
+    ```
+  tips:
+    - Use `Time.unscaledDeltaTime` in anything that must keep animating during pause (menu effects, UI tweens).
+    - "`SetPaused` raises the event even if the state didn't change, so listeners should just apply the value they receive."
+es:
+  summary: Pausa y reanuda el juego con Esc (o Start en el gamepad) congelando el tiempo.
+  clip_caption: El mundo se congela en pleno rebote durante la pausa y sigue exactamente donde estaba al reanudar.
+  description: |
+    `PauseManager` pausa el juego poniendo `Time.timeScale` en 0 y lo reanuda volviéndolo a 1; luego dispara
+    `OnPauseChanged` para que los menús y otros sistemas reaccionen. La física, el movimiento, los timers y
+    las animaciones con tiempo escalado se detienen; lo que usa tiempo sin escalar (el fundido de
+    `AudioManager`, el fundido de `SceneTransitionManager`, `CameraShake`) sigue.
+
+    Se alterna con **Pause Key** (Esc) o **Pause Pad Button** (Start). Para evitar pausas sorpresa, ignora el
+    input durante el primer segundo después de activarse y solo se "arma" cuando ve la tecla suelta. En
+    `Awake` fuerza `Time.timeScale` a 1 (en el Editor un 0 puede quedar de una sesión anterior), y si se
+    destruye en pausa — por ejemplo al cambiar de escena — descongela el juego. Es un singleton disponible
+    como `PauseManager.Instance`.
+
+    Si hay un `GameManager`, pausar también cambia su estado de `Playing` a `Paused`, y reanudar devuelve
+    `Paused` a `Playing`. Nunca pisa un estado `GameOver`, así que pausar en la pantalla de game over lo deja
+    en `GameOver`.
+  setup:
+    - Agrega `PauseManager` a un objeto de managers en tu escena.
+    - Agrega un `UIPauseMenu` a tu HUD para mostrar un menú durante la pausa.
+    - Pon **Pause Key** en *None* si la pausa solo debe venir del código o de botones de UI.
+  fields:
+    pauseKey: Tecla que alterna la pausa. *None* desactiva el atajo de teclado.
+    pausePadButton: Botón del gamepad que alterna la pausa (requiere el paquete Input System). *None* lo desactiva.
+  events:
+    OnPauseChanged: "Evento C# (`Action<bool>`) que se dispara en cada cambio de pausa; el argumento es true cuando el juego acaba de pausarse."
+  api:
+    Instance: El PauseManager activo (null si no hay).
+    IsPaused: Verdadero mientras el juego está en pausa.
+    TogglePause: Pausa si está corriendo y reanuda si está en pausa.
+    SetPaused: Pausa (`true`) o reanuda (`false`) de forma explícita, y siempre dispara `OnPauseChanged`.
+  example: |
+    Pausa automáticamente cuando la ventana pierde el foco:
+
+    ```csharp
+    using GameplayKit.Managers;
+    using UnityEngine;
+
+    public class PauseOnFocusLoss : MonoBehaviour
+    {
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (!hasFocus && PauseManager.Instance != null) PauseManager.Instance.SetPaused(true);
+        }
+    }
+    ```
+  tips:
+    - Usa `Time.unscaledDeltaTime` en todo lo que deba seguir animándose en pausa (efectos del menú, tweens de UI).
+    - "`SetPaused` dispara el evento aunque el estado no cambie, así que los listeners solo deben aplicar el valor que reciben."

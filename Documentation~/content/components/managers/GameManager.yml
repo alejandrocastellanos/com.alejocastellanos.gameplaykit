@@ -1,0 +1,95 @@
+name: GameManager
+clip: true
+related: [CharacterLives, PauseManager, ScoreManager, LevelManager]
+en:
+  summary: A central place for the game's overall state — Playing, Paused or GameOver — that any system can read.
+  clip_caption: The player dies twice on spikes; the first death costs a life, the second leaves no lives and the state becomes GameOver.
+  description: |
+    `GameManager` is a lightweight singleton that holds `CurrentState` (`Playing`, `Paused` or `GameOver`,
+    starting in `Playing`) and raises `OnStateChanged` when it changes. Setting the state it already has
+    does nothing. It's marked `DontDestroyOnLoad`, so the same manager survives scene changes; any copy in
+    the next scene destroys itself. It can sit under a parent "Managers" object: on `Awake` it detaches to
+    the scene root first, because `DontDestroyOnLoad` only works on root objects.
+
+    The kit already uses it: when `CharacterLives` runs out of lives it sets the state to `GameOver`, and
+    `PauseManager` switches between `Playing` and `Paused` when the game pauses and resumes. It
+    doesn't pause time, load scenes or show screens by itself — subscribe to `OnStateChanged` to show your
+    game-over screen, stop spawners or save progress.
+  setup:
+    - Add `GameManager` to a manager object in your first scene.
+    - Give the player `CharacterLives` (with `CharacterRespawn`) so running out of lives sets `GameOver`.
+    - Subscribe to `OnStateChanged` from your UI or other systems.
+  events:
+    OnStateChanged: "C# event (`Action<GameManager.GameState>`) raised with the new state every time it changes."
+  api:
+    Instance: The persistent GameManager (null if none).
+    CurrentState: The current `GameState`.
+    SetState: Changes the state and raises `OnStateChanged` (ignored if it's the same state).
+  example: |
+    Show a game-over panel when the state changes:
+
+    ```csharp
+    using GameplayKit.Managers;
+    using UnityEngine;
+
+    public class GameOverScreen : MonoBehaviour
+    {
+        [SerializeField] private GameObject panel;
+
+        private void Start()
+        {
+            panel.SetActive(false);
+            GameManager.Instance.OnStateChanged += state =>
+                panel.SetActive(state == GameManager.GameState.GameOver);
+        }
+    }
+    ```
+  tips:
+    - "`PauseManager` keeps the state in sync for you (`Playing` ↔ `Paused`), so you don't need to call `SetState` from `OnPauseChanged`."
+    - Because it persists across scenes, set the state back to `Playing` yourself when a new run starts.
+es:
+  summary: Un punto central para el estado general del juego — Playing, Paused o GameOver — que cualquier sistema puede leer.
+  clip_caption: El jugador muere dos veces en los pinchos; la primera muerte cuesta una vida y la segunda lo deja sin vidas y el estado pasa a GameOver.
+  description: |
+    `GameManager` es un singleton liviano que guarda `CurrentState` (`Playing`, `Paused` o `GameOver`; empieza
+    en `Playing`) y dispara `OnStateChanged` cuando cambia. Asignar el estado que ya tiene no hace nada. Está
+    marcado `DontDestroyOnLoad`, así el mismo manager sobrevive a los cambios de escena; cualquier copia en la
+    escena siguiente se destruye sola. Puede estar dentro de un objeto padre "Managers": en `Awake` primero
+    se suelta a la raíz de la escena, porque `DontDestroyOnLoad` solo funciona con objetos raíz.
+
+    El kit ya lo usa: cuando `CharacterLives` se queda sin vidas pone el estado en `GameOver`, y
+    `PauseManager` alterna entre `Playing` y `Paused` al pausar y reanudar. No pausa el
+    tiempo, no carga escenas ni muestra pantallas por sí solo — suscríbete a `OnStateChanged` para mostrar tu
+    pantalla de game over, detener spawners o guardar el progreso.
+  setup:
+    - Agrega `GameManager` a un objeto de managers en tu primera escena.
+    - Dale al jugador `CharacterLives` (con `CharacterRespawn`) para que quedarse sin vidas ponga `GameOver`.
+    - Suscríbete a `OnStateChanged` desde tu UI u otros sistemas.
+  events:
+    OnStateChanged: "Evento C# (`Action<GameManager.GameState>`) que se dispara con el nuevo estado cada vez que cambia."
+  api:
+    Instance: El GameManager persistente (null si no hay).
+    CurrentState: El `GameState` actual.
+    SetState: Cambia el estado y dispara `OnStateChanged` (se ignora si es el mismo estado).
+  example: |
+    Muestra un panel de game over cuando cambia el estado:
+
+    ```csharp
+    using GameplayKit.Managers;
+    using UnityEngine;
+
+    public class GameOverScreen : MonoBehaviour
+    {
+        [SerializeField] private GameObject panel;
+
+        private void Start()
+        {
+            panel.SetActive(false);
+            GameManager.Instance.OnStateChanged += state =>
+                panel.SetActive(state == GameManager.GameState.GameOver);
+        }
+    }
+    ```
+  tips:
+    - "`PauseManager` mantiene el estado sincronizado por ti (`Playing` ↔ `Paused`), así que no necesitas llamar `SetState` desde `OnPauseChanged`."
+    - Como persiste entre escenas, vuelve tú el estado a `Playing` cuando empiece una partida nueva.

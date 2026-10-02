@@ -1,0 +1,47 @@
+name: HazardZone
+clip: true
+related: [CharacterHealth, DamageFlash, CharacterKnockback, Checkpoint]
+en:
+  summary: Spikes, lava or acid that keep damaging anything inside at a fixed interval.
+  clip_caption: The player walks onto the spikes, loses health every half second while standing still, and walks off.
+  description: |
+    `HazardZone` works with a trigger collider and hurts anything that implements `IDamageable`
+    (`CharacterHealth`, `DamageableObject`, `BreakableObject`...), found on the entering collider or its
+    parents. The first hit lands the moment it enters; after that it deals **Damage** every
+    **Damage Interval** seconds for as long as it stays inside, even if it stands perfectly still.
+
+    The hit direction points from the zone's center to the victim, so a `CharacterKnockback` on the player
+    pushes it out of the hazard. Each victim has its own timer, and a character with several colliders is
+    only counted once.
+  setup:
+    - Create a GameObject with a `BoxCollider2D` marked **Is Trigger** covering the spikes or lava and add `HazardZone`.
+    - Give the player a `CharacterHealth` (and optionally `DamageFlash` and `CharacterKnockback`).
+    - Adjust **Damage** and **Damage Interval**; set a very high **Damage** for instant-death pits.
+  fields:
+    damage: Damage dealt on each hit.
+    damageInterval: Seconds between hits while the target stays inside. The first hit always happens on entering.
+  tips:
+    - "`CharacterHealth` ignores damage during its **Invulnerability Duration** (0.5 s by default); with a shorter **Damage Interval** some hits will be swallowed."
+    - Combine with `Checkpoint` and `CharacterRespawn` so falling into lava sends the player back to the last checkpoint.
+es:
+  summary: Pinchos, lava o ácido que dañan a intervalos fijos a todo lo que esté dentro.
+  clip_caption: El jugador pisa los pinchos, pierde vida cada medio segundo mientras está quieto y luego sale.
+  description: |
+    `HazardZone` funciona con un collider trigger y daña a cualquier cosa que implemente `IDamageable`
+    (`CharacterHealth`, `DamageableObject`, `BreakableObject`...), buscándola en el collider que entra o en
+    sus padres. El primer golpe llega en cuanto entra; después aplica **Damage** cada **Damage Interval**
+    segundos mientras siga dentro, aunque esté completamente quieto.
+
+    La dirección del golpe va del centro de la zona hacia la víctima, así que un `CharacterKnockback` en el
+    jugador lo empuja fuera del peligro. Cada víctima tiene su propio temporizador, y un personaje con
+    varios colliders cuenta una sola vez.
+  setup:
+    - Crea un GameObject con un `BoxCollider2D` marcado como **Is Trigger** que cubra los pinchos o la lava y agrégale `HazardZone`.
+    - Dale al jugador un `CharacterHealth` (y si quieres `DamageFlash` y `CharacterKnockback`).
+    - Ajusta **Damage** y **Damage Interval**; usa un **Damage** muy alto para fosos de muerte instantánea.
+  fields:
+    damage: Daño de cada golpe.
+    damageInterval: Segundos entre golpes mientras el objetivo siga dentro. El primer golpe siempre ocurre al entrar.
+  tips:
+    - "`CharacterHealth` ignora el daño durante su **Invulnerability Duration** (0.5 s por defecto); con un **Damage Interval** menor, algunos golpes se pierden."
+    - Combínalo con `Checkpoint` y `CharacterRespawn` para que caer en la lava devuelva al jugador al último checkpoint.

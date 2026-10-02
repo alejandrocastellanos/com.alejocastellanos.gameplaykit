@@ -1,0 +1,81 @@
+name: AIDecisionTimeInState
+clip: true
+related: [AIBrain, AIActionWait, AIActionShoot, AIActionPatrolPoints]
+en:
+  summary: AIBrain decision that becomes true after the brain has spent a number of seconds in the current state.
+  clip_caption: A turret alternates a 1.2-second Burst state with a 1.5-second Reload state; the caption shows the time in each state.
+  description: |
+    Returns true once `AIBrain.TimeInCurrentState` reaches **Seconds**. The brain resets that timer every
+    time it enters a state, so the same decision measures "time since I got here" in whatever state uses
+    it. It reads scaled time, so it pauses with the game.
+
+    It's the building block for anything rhythmic: pauses on a patrol, shoot-then-reload bursts, an
+    alert state that gives up after a while, a boss that changes attack every few seconds.
+  setup:
+    - Add `AIDecisionTimeInState` to the enemy with the `AIBrain` and set **Seconds**.
+    - In a state's **Transitions**, drag it into **Decision** and set **True Target State** to the next state.
+    - Add another copy with a different **Seconds** for the way back if the durations differ.
+  fields:
+    seconds: How long the brain must stay in the state before the decision turns true.
+  example: |
+    Give each patrol pause a random length by changing the brain's state from code instead:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class RandomPause : AIActionBase
+    {
+        [SerializeField] private Vector2 pauseRange = new Vector2(0.5f, 2f);
+        private float _duration;
+
+        public override void OnEnterState(AIBrain brain) => _duration = Random.Range(pauseRange.x, pauseRange.y);
+
+        public override void PerformAction(AIBrain brain)
+        {
+            if (brain.TimeInCurrentState >= _duration) brain.TransitionTo("Patrol");
+        }
+    }
+    ```
+  tips:
+    - One component can be shared by several states when they should last the same time.
+    - In a chase state, a time limit plus a "give up" state stops enemies from following the player forever.
+es:
+  summary: Decisión de AIBrain que se vuelve verdadera cuando el cerebro lleva cierta cantidad de segundos en el estado actual.
+  clip_caption: Una torreta alterna un estado Burst de 1.2 segundos con un estado Reload de 1.5 segundos; el texto muestra el tiempo en cada estado.
+  description: |
+    Devuelve verdadero cuando `AIBrain.TimeInCurrentState` llega a **Seconds**. El cerebro reinicia ese
+    cronómetro cada vez que entra a un estado, así que la misma decisión mide "tiempo desde que llegué"
+    en cualquier estado que la use. Lee tiempo escalado, por lo que se pausa con el juego.
+
+    Es la pieza base para todo lo rítmico: pausas en una patrulla, ráfagas de disparo y recarga, un
+    estado de alerta que se rinde después de un rato, un jefe que cambia de ataque cada pocos segundos.
+  setup:
+    - Agrega `AIDecisionTimeInState` al enemigo que tiene el `AIBrain` y ajusta **Seconds**.
+    - En las **Transitions** de un estado, arrástrala a **Decision** y pon en **True Target State** el siguiente estado.
+    - Agrega otra copia con otro valor de **Seconds** para la vuelta si las duraciones son distintas.
+  fields:
+    seconds: Cuánto tiempo debe pasar el cerebro en el estado antes de que la decisión sea verdadera.
+  example: |
+    Dale a cada pausa de la patrulla una duración aleatoria cambiando el estado del cerebro por código:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class RandomPause : AIActionBase
+    {
+        [SerializeField] private Vector2 pauseRange = new Vector2(0.5f, 2f);
+        private float _duration;
+
+        public override void OnEnterState(AIBrain brain) => _duration = Random.Range(pauseRange.x, pauseRange.y);
+
+        public override void PerformAction(AIBrain brain)
+        {
+            if (brain.TimeInCurrentState >= _duration) brain.TransitionTo("Patrol");
+        }
+    }
+    ```
+  tips:
+    - Un mismo componente lo pueden compartir varios estados cuando deben durar lo mismo.
+    - En un estado de persecución, un límite de tiempo más un estado de "rendirse" evita que los enemigos sigan al jugador para siempre.

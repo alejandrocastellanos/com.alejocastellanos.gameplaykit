@@ -1,0 +1,107 @@
+name: PlayerCrawl
+clip: true
+related: [PlayerCrouch, PlayerWalkRun, PlayerDropThrough]
+en:
+  summary: Crawl through low spaces at a fixed speed while crouched, regardless of walking or running.
+  clip_caption: Crouching at the mouth of a low vent and crawling through it at a slow, steady speed.
+  description: |
+    `PlayerCrawl` builds on `PlayerCrouch` (which Unity adds automatically, since it's required). While
+    `PlayerCrouch.IsCrouching` is true, it sets the horizontal velocity to the horizontal input times
+    **Crawl Speed**, replacing whatever speed walking, running or the crouch multiplier produced. Holding
+    **Shift** doesn't make the character crawl faster.
+
+    The shape change still comes from `PlayerCrouch`: the collider shrinks while **Crouch** (Ctrl) is held on
+    the ground, and the character stands up when the button is released. Outside of a crouch,
+    `PlayerCrawl` does nothing, so without `PlayerWalkRun` the character can only move while crawling.
+
+    It reads `IsCrouching` in the same frame, so keep it below `PlayerCrouch` in the component list (adding
+    `PlayerCrawl` first adds `PlayerCrouch` above it, which is already the right order).
+  setup:
+    - Build a character with `CharacterController2D`, a Capsule or Box collider and `PlayerWalkRun`.
+    - Add `PlayerCrawl`; `PlayerCrouch` is added with it. Both go before `CharacterCore` (or anywhere if `CharacterCore` is added last).
+    - Hold **Ctrl** and a direction to crawl through a low gap.
+  fields:
+    crawlSpeed: Horizontal speed while crouched, in units per second. Replaces the walk/run speed and the crouch multiplier.
+  example: |
+    Play a looping crawl sound only while the character is actually moving crouched:
+
+    ```csharp
+    using GameplayKit.Core;
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class CrawlSound : MonoBehaviour
+    {
+        [SerializeField] private AudioSource loop;
+        private PlayerCrouch _crouch;
+        private CharacterController2D _controller;
+
+        private void Awake()
+        {
+            _crouch = GetComponent<PlayerCrouch>();
+            _controller = GetComponent<CharacterController2D>();
+        }
+
+        private void Update()
+        {
+            bool crawling = _crouch.IsCrouching && Mathf.Abs(_controller.Velocity.x) > 0.1f;
+            if (crawling && !loop.isPlaying) loop.Play();
+            else if (!crawling && loop.isPlaying) loop.Stop();
+        }
+    }
+    ```
+  tips:
+    - Use `PlayerCrouch` alone if you want crouch speed to scale with walking and running; add `PlayerCrawl` when you want one fixed, slow pace.
+    - Set **Crawl Speed** to 0 for a crouch that can't move at all (a "duck" to dodge projectiles).
+es:
+  summary: Gatea por espacios bajos a una velocidad fija mientras estás agachado, sin importar si caminas o corres.
+  clip_caption: Agachándose en la entrada de un ducto bajo y gateando por dentro a una velocidad lenta y constante.
+  description: |
+    `PlayerCrawl` se apoya en `PlayerCrouch` (Unity lo agrega solo, porque es obligatorio). Mientras
+    `PlayerCrouch.IsCrouching` es verdadero, fija la velocidad horizontal en el input horizontal por
+    **Crawl Speed**, reemplazando la velocidad que hayan dado caminar, correr o el multiplicador de
+    agacharse. Mantener **Shift** no hace que gatee más rápido.
+
+    El cambio de forma sigue viniendo de `PlayerCrouch`: el collider se encoge mientras mantienes
+    **Agacharse** (Ctrl) en el suelo, y el personaje se levanta al soltar el botón. Fuera del agachado,
+    `PlayerCrawl` no hace nada, así que sin `PlayerWalkRun` el personaje solo puede moverse gateando.
+
+    Lee `IsCrouching` en el mismo frame, así que déjalo debajo de `PlayerCrouch` en la lista de componentes
+    (si agregas `PlayerCrawl` primero, `PlayerCrouch` queda encima, que ya es el orden correcto).
+  setup:
+    - Arma un personaje con `CharacterController2D`, un collider Capsule o Box y `PlayerWalkRun`.
+    - Agrega `PlayerCrawl`; `PlayerCrouch` se agrega con él. Ambos van antes de `CharacterCore` (o en cualquier orden si `CharacterCore` va al final).
+    - Mantén **Ctrl** y una dirección para gatear por un hueco bajo.
+  fields:
+    crawlSpeed: Velocidad horizontal agachado, en unidades por segundo. Reemplaza la velocidad de caminar/correr y el multiplicador de agacharse.
+  example: |
+    Reproduce un sonido de gateo en bucle solo mientras el personaje se mueve agachado:
+
+    ```csharp
+    using GameplayKit.Core;
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class CrawlSound : MonoBehaviour
+    {
+        [SerializeField] private AudioSource loop;
+        private PlayerCrouch _crouch;
+        private CharacterController2D _controller;
+
+        private void Awake()
+        {
+            _crouch = GetComponent<PlayerCrouch>();
+            _controller = GetComponent<CharacterController2D>();
+        }
+
+        private void Update()
+        {
+            bool crawling = _crouch.IsCrouching && Mathf.Abs(_controller.Velocity.x) > 0.1f;
+            if (crawling && !loop.isPlaying) loop.Play();
+            else if (!crawling && loop.isPlaying) loop.Stop();
+        }
+    }
+    ```
+  tips:
+    - Usa solo `PlayerCrouch` si quieres que la velocidad agachado escale con caminar y correr; agrega `PlayerCrawl` cuando quieras un ritmo lento y fijo.
+    - Pon **Crawl Speed** en 0 para un agachado que no se mueve (para esquivar proyectiles agachándote).

@@ -1,0 +1,107 @@
+name: PlayerWalkRun
+clip: true
+related: [PlayerJump, PlayerCrouch, PlayerDash, PlayerTopDownMovement]
+en:
+  summary: Basic side-scrolling movement with a walk speed and a faster run speed while Shift is held.
+  clip_caption: Walking to the right, holding Shift to run, then walking back to the left.
+  description: |
+    Every frame `PlayerWalkRun` sets the character's horizontal velocity to the horizontal input times
+    **Walk Speed**, or times **Run Speed** while **Run** (Shift, or the gamepad left trigger) is held. The
+    vertical velocity is left untouched, so it combines with any jump or fall, and it works the same on the
+    ground and in the air (full air control). There is no acceleration: the character starts and stops
+    instantly, and an analog stick gives proportional speed.
+
+    With **Flip With Direction** on, the character turns by flipping the sign of `transform.localScale.x`.
+    That sign is how the rest of the kit knows where the character is facing: `PlayerDash`,
+    `PlayerWallJump`, `PlayerRollDodge` and `PlayerTeleportBlink` all read it.
+
+    Movement pauses while the character is stunned or dead, and while another mechanic owns the horizontal
+    velocity (a wall jump, a roll) through `CharacterController2D.LockHorizontalControl`. It
+    also updates the movement state to `Idle`, `Walking` or `Running`, which `CharacterAnimatorBridge`
+    can forward to your Animator.
+  setup:
+    - Add a `Collider2D` (a 0.8 × 1.8 `CapsuleCollider2D` works well) and `CharacterController2D` to your character.
+    - Add `PlayerWalkRun`, then `CharacterCore` last (or anywhere, if `CharacterCore` is added at the end).
+    - Press Play and move with A/D or the arrows; hold **Shift** to run.
+  fields:
+    walkSpeed: Horizontal speed when moving without **Run**, in units per second.
+    runSpeed: Horizontal speed while **Run** is held, in units per second.
+    flipWithDirection: Flips `localScale.x` to face the movement direction. Turn it off if your sprite or animator handles facing on its own, but remember facing-based abilities read this scale.
+  example: |
+    Read the movement state it writes to react to it, for example kicking up dust while running:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class FootstepDust : MonoBehaviour
+    {
+        [SerializeField] private ParticleSystem dust;
+        private CharacterCore _core;
+
+        private void Awake() => _core = GetComponent<CharacterCore>();
+
+        private void Update()
+        {
+            bool running = _core.Movement.CurrentState == MovementState.Running && _core.Controller.IsGrounded;
+            if (running && !dust.isPlaying) dust.Play();
+            else if (!running && dust.isPlaying) dust.Stop();
+        }
+    }
+    ```
+  tips:
+    - Put `PlayerCrouch` below `PlayerWalkRun` in the component list so its speed multiplier applies on top of the walk speed.
+    - For top-down games use `PlayerTopDownMovement` instead; it moves on both axes without gravity.
+    - Because it overwrites horizontal velocity every frame, scripts that push the character sideways should call `LockHorizontalControl` for a moment, like the wall jump does.
+es:
+  summary: Movimiento lateral básico con velocidad de caminar y una velocidad de correr más rápida mientras mantienes Shift.
+  clip_caption: Caminando a la derecha, manteniendo Shift para correr y luego caminando de vuelta a la izquierda.
+  description: |
+    En cada frame `PlayerWalkRun` fija la velocidad horizontal del personaje en el input horizontal por
+    **Walk Speed**, o por **Run Speed** mientras mantienes **Correr** (Shift, o el gatillo izquierdo del
+    gamepad). La velocidad vertical no se toca, así que se combina con cualquier salto o caída, y funciona
+    igual en el suelo que en el aire (control aéreo completo). No hay aceleración: el personaje arranca y
+    frena al instante, y con un stick analógico la velocidad es proporcional.
+
+    Con **Flip With Direction** activo, el personaje se voltea cambiando el signo de
+    `transform.localScale.x`. Ese signo es la forma en que el resto del kit sabe hacia dónde mira:
+    `PlayerDash`, `PlayerWallJump`, `PlayerRollDodge` y `PlayerTeleportBlink` lo leen.
+
+    El movimiento se pausa mientras el personaje está aturdido o muerto, y mientras otra mecánica es dueña
+    de la velocidad horizontal (un wall jump, una rodada) mediante
+    `CharacterController2D.LockHorizontalControl`. Además actualiza el estado de movimiento a `Idle`,
+    `Walking` o `Running`, que `CharacterAnimatorBridge` puede pasarle a tu Animator.
+  setup:
+    - Agrega un `Collider2D` (un `CapsuleCollider2D` de 0.8 × 1.8 funciona bien) y `CharacterController2D` a tu personaje.
+    - Agrega `PlayerWalkRun` y luego `CharacterCore` al final (o en cualquier orden, si `CharacterCore` va al final).
+    - Dale Play y muévete con A/D o las flechas; mantén **Shift** para correr.
+  fields:
+    walkSpeed: Velocidad horizontal al moverte sin **Correr**, en unidades por segundo.
+    runSpeed: Velocidad horizontal mientras mantienes **Correr**, en unidades por segundo.
+    flipWithDirection: Voltea `localScale.x` para mirar hacia donde te mueves. Desactívalo si tu sprite o tu Animator manejan la orientación por su cuenta, pero recuerda que las habilidades que dependen de la orientación leen esta escala.
+  example: |
+    Lee el estado de movimiento que escribe para reaccionar a él, por ejemplo soltando polvo al correr:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class FootstepDust : MonoBehaviour
+    {
+        [SerializeField] private ParticleSystem dust;
+        private CharacterCore _core;
+
+        private void Awake() => _core = GetComponent<CharacterCore>();
+
+        private void Update()
+        {
+            bool running = _core.Movement.CurrentState == MovementState.Running && _core.Controller.IsGrounded;
+            if (running && !dust.isPlaying) dust.Play();
+            else if (!running && dust.isPlaying) dust.Stop();
+        }
+    }
+    ```
+  tips:
+    - Pon `PlayerCrouch` debajo de `PlayerWalkRun` en la lista de componentes para que su multiplicador de velocidad se aplique sobre la de caminar.
+    - Para juegos cenitales usa `PlayerTopDownMovement`; se mueve en ambos ejes y sin gravedad.
+    - Como sobrescribe la velocidad horizontal en cada frame, los scripts que empujen al personaje de lado deberían llamar a `LockHorizontalControl` un momento, como hace el wall jump.

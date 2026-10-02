@@ -1,0 +1,161 @@
+name: AIDecisionBase
+clip: false
+related: [AIBrain, AIActionBase, AIDecisionTargetInRange, AIDecisionTimeInState]
+en:
+  summary: Base class for AI decisions — inherit from it to give an AIBrain new conditions for switching states.
+  description: |
+    A decision is a yes/no question the `AIBrain` asks to know whether to change state: *is the player
+    close?*, *can I see it?*, *is my health low?*. `AIDecisionBase` is an abstract `MonoBehaviour` with a
+    single method, `bool Decide(AIBrain brain)`.
+
+    Decisions are plugged into the **Transitions** of a state. Every frame, after running the state's
+    actions, the brain goes through the transitions in order and calls `Decide` on each one's
+    **Decision**: `true` selects **True Target State**, `false` selects **False Target State**. The
+    first transition that selects a non-empty name different from the current state wins and the rest
+    are not evaluated that frame. Decisions in other states are not called at all, and a transition whose
+    decision component is unticked in the Inspector is skipped.
+
+    Because `Decide` may run every frame, and once per transition that uses it, keep it cheap and free of
+    side effects. Read what you need from `brain` (`Target`, `TimeInCurrentState`, `CurrentState`) and
+    from the components around it. The decision uses its own `transform`, so a decision on a child
+    object measures from that child (handy for "eyes" at head height).
+  setup:
+    - Create a C# script, add `using GameplayKit.AI;` and make the class inherit from `AIDecisionBase`.
+    - Override `Decide` and return `true` or `false`; expose settings with `[SerializeField]`.
+    - Add the component to the enemy with the `AIBrain` (or to a child of it).
+    - In a state's **Transitions**, drag it into **Decision** and fill **True Target State** and/or **False Target State**.
+  api:
+    Decide: Returns the answer for this frame. Called by `AIBrain` while a state that uses the decision is active.
+  example: |
+    A decision that is true when the target is clearly above the enemy (for example, to switch to a
+    "jump" or "shoot up" state):
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class AIDecisionTargetAbove : AIDecisionBase
+    {
+        [SerializeField] private float minHeight = 2f;
+
+        public override bool Decide(AIBrain brain)
+        {
+            if (brain.Target == null) return false;
+            return brain.Target.position.y - transform.position.y >= minHeight;
+        }
+    }
+    ```
+
+    Decisions can read other kit components. This one becomes true when the target's health (any
+    `IHealthSource`, like `CharacterHealth` or `DamageableObject`) drops below a ratio, so a boss can go
+    in for the kill:
+
+    ```csharp
+    using GameplayKit.AI;
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class AIDecisionTargetWeak : AIDecisionBase
+    {
+        [Range(0f, 1f)]
+        [SerializeField] private float ratio = 0.3f;
+
+        private Transform _cachedTarget;
+        private IHealthSource _targetHealth;
+
+        public override bool Decide(AIBrain brain)
+        {
+            if (brain.Target == null) return false;
+            if (brain.Target != _cachedTarget)
+            {
+                _cachedTarget = brain.Target;
+                _targetHealth = _cachedTarget.GetComponentInParent<IHealthSource>();
+            }
+            if (_targetHealth == null || _targetHealth.MaxHealth <= 0f) return false;
+            return _targetHealth.CurrentHealth / _targetHealth.MaxHealth <= ratio;
+        }
+    }
+    ```
+  tips:
+    - Return `false` when there is no target, so transitions that use **True Target State** stay put.
+    - Cache `GetComponent` results instead of searching every frame, as in the second example.
+    - Need "A and B"? Either write a decision that checks both, or chain states (`Alert` → `Attack`) so each transition checks one thing.
+es:
+  summary: Clase base para decisiones de IA — hereda de ella para darle a un AIBrain nuevas condiciones para cambiar de estado.
+  description: |
+    Una decisión es una pregunta de sí o no que el `AIBrain` hace para saber si debe cambiar de estado:
+    *¿está cerca el jugador?*, *¿lo veo?*, *¿me queda poca vida?*. `AIDecisionBase` es un `MonoBehaviour`
+    abstracto con un solo método, `bool Decide(AIBrain brain)`.
+
+    Las decisiones se conectan en las **Transitions** de un estado. En cada frame, después de ejecutar las
+    acciones del estado, el cerebro recorre las transiciones en orden y llama a `Decide` en la
+    **Decision** de cada una: `true` elige **True Target State** y `false` elige **False Target State**. La
+    primera transición que elige un nombre no vacío y distinto del estado actual gana, y el resto no se
+    evalúa en ese frame. Las decisiones de otros estados no se llaman, y una transición cuya decisión tiene
+    el componente desmarcado en el Inspector se salta.
+
+    Como `Decide` puede correr en cada frame, y una vez por cada transición que la usa, mantenla liviana y
+    sin efectos secundarios. Lee lo que necesites de `brain` (`Target`, `TimeInCurrentState`,
+    `CurrentState`) y de los componentes cercanos. La decisión usa su propio `transform`, así que una
+    decisión en un objeto hijo mide desde ese hijo (útil para "ojos" a la altura de la cabeza).
+  setup:
+    - Crea un script de C#, agrega `using GameplayKit.AI;` y haz que la clase herede de `AIDecisionBase`.
+    - Sobrescribe `Decide` y devuelve `true` o `false`; expón la configuración con `[SerializeField]`.
+    - Agrega el componente al enemigo que tiene el `AIBrain` (o a un hijo suyo).
+    - En las **Transitions** de un estado, arrástralo a **Decision** y completa **True Target State** y/o **False Target State**.
+  api:
+    Decide: Devuelve la respuesta de este frame. La llama `AIBrain` mientras esté activo un estado que use la decisión.
+  example: |
+    Una decisión que es verdadera cuando el objetivo está claramente por encima del enemigo (por ejemplo,
+    para pasar a un estado de "saltar" o "disparar hacia arriba"):
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class AIDecisionTargetAbove : AIDecisionBase
+    {
+        [SerializeField] private float minHeight = 2f;
+
+        public override bool Decide(AIBrain brain)
+        {
+            if (brain.Target == null) return false;
+            return brain.Target.position.y - transform.position.y >= minHeight;
+        }
+    }
+    ```
+
+    Las decisiones pueden leer otros componentes del kit. Esta se vuelve verdadera cuando la vida del
+    objetivo (cualquier `IHealthSource`, como `CharacterHealth` o `DamageableObject`) baja de una
+    proporción, para que un jefe vaya a rematar:
+
+    ```csharp
+    using GameplayKit.AI;
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class AIDecisionTargetWeak : AIDecisionBase
+    {
+        [Range(0f, 1f)]
+        [SerializeField] private float ratio = 0.3f;
+
+        private Transform _cachedTarget;
+        private IHealthSource _targetHealth;
+
+        public override bool Decide(AIBrain brain)
+        {
+            if (brain.Target == null) return false;
+            if (brain.Target != _cachedTarget)
+            {
+                _cachedTarget = brain.Target;
+                _targetHealth = _cachedTarget.GetComponentInParent<IHealthSource>();
+            }
+            if (_targetHealth == null || _targetHealth.MaxHealth <= 0f) return false;
+            return _targetHealth.CurrentHealth / _targetHealth.MaxHealth <= ratio;
+        }
+    }
+    ```
+  tips:
+    - Devuelve `false` cuando no hay objetivo, así las transiciones que usan **True Target State** no se mueven.
+    - Guarda en caché los resultados de `GetComponent` en vez de buscar en cada frame, como en el segundo ejemplo.
+    - ¿Necesitas "A y B"? Escribe una decisión que revise ambas cosas o encadena estados (`Alert` → `Attack`) para que cada transición revise una sola.

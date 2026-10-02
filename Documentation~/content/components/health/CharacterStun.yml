@@ -1,0 +1,89 @@
+name: CharacterStun
+clip: true
+related: [CharacterKnockback, CharacterHealth, CharacterCore, CharacterDeath]
+en:
+  summary: Stuns the character for a while, freezing its abilities and setting the Stunned state.
+  clip_caption: The character is stunned for one second, ignores input while it lasts, and then walks on.
+  description: |
+    Call `Stun()` (or `Stun(seconds)`) and the character suspends all its `CharacterCore` abilities and
+    switches its condition to `Stunned` until the time runs out. Then the abilities resume and, if the
+    condition is still `Stunned`, it goes back to `Normal` — a death that happened meanwhile is not
+    overwritten. Stunning again while already stunned restarts the timer with the new duration.
+
+    Nothing in the kit stuns on its own: you trigger it from your scripts (a heavy hit, a trap, a stomp).
+    Without `CharacterCore` the component only toggles `IsStunned`, which your own enemy scripts can
+    read. If the component is disabled in the middle of a stun, the character is released.
+  setup:
+    - Add `CharacterStun` to a character (with `CharacterCore` to freeze its abilities).
+    - Set **Default Stun Duration**.
+    - Call `Stun()` from your own script, for example when a strong attack hits.
+  fields:
+    defaultStunDuration: Seconds the stun lasts when calling `Stun()` without a duration.
+  api:
+    IsStunned: True while the stun is active.
+    Stun: "Starts (or restarts) the stun. `Stun()` uses **Default Stun Duration**; `Stun(float)` takes the seconds."
+  example: |
+    Stun anything with a `CharacterStun` that steps on a trap:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class StunTrap : MonoBehaviour
+    {
+        [SerializeField] private float seconds = 1.5f;
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            var stun = other.GetComponentInParent<CharacterStun>();
+            if (stun != null && !stun.IsStunned) stun.Stun(seconds);
+        }
+    }
+    ```
+  tips:
+    - Show the state with an Animator (the condition is `Stunned`) or a small icon toggled from `IsStunned`.
+    - "The stun suspends every ability, including `PlayerAttack`; for a short push-only reaction use `CharacterKnockback`."
+es:
+  summary: Aturde al personaje un rato, congelando sus habilidades y marcando el estado Stunned.
+  clip_caption: El personaje queda aturdido un segundo, ignora el input mientras dura y luego sigue caminando.
+  description: |
+    Llama a `Stun()` (o `Stun(segundos)`) y el personaje suspende todas sus habilidades de
+    `CharacterCore` y cambia su condición a `Stunned` hasta que se acabe el tiempo. Después las
+    habilidades vuelven y, si la condición sigue en `Stunned`, pasa a `Normal` — una muerte ocurrida
+    mientras tanto no se pisa. Aturdir de nuevo mientras ya está aturdido reinicia el tiempo con la
+    nueva duración.
+
+    Nada en el kit aturde por sí solo: lo disparas desde tus scripts (un golpe fuerte, una trampa, un
+    pisotón). Sin `CharacterCore` el componente solo cambia `IsStunned`, que tus propios scripts de
+    enemigos pueden leer. Si el componente se desactiva a mitad del aturdimiento, el personaje queda
+    libre.
+  setup:
+    - Agrega `CharacterStun` a un personaje (con `CharacterCore` para que se congelen sus habilidades).
+    - Ajusta **Default Stun Duration**.
+    - Llama a `Stun()` desde tu propio script, por ejemplo cuando entra un ataque fuerte.
+  fields:
+    defaultStunDuration: Segundos que dura el aturdimiento al llamar a `Stun()` sin duración.
+  api:
+    IsStunned: Verdadero mientras dura el aturdimiento.
+    Stun: "Empieza (o reinicia) el aturdimiento. `Stun()` usa **Default Stun Duration**; `Stun(float)` recibe los segundos."
+  example: |
+    Aturde a cualquiera con `CharacterStun` que pise una trampa:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class StunTrap : MonoBehaviour
+    {
+        [SerializeField] private float seconds = 1.5f;
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            var stun = other.GetComponentInParent<CharacterStun>();
+            if (stun != null && !stun.IsStunned) stun.Stun(seconds);
+        }
+    }
+    ```
+  tips:
+    - Muestra el estado con un Animator (la condición es `Stunned`) o con un ícono que se active según `IsStunned`.
+    - "El aturdimiento suspende todas las habilidades, también `PlayerAttack`; para una reacción breve de solo empujón usa `CharacterKnockback`."

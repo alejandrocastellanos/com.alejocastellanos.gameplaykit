@@ -1,0 +1,114 @@
+name: WeaponMelee
+clip: true
+related: [PlayerAttack, WeaponCombo, WeaponCharge, DamageableObject, CharacterKnockback]
+en:
+  summary: A close-range attack that briefly opens a circular hitbox in front of the character.
+  clip_caption: Two swings hit a training dummy in front, then the character turns around and breaks the crate behind it.
+  description: |
+    Each attack keeps a circular hitbox active for **Active Duration** seconds, checking every frame for
+    anything that can be damaged (`IDamageable`: `CharacterHealth`, `DamageableObject`,
+    `BreakableObject`...). Each target is hit at most once per swing, and the attacker's own colliders
+    are ignored, so **Target Layers** can stay on *Everything*. After attacking, the weapon is on
+    cooldown for **Cooldown** seconds.
+
+    Without a **Hitbox Origin**, the hitbox center is **Hitbox Offset** from the character, with X
+    flipped to the side it faces (the sign of its X scale, which `PlayerWalkRun` flips). The damage
+    direction goes from the hitbox center to the target, so a `CharacterKnockback` on the victim pushes
+    it away from the swing. Select the object to see the hitbox as a red gizmo in the Scene view.
+  setup:
+    - Add `WeaponMelee` to a character with `PlayerAttack` (or to a child weapon object).
+    - Select it and adjust **Hitbox Radius** and **Hitbox Offset** using the red gizmo.
+    - Put something damageable in front, like a `DamageableObject`, and press **Attack**.
+  fields:
+    hitboxOrigin: Optional transform used as hitbox center (for example a sword tip). When set, **Hitbox Offset** is ignored.
+    hitboxRadius: Radius of the circular hitbox, in units.
+    hitboxOffset: Hitbox center relative to the character when there is no origin. X is mirrored to the facing side.
+    damage: Damage per hit.
+    targetLayers: Layers that can be hit. *Everything* works because the attacker ignores itself.
+    activeDuration: Seconds the hitbox stays active after each attack.
+    cooldown: Seconds before the next attack is allowed.
+  api:
+    IsOnCooldown: True while waiting for the cooldown to end.
+    IsHitboxActive: True during the active window of a swing. Useful to sync effects.
+    TryAttack: "Starts an attack if it isn't on cooldown and returns whether it did. The overload with a damage value overrides **Damage** for that swing (used by `WeaponCharge`)."
+  example: |
+    An enemy that swings whenever the player is close:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class EnemySwing : MonoBehaviour
+    {
+        [SerializeField] private Transform player;
+        [SerializeField] private float reach = 1.2f;
+        private WeaponMelee _weapon;
+
+        private void Awake() => _weapon = GetComponent<WeaponMelee>();
+
+        private void Update()
+        {
+            if (Vector2.Distance(transform.position, player.position) < reach)
+                _weapon.TryAttack();
+        }
+    }
+    ```
+  tips:
+    - Keep **Active Duration** shorter than **Cooldown**; otherwise a new swing could start while the old one is still active.
+    - Chain several `WeaponMelee` components with `WeaponCombo` for a 1-2-3 combo.
+es:
+  summary: Un ataque cuerpo a cuerpo que abre por un instante una hitbox circular delante del personaje.
+  clip_caption: Dos espadazos golpean un muñeco de práctica al frente; luego el personaje se da vuelta y rompe la caja de atrás.
+  description: |
+    Cada ataque mantiene una hitbox circular activa durante **Active Duration** segundos y revisa en
+    cada frame si hay algo que se pueda dañar (`IDamageable`: `CharacterHealth`, `DamageableObject`,
+    `BreakableObject`...). Cada objetivo recibe como mucho un golpe por ataque y se ignoran los
+    colliders del propio atacante, así que **Target Layers** puede quedarse en *Everything*. Tras atacar,
+    el arma queda en cooldown durante **Cooldown** segundos.
+
+    Sin **Hitbox Origin**, el centro de la hitbox está a **Hitbox Offset** del personaje, con la X
+    invertida hacia el lado al que mira (el signo de su escala X, que voltea `PlayerWalkRun`). La
+    dirección del daño va del centro de la hitbox al objetivo, así que un `CharacterKnockback` en la
+    víctima la empuja lejos del golpe. Selecciona el objeto para ver la hitbox como un gizmo rojo en la
+    vista Scene.
+  setup:
+    - Agrega `WeaponMelee` a un personaje con `PlayerAttack` (o a un objeto hijo que haga de arma).
+    - Selecciónalo y ajusta **Hitbox Radius** y **Hitbox Offset** guiándote por el gizmo rojo.
+    - Pon algo dañable al frente, como un `DamageableObject`, y pulsa **Attack**.
+  fields:
+    hitboxOrigin: Transform opcional que hace de centro de la hitbox (por ejemplo la punta de la espada). Si se asigna, se ignora **Hitbox Offset**.
+    hitboxRadius: Radio de la hitbox circular, en unidades.
+    hitboxOffset: Centro de la hitbox respecto al personaje cuando no hay origen. La X se refleja hacia donde mira.
+    damage: Daño por golpe.
+    targetLayers: Capas que se pueden golpear. *Everything* funciona porque el atacante se ignora a sí mismo.
+    activeDuration: Segundos que la hitbox sigue activa tras cada ataque.
+    cooldown: Segundos antes de permitir el siguiente ataque.
+  api:
+    IsOnCooldown: Verdadero mientras espera que termine el cooldown.
+    IsHitboxActive: Verdadero durante la ventana activa de un golpe. Útil para sincronizar efectos.
+    TryAttack: "Empieza un ataque si no está en cooldown y devuelve si lo hizo. La sobrecarga con un valor de daño reemplaza **Damage** en ese golpe (la usa `WeaponCharge`)."
+  example: |
+    Un enemigo que da espadazos cuando el jugador está cerca:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class EnemySwing : MonoBehaviour
+    {
+        [SerializeField] private Transform player;
+        [SerializeField] private float reach = 1.2f;
+        private WeaponMelee _weapon;
+
+        private void Awake() => _weapon = GetComponent<WeaponMelee>();
+
+        private void Update()
+        {
+            if (Vector2.Distance(transform.position, player.position) < reach)
+                _weapon.TryAttack();
+        }
+    }
+    ```
+  tips:
+    - Deja **Active Duration** por debajo de **Cooldown**; si no, un golpe nuevo podría empezar con el anterior todavía activo.
+    - Encadena varios `WeaponMelee` con `WeaponCombo` para un combo 1-2-3.

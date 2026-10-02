@@ -1,0 +1,101 @@
+name: PlayerWallJump
+clip: true
+related: [PlayerJump, PlayerWallSlide, PlayerWallCling, PlayerWalkRun]
+en:
+  summary: Jump off walls while airborne, kicking away from the wall you are touching.
+  clip_caption: Bouncing between two walls by pressing jump each time the character touches one.
+  description: |
+    While the character is in the air and a wall is right in front of it, pressing **Jump** launches it
+    up and away from the wall. Wall detection needs no setup: it casts from the collider towards the
+    direction the character is facing (the sign of `transform.localScale.x`, which is what
+    `PlayerWalkRun` flips), ignoring the character's own colliders, so the default layer mask can stay on
+    *Everything*.
+
+    Right after the kick, horizontal input is ignored for **Control Lock Time** seconds. Without that
+    lock, holding towards the wall would cancel the push on the very next frame and the character would
+    just slide back.
+  setup:
+    - Build a character with `CharacterController2D`, `PlayerWalkRun` and `PlayerJump` (or `PlayerMultiJump`).
+    - Add `PlayerWallJump` before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Place walls (any solid `Collider2D`) and jump towards one; press **Jump** again while touching it.
+  fields:
+    wallCheck: Optional origin for the wall check. When empty, the cast starts at the collider's center and reaches past its edge.
+    wallCheckDistance: How far beyond the collider edge a wall is still detected, in units.
+    wallLayers: Layers that count as walls. *Everything* is fine because the character ignores itself.
+    wallJumpForce: Velocity applied on the kick — X away from the wall, Y upwards.
+    controlLockTime: Seconds during which horizontal input can't override the kick.
+  api:
+    IsTouchingWall: True while a wall is detected in front of the character this frame.
+  example: |
+    React to wall contact from your own script, for example to play a dust effect:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class WallDust : MonoBehaviour
+    {
+        [SerializeField] private ParticleSystem dust;
+        private PlayerWallJump _wallJump;
+
+        private void Awake() => _wallJump = GetComponent<PlayerWallJump>();
+
+        private void Update()
+        {
+            if (_wallJump.IsTouchingWall && !dust.isPlaying) dust.Play();
+        }
+    }
+    ```
+  tips:
+    - Combine it with `PlayerWallSlide` so the character slides down slowly while waiting for the jump.
+    - Raise **Control Lock Time** if players complain they can't climb a single wall by alternating directions; lower it for tighter air control.
+    - With `PlayerWallCling` the kick keeps its full height: the cling ignores the jump frame and the whole **Control Lock Time**.
+es:
+  summary: Salta desde las paredes estando en el aire, impulsándote lejos de la pared que tocas.
+  clip_caption: Rebotando entre dos paredes con un salto cada vez que el personaje toca una.
+  description: |
+    Mientras el personaje está en el aire y tiene una pared justo adelante, pulsar **Salto** lo lanza
+    hacia arriba y lejos de la pared. La detección no necesita configuración: lanza un rayo desde el
+    collider hacia donde mira el personaje (el signo de `transform.localScale.x`, que es lo que voltea
+    `PlayerWalkRun`) ignorando sus propios colliders, por eso la máscara de capas puede quedarse en
+    *Everything*.
+
+    Justo después del impulso, el input horizontal se ignora durante **Control Lock Time** segundos. Sin
+    ese bloqueo, mantener la dirección hacia la pared anularía el empuje en el frame siguiente y el
+    personaje se quedaría pegado.
+  setup:
+    - Arma un personaje con `CharacterController2D`, `PlayerWalkRun` y `PlayerJump` (o `PlayerMultiJump`).
+    - Agrega `PlayerWallJump` antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Pon paredes (cualquier `Collider2D` sólido) y salta hacia una; pulsa **Salto** otra vez mientras la tocas.
+  fields:
+    wallCheck: Origen opcional del chequeo. Si se deja vacío, el rayo sale del centro del collider y llega más allá de su borde.
+    wallCheckDistance: Cuánto más allá del borde del collider se sigue detectando la pared, en unidades.
+    wallLayers: Capas que cuentan como pared. *Everything* funciona porque el personaje se ignora a sí mismo.
+    wallJumpForce: Velocidad del impulso — X alejándose de la pared, Y hacia arriba.
+    controlLockTime: Segundos durante los que el input horizontal no puede anular el impulso.
+  api:
+    IsTouchingWall: Verdadero mientras hay una pared detectada delante del personaje en este frame.
+  example: |
+    Reacciona al contacto con la pared desde tu propio script, por ejemplo para soltar polvo:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class WallDust : MonoBehaviour
+    {
+        [SerializeField] private ParticleSystem dust;
+        private PlayerWallJump _wallJump;
+
+        private void Awake() => _wallJump = GetComponent<PlayerWallJump>();
+
+        private void Update()
+        {
+            if (_wallJump.IsTouchingWall && !dust.isPlaying) dust.Play();
+        }
+    }
+    ```
+  tips:
+    - Combínalo con `PlayerWallSlide` para que el personaje baje despacio mientras espera el salto.
+    - Sube **Control Lock Time** si cuesta escalar una sola pared alternando direcciones; bájalo para tener más control en el aire.
+    - Con `PlayerWallCling` el impulso conserva toda su altura: el agarre ignora el frame del salto y todo el **Control Lock Time**.

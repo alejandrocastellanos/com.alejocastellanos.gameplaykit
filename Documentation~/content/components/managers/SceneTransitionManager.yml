@@ -1,0 +1,94 @@
+name: SceneTransitionManager
+clip: false
+related: [LevelExit, PauseManager, GameManager, AudioManager]
+en:
+  summary: Loads scenes behind a fade to black, so level changes feel smooth instead of abrupt.
+  description: |
+    `SceneTransitionManager` is a persistent singleton (`SceneTransitionManager.Instance`,
+    `DontDestroyOnLoad`). `LoadScene` (by name or build index) fades the screen to **Fade Color** over **Fade
+    Duration**, resets `Time.timeScale` to 1 (in case you're leaving from a pause menu), loads the scene
+    asynchronously and fades back in. While a transition is running, new requests are ignored and the fade
+    layer blocks clicks.
+
+    If **Fade Canvas Group** is empty it builds its own full-screen overlay canvas with an Image in the fade
+    color, drawn on top of everything, which travels with the manager across scenes. `LevelExit` uses this
+    manager automatically when it exists. The fades use unscaled time, so they work even while paused.
+  setup:
+    - Add `SceneTransitionManager` to a root GameObject in your first scene (it un-parents itself if needed).
+    - Make sure your scenes are in the build's scene list (**File > Build Profiles**).
+    - Call `SceneTransitionManager.Instance.LoadScene("Level2")`, or let `LevelExit` do it.
+  fields:
+    fadeCanvasGroup: Your own fade layer. Empty creates a full-screen layer automatically. If you assign one, it must be a child of this object so it survives scene loads.
+    fadeDuration: Seconds of each half of the transition (fade out, then fade in).
+    fadeColor: Color of the auto-created fade layer. Ignored when you assign your own **Fade Canvas Group**.
+  api:
+    Instance: The persistent SceneTransitionManager (null if none).
+    IsTransitioning: True from the start of the fade out until the fade in finishes.
+    LoadScene: Fades out, loads the scene by name or build index, and fades in. Ignored while a transition is running.
+  example: |
+    A "Retry" button that reloads the current level with a fade:
+
+    ```csharp
+    using GameplayKit.Managers;
+    using UnityEngine;
+    using UnityEngine.SceneManagement;
+
+    public class RetryButton : MonoBehaviour
+    {
+        public void Retry()
+        {
+            int current = SceneManager.GetActiveScene().buildIndex;
+            if (SceneTransitionManager.Instance != null) SceneTransitionManager.Instance.LoadScene(current);
+            else SceneManager.LoadScene(current);
+        }
+    }
+    ```
+  tips:
+    - Put only one in your first scene; copies in later scenes destroy themselves, keeping the first one's settings.
+    - Use `IsTransitioning` to ignore player input or disable menus while the screen is black.
+es:
+  summary: Carga escenas detrás de un fundido a negro, para que los cambios de nivel se sientan suaves y no bruscos.
+  description: |
+    `SceneTransitionManager` es un singleton persistente (`SceneTransitionManager.Instance`,
+    `DontDestroyOnLoad`). `LoadScene` (por nombre o índice del build) funde la pantalla a **Fade Color**
+    durante **Fade Duration**, vuelve `Time.timeScale` a 1 (por si sales desde un menú de pausa), carga la
+    escena de forma asíncrona y vuelve a mostrarla. Mientras hay una transición, los pedidos nuevos se
+    ignoran y la capa de fundido bloquea los clics.
+
+    Si **Fade Canvas Group** está vacío, arma su propio canvas overlay a pantalla completa con una Image del
+    color del fundido, dibujado encima de todo, que viaja con el manager entre escenas. `LevelExit` usa este
+    manager automáticamente cuando existe. Los fundidos usan tiempo sin escalar, así que funcionan incluso
+    en pausa.
+  setup:
+    - Agrega `SceneTransitionManager` a un GameObject raíz en tu primera escena (se desemparenta solo si hace falta).
+    - Asegúrate de que tus escenas estén en la lista de escenas del build (**File > Build Profiles**).
+    - Llama `SceneTransitionManager.Instance.LoadScene("Level2")`, o deja que lo haga `LevelExit`.
+  fields:
+    fadeCanvasGroup: Tu propia capa de fundido. Vacío crea una a pantalla completa automáticamente. Si asignas una, debe ser hija de este objeto para que sobreviva a la carga de escenas.
+    fadeDuration: Segundos de cada mitad de la transición (fundido de salida y luego de entrada).
+    fadeColor: Color de la capa creada automáticamente. Se ignora si asignas tu propio **Fade Canvas Group**.
+  api:
+    Instance: El SceneTransitionManager persistente (null si no hay).
+    IsTransitioning: Verdadero desde que empieza el fundido de salida hasta que termina el de entrada.
+    LoadScene: Funde a negro, carga la escena por nombre o índice del build y vuelve a mostrarla. Se ignora mientras hay una transición.
+  example: |
+    Un botón "Reintentar" que recarga el nivel actual con fundido:
+
+    ```csharp
+    using GameplayKit.Managers;
+    using UnityEngine;
+    using UnityEngine.SceneManagement;
+
+    public class RetryButton : MonoBehaviour
+    {
+        public void Retry()
+        {
+            int current = SceneManager.GetActiveScene().buildIndex;
+            if (SceneTransitionManager.Instance != null) SceneTransitionManager.Instance.LoadScene(current);
+            else SceneManager.LoadScene(current);
+        }
+    }
+    ```
+  tips:
+    - Pon uno solo en tu primera escena; las copias en escenas posteriores se destruyen solas y queda la configuración del primero.
+    - Usa `IsTransitioning` para ignorar el input del jugador o desactivar menús mientras la pantalla está en negro.

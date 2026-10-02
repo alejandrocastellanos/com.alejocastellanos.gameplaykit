@@ -1,0 +1,107 @@
+name: PlayerDropThrough
+clip: true
+related: [OneWayPlatform, PlayerJump, PlayerMultiJump, PlayerCrouch]
+en:
+  summary: Press down + jump while standing on a one-way platform to drop through it instead of jumping.
+  clip_caption: Standing on a one-way platform, pressing down + jump to fall through it, then jumping back up through it from below.
+  description: |
+    When the character is grounded on a one-way platform and the player holds **down** (S, down arrow or
+    left stick) while pressing **Jump**, `PlayerDropThrough` lets it fall through. It looks for a solid
+    collider used by a `PlatformEffector2D` in a thin box just under the feet (**Probe Distance** tall), so it
+    works with `OneWayPlatform` or any collider you set up with a Platform Effector yourself.
+
+    When a platform is found, collisions between the character's body and that platform are ignored for
+    **Ignore Duration** seconds and the character gets a small downward push. In the same frame it calls
+    `CharacterController2D.BlockJumpThisFrame`, so `PlayerJump` and `PlayerMultiJump` don't also jump. On
+    normal ground (or on a platform without an effector) nothing happens and down + jump is a regular jump.
+
+    `IsDropping` is true while the collision is being ignored. Down is read from the movement input, not
+    from the **Crouch** button, so it doesn't conflict with `PlayerCrouch`.
+  setup:
+    - Build a character with `CharacterController2D`, `PlayerWalkRun` and `PlayerJump` (or `PlayerMultiJump`).
+    - Add `PlayerDropThrough` before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Create platforms with `OneWayPlatform` (it sets up the collider and `PlatformEffector2D`).
+    - Stand on one, hold **down** and press **Jump**.
+  fields:
+    ignoreDuration: Seconds the character ignores collisions with the platform after dropping. Raise it for thick platforms so the character clears them before collisions come back.
+    probeDistance: Height of the check box under the feet used to find the platform, in units.
+  api:
+    IsDropping: True while the character is falling through a platform (collisions with it are ignored).
+  example: |
+    Play a "whoosh" when the character drops through a platform:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class DropSound : MonoBehaviour
+    {
+        [SerializeField] private AudioSource source;
+        private PlayerDropThrough _drop;
+        private bool _wasDropping;
+
+        private void Awake() => _drop = GetComponent<PlayerDropThrough>();
+
+        private void Update()
+        {
+            if (_drop.IsDropping && !_wasDropping) source.Play();
+            _wasDropping = _drop.IsDropping;
+        }
+    }
+    ```
+  tips:
+    - Leave enough room under one-way platforms; if the character lands on another platform within **Ignore Duration**, it still collides with that one (only the platform it dropped from is ignored).
+    - The **GameplayKit > Create Player** menu already adds this ability, and `OneWayPlatform` objects work with it out of the box.
+es:
+  summary: Pulsa abajo + salto sobre una plataforma de una vía para atravesarla hacia abajo en vez de saltar.
+  clip_caption: Parado sobre una plataforma de una vía, pulsa abajo + salto para caer a través de ella y luego vuelve a subir saltando desde abajo.
+  description: |
+    Cuando el personaje está en el suelo sobre una plataforma de una vía y el jugador mantiene **abajo** (S,
+    flecha abajo o stick izquierdo) mientras pulsa **Salto**, `PlayerDropThrough` lo deja caer a través de
+    ella. Busca un collider sólido usado por un `PlatformEffector2D` en una caja delgada justo bajo los pies
+    (de **Probe Distance** de alto), así que funciona con `OneWayPlatform` o con cualquier collider que
+    configures tú mismo con un Platform Effector.
+
+    Cuando encuentra una plataforma, las colisiones entre el cuerpo del personaje y esa plataforma se ignoran
+    durante **Ignore Duration** segundos y el personaje recibe un pequeño empujón hacia abajo. En ese mismo
+    frame llama a `CharacterController2D.BlockJumpThisFrame`, para que `PlayerJump` y `PlayerMultiJump` no
+    salten también. En suelo normal (o en una plataforma sin effector) no pasa nada y abajo + salto es un
+    salto común.
+
+    `IsDropping` es verdadero mientras se ignora la colisión. Abajo se lee del input de movimiento, no del
+    botón de **Agacharse**, así que no choca con `PlayerCrouch`.
+  setup:
+    - Arma un personaje con `CharacterController2D`, `PlayerWalkRun` y `PlayerJump` (o `PlayerMultiJump`).
+    - Agrega `PlayerDropThrough` antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Crea plataformas con `OneWayPlatform` (configura el collider y el `PlatformEffector2D`).
+    - Párate en una, mantén **abajo** y pulsa **Salto**.
+  fields:
+    ignoreDuration: Segundos que el personaje ignora la colisión con la plataforma después de soltarse. Súbelo para plataformas gruesas, así termina de atravesarlas antes de que vuelva la colisión.
+    probeDistance: Altura de la caja de chequeo bajo los pies que busca la plataforma, en unidades.
+  api:
+    IsDropping: Verdadero mientras el personaje cae a través de una plataforma (la colisión con ella se ignora).
+  example: |
+    Reproduce un sonido cuando el personaje atraviesa una plataforma:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class DropSound : MonoBehaviour
+    {
+        [SerializeField] private AudioSource source;
+        private PlayerDropThrough _drop;
+        private bool _wasDropping;
+
+        private void Awake() => _drop = GetComponent<PlayerDropThrough>();
+
+        private void Update()
+        {
+            if (_drop.IsDropping && !_wasDropping) source.Play();
+            _wasDropping = _drop.IsDropping;
+        }
+    }
+    ```
+  tips:
+    - Deja espacio bajo las plataformas de una vía; si el personaje cae sobre otra plataforma dentro de **Ignore Duration**, igual choca con ella (solo se ignora la plataforma de la que se soltó).
+    - El menú **GameplayKit > Create Player** ya agrega esta habilidad, y los objetos con `OneWayPlatform` funcionan con ella sin configurar nada.

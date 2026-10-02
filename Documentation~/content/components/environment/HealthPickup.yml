@@ -1,0 +1,87 @@
+name: HealthPickup
+clip: true
+related: [CharacterHealth, UIHealthBar, HazardZone, Collectible]
+en:
+  summary: A heart or potion that restores health to whoever touches it, and is not wasted at full health.
+  clip_caption: At full health the first heart stays; after the spikes, the second heart heals the player from 60 to 85.
+  description: |
+    `HealthPickup` goes on a trigger collider. Anything with a `CharacterHealth` (on the collider or its
+    parents) that touches it is healed by **Heal Amount**; then it spawns **Pickup Effect Prefab**, fires
+    `OnPickedUp` and destroys itself. Dead characters are ignored.
+
+    With **Only If Hurt** on (the default), a character at full health leaves it untouched. The pickup
+    remembers who is standing on it, so if that character gets hurt while still on top, it is healed right
+    away without having to step off and back on. No tag is needed, so enemies with `CharacterHealth` can
+    take it too.
+  setup:
+    - Create a small GameObject with a `CircleCollider2D` marked **Is Trigger** and add `HealthPickup`.
+    - Make sure the player has a `CharacterHealth`.
+    - Set **Heal Amount** (health is capped at **Max Health**).
+  fields:
+    healAmount: Health restored on pickup. The result never goes above the character's **Max Health**.
+    onlyIfHurt: Leaves the pickup in place when the character is already at full health.
+    pickupEffectPrefab: Prefab spawned where it was picked up (sparkles, a sound). Leave empty for none.
+  events:
+    OnPickedUp: C# event fired when it heals someone, with the healed character's GameObject.
+  example: |
+    Show a floating "+25" when a heart is taken:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    [RequireComponent(typeof(HealthPickup))]
+    public class HealPopup : MonoBehaviour
+    {
+        [SerializeField] private GameObject popupPrefab;
+
+        private void Awake() =>
+            GetComponent<HealthPickup>().OnPickedUp += who =>
+                Instantiate(popupPrefab, who.transform.position + Vector3.up, Quaternion.identity);
+    }
+    ```
+  tips:
+    - Add it to a `BreakableObject`'s **Loot Drops** so crates sometimes hide a heart.
+    - Turn **Only If Hurt** off for pickups that should vanish when touched no matter what.
+es:
+  summary: Un corazón o poción que cura a quien lo toca y no se desperdicia con la vida llena.
+  clip_caption: Con la vida llena el primer corazón se queda; tras los pinchos, el segundo cura al jugador de 60 a 85.
+  description: |
+    `HealthPickup` va en un collider trigger. Cualquier cosa con `CharacterHealth` (en el collider o sus
+    padres) que lo toque recupera **Heal Amount**; luego instancia **Pickup Effect Prefab**, dispara
+    `OnPickedUp` y se destruye. Los personajes muertos se ignoran.
+
+    Con **Only If Hurt** activo (por defecto), un personaje con la vida llena lo deja en su sitio. El
+    recogible recuerda quién está encima, así que si ese personaje recibe daño sin moverse, se cura en el
+    acto sin tener que salir y volver a entrar. No necesita tag, así que los enemigos con `CharacterHealth`
+    también pueden tomarlo.
+  setup:
+    - Crea un GameObject pequeño con un `CircleCollider2D` marcado como **Is Trigger** y agrégale `HealthPickup`.
+    - Asegúrate de que el jugador tenga `CharacterHealth`.
+    - Ajusta **Heal Amount** (la vida nunca supera **Max Health**).
+  fields:
+    healAmount: Vida que recupera al recogerlo. El resultado nunca pasa del **Max Health** del personaje.
+    onlyIfHurt: Deja el recogible en su sitio si el personaje ya tiene la vida llena.
+    pickupEffectPrefab: Prefab que aparece donde se recogió (brillos, un sonido). Déjalo vacío si no quieres efecto.
+  events:
+    OnPickedUp: Evento C# que se dispara al curar a alguien, con el GameObject del personaje curado.
+  example: |
+    Muestra un "+25" flotante al tomar un corazón:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    [RequireComponent(typeof(HealthPickup))]
+    public class HealPopup : MonoBehaviour
+    {
+        [SerializeField] private GameObject popupPrefab;
+
+        private void Awake() =>
+            GetComponent<HealthPickup>().OnPickedUp += who =>
+                Instantiate(popupPrefab, who.transform.position + Vector3.up, Quaternion.identity);
+    }
+    ```
+  tips:
+    - Agrégalo a **Loot Drops** de un `BreakableObject` para que algunas cajas escondan un corazón.
+    - Desactiva **Only If Hurt** si quieres que desaparezca al tocarlo pase lo que pase.

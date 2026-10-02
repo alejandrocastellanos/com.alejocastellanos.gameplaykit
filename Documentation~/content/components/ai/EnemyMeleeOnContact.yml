@@ -1,0 +1,92 @@
+name: EnemyMeleeOnContact
+clip: true
+related: [EnemyPatrol, EnemyChase, CharacterHealth, CharacterKnockback]
+en:
+  summary: Makes an enemy hurt the player the moment they touch, with a cooldown between hits.
+  clip_caption: The player bumps into the enemy three times and loses 10 HP on each touch.
+  description: |
+    When the enemy's collider starts touching another collider (`OnCollisionEnter2D`) or a trigger
+    (`OnTriggerEnter2D`), it checks **Target Tag** and looks for an `IDamageable` (such as
+    `CharacterHealth`) on the other object or its parents. If it finds one it deals **Damage**, passing
+    the direction from the enemy to the victim, so a `CharacterKnockback` on the player pushes it away.
+    Then it waits **Damage Cooldown** seconds before it can hit again.
+
+    Damage happens on *entering* contact only. A player that keeps leaning against the enemy is hit
+    once; it has to separate and touch again (knockback does this naturally). The tag check also
+    accepts a child collider whose `Rigidbody2D` is on an object with the tag, and an empty tag accepts
+    anything damageable, other enemies included.
+  setup:
+    - Give the enemy a `Collider2D`. Collision messages need a `Rigidbody2D` on at least one of the two objects (the player already has one).
+    - Add `EnemyMeleeOnContact` and set the player's GameObject **Tag** to `Player`.
+    - Give the player `CharacterHealth` (and `CharacterKnockback` for a push back on each hit).
+  fields:
+    damage: Damage dealt per touch.
+    damageCooldown: Seconds after a hit during which new touches do nothing.
+    targetTag: Only objects with this tag are hurt. Leave it empty to hurt any `IDamageable` it touches.
+  example: |
+    React to contact hits by listening to the player's health, for example to shake the camera:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class HitCamShake : MonoBehaviour
+    {
+        [SerializeField] private CharacterHealth playerHealth;
+        [SerializeField] private Animator cameraAnimator;
+
+        private void OnEnable() => playerHealth.OnDamaged += HandleDamaged;
+        private void OnDisable() => playerHealth.OnDamaged -= HandleDamaged;
+
+        private void HandleDamaged(float amount) => cameraAnimator.SetTrigger("Shake");
+    }
+    ```
+  tips:
+    - The **Create Enemy** menu item builds an enemy with `EnemyPatrol`, `EnemyMeleeOnContact` and `DamageableObject` already set up.
+    - Add `CharacterKnockback` to the player; without it, leaning on an enemy only hurts once.
+    - The player's `CharacterHealth` invulnerability time also blocks hits that land too close together.
+es:
+  summary: Hace que un enemigo dañe al jugador en cuanto lo toca, con un tiempo de espera entre golpes.
+  clip_caption: El jugador choca tres veces con el enemigo y pierde 10 de vida en cada contacto.
+  description: |
+    Cuando el collider del enemigo empieza a tocar otro collider (`OnCollisionEnter2D`) o un trigger
+    (`OnTriggerEnter2D`), revisa **Target Tag** y busca un `IDamageable` (como `CharacterHealth`) en el otro
+    objeto o sus padres. Si lo encuentra aplica **Damage**, pasando la dirección del enemigo hacia la
+    víctima, así un `CharacterKnockback` en el jugador lo empuja hacia atrás. Después espera **Damage
+    Cooldown** segundos antes de poder golpear de nuevo.
+
+    El daño ocurre solo al *entrar* en contacto. Un jugador que se queda apoyado contra el enemigo recibe
+    un solo golpe; tiene que separarse y volver a tocarlo (el knockback lo hace solo). El chequeo de tag
+    también acepta un collider hijo cuyo `Rigidbody2D` esté en un objeto con el tag, y un tag vacío acepta
+    cualquier cosa dañable, incluidos otros enemigos.
+  setup:
+    - Dale al enemigo un `Collider2D`. Los mensajes de colisión necesitan un `Rigidbody2D` en al menos uno de los dos objetos (el jugador ya tiene uno).
+    - Agrega `EnemyMeleeOnContact` y pon el **Tag** del GameObject del jugador en `Player`.
+    - Dale al jugador `CharacterHealth` (y `CharacterKnockback` para un empujón en cada golpe).
+  fields:
+    damage: Daño por contacto.
+    damageCooldown: Segundos después de un golpe durante los que los nuevos contactos no hacen nada.
+    targetTag: Solo se daña a objetos con este tag. Déjalo vacío para dañar cualquier `IDamageable` que toque.
+  example: |
+    Reacciona a los golpes por contacto escuchando la vida del jugador, por ejemplo para sacudir la
+    cámara:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class HitCamShake : MonoBehaviour
+    {
+        [SerializeField] private CharacterHealth playerHealth;
+        [SerializeField] private Animator cameraAnimator;
+
+        private void OnEnable() => playerHealth.OnDamaged += HandleDamaged;
+        private void OnDisable() => playerHealth.OnDamaged -= HandleDamaged;
+
+        private void HandleDamaged(float amount) => cameraAnimator.SetTrigger("Shake");
+    }
+    ```
+  tips:
+    - El menú **Create Enemy** arma un enemigo con `EnemyPatrol`, `EnemyMeleeOnContact` y `DamageableObject` ya configurados.
+    - Agrega `CharacterKnockback` al jugador; sin él, apoyarse en un enemigo solo duele una vez.
+    - El tiempo de invulnerabilidad del `CharacterHealth` del jugador también bloquea golpes demasiado seguidos.

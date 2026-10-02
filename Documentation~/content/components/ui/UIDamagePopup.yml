@@ -1,0 +1,91 @@
+name: UIDamagePopup
+clip: true
+related: [DamagePopupSpawner, CharacterHealth, HealthPickup, UIHealthBar]
+en:
+  summary: A floating number that rises and fades — red for damage, green for healing.
+  clip_caption: Walking over spikes pops red damage numbers (-10, then -25 on the stronger spikes), and the heart pops a green +25.
+  description: |
+    `UIDamagePopup` animates a uGUI `Text`: each frame it moves up at **Float Speed** and fades from full
+    opacity to transparent over **Lifetime**, then destroys itself. `Setup` writes the amount as `-N` in
+    **Damage Color** or `+N` in **Heal Color** (rounded to a whole number).
+
+    You don't usually add it by hand: `DamagePopupSpawner` creates one per hit, and the static `Spawn`
+    method lets you create them from any script. Without a prefab, `Spawn` builds a small world-space canvas
+    with the text and destroys the whole thing at the end. For your own look, make a prefab whose root has
+    a world-space Canvas, a Text and this component, and pass it to `Spawn` or to the spawner; the whole
+    instance is destroyed when it fades out.
+  setup:
+    - For the default look, just use `DamagePopupSpawner` — no setup needed.
+    - For a custom look, create a prefab whose root has a Canvas (World Space, small scale such as 0.01), a Text and `UIDamagePopup`, and set its colors.
+    - Assign the prefab to `DamagePopupSpawner`'s **Popup Prefab**, or pass it to `UIDamagePopup.Spawn`.
+  fields:
+    floatSpeed: Upward speed of the number, in world units per second.
+    lifetime: Seconds until the number has fully faded and is destroyed.
+    damageColor: Text color for damage numbers.
+    healColor: Text color for heal numbers.
+  api:
+    Spawn: Static. Creates a popup at a world position with an amount and a damage/heal flag; uses the optional prefab or builds a simple one.
+    Setup: Sets the text and color of an existing popup (`Spawn` calls it for you).
+  example: |
+    Show a popup for something that isn't health, like experience gained:
+
+    ```csharp
+    using GameplayKit.UI;
+    using UnityEngine;
+
+    public class XpReward : MonoBehaviour
+    {
+        public void Give(int xp)
+        {
+            // isHeal = true gives the green "+N" style
+            UIDamagePopup.Spawn(transform.position + Vector3.up * 1.5f, xp, true);
+        }
+    }
+    ```
+  tips:
+    - Keep the Text, the Canvas and `UIDamagePopup` on the prefab's root object: the field references that component, and its GameObject is what gets instantiated and destroyed.
+    - Popups use scaled time, so they freeze while the game is paused.
+es:
+  summary: Un número flotante que sube y se desvanece — rojo para el daño, verde para la curación.
+  clip_caption: Al pisar pinchos aparecen números rojos de daño (-10, luego -25 en los pinchos más fuertes) y el corazón muestra un +25 verde.
+  description: |
+    `UIDamagePopup` anima un `Text` de uGUI: cada frame sube a **Float Speed** y pasa de opaco a transparente
+    durante **Lifetime**; luego se destruye solo. `Setup` escribe la cantidad como `-N` en **Damage Color** o
+    `+N` en **Heal Color** (redondeada a un entero).
+
+    Normalmente no lo agregas a mano: `DamagePopupSpawner` crea uno por golpe, y el método estático `Spawn`
+    te deja crearlos desde cualquier script. Sin prefab, `Spawn` arma un canvas pequeño en el mundo con el
+    texto y destruye todo al terminar. Para tu propio estilo, haz un prefab cuya raíz tenga un Canvas World
+    Space, un Text y este componente, y pásalo a `Spawn` o al spawner; la instancia completa se destruye al
+    desvanecerse.
+  setup:
+    - Para el estilo por defecto, usa `DamagePopupSpawner` — no hace falta configurar nada.
+    - Para un estilo propio, crea un prefab cuya raíz tenga un Canvas (World Space, con escala pequeña como 0.01), un Text y `UIDamagePopup`, y define sus colores.
+    - Asigna el prefab a **Popup Prefab** de `DamagePopupSpawner`, o pásalo a `UIDamagePopup.Spawn`.
+  fields:
+    floatSpeed: Velocidad de subida del número, en unidades del mundo por segundo.
+    lifetime: Segundos hasta que el número se desvanece por completo y se destruye.
+    damageColor: Color del texto para los números de daño.
+    healColor: Color del texto para los números de curación.
+  api:
+    Spawn: Estático. Crea un popup en una posición del mundo con una cantidad y un indicador de daño/curación; usa el prefab opcional o arma uno simple.
+    Setup: Define el texto y el color de un popup existente (`Spawn` lo llama por ti).
+  example: |
+    Muestra un popup para algo que no es vida, como la experiencia ganada:
+
+    ```csharp
+    using GameplayKit.UI;
+    using UnityEngine;
+
+    public class XpReward : MonoBehaviour
+    {
+        public void Give(int xp)
+        {
+            // isHeal = true usa el estilo verde "+N"
+            UIDamagePopup.Spawn(transform.position + Vector3.up * 1.5f, xp, true);
+        }
+    }
+    ```
+  tips:
+    - Deja el Text, el Canvas y `UIDamagePopup` en el objeto raíz del prefab: el campo referencia ese componente, y su GameObject es lo que se instancia y se destruye.
+    - Los popups usan tiempo escalado, así que se congelan mientras el juego está en pausa.

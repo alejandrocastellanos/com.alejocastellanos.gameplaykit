@@ -1,0 +1,117 @@
+name: PlayerMultiJump
+clip: true
+related: [PlayerJump, PlayerWallJump, PlayerWalkRun, PlayerDash]
+en:
+  summary: Jump plus a configurable number of extra jumps in mid-air (double jump, triple jump and so on).
+  clip_caption: A short hop followed by a second jump in mid-air; a third press does nothing because only one extra jump is allowed.
+  description: |
+    `PlayerMultiJump` is a self-contained alternative to `PlayerJump` that adds air jumps. From the ground,
+    **Jump** launches the character at **Jump Force**. While airborne, each new press spends one of the
+    **Extra Jumps** and sets the vertical velocity to **Air Jump Force**, cancelling any downward speed so
+    the air jump always feels the same. The counter refills every frame the character is grounded.
+
+    Releasing the button while rising multiplies the upward speed by **Jump Cut Multiplier**, for both the
+    ground jump and air jumps, so taps give shorter jumps. **Jump Buffer Time** applies to the ground jump: a
+    press just before landing jumps as soon as the character touches down (cut if the button is no longer
+    held).
+
+    There is no coyote time: after walking off a ledge, the first press already counts as an air jump.
+    Like `PlayerJump`, it skips the jump when `CharacterController2D.IsJumpBlocked` is set (for example by
+    `PlayerDropThrough`). It's the jump the **GameplayKit > Create Player** menu puts on its character.
+  setup:
+    - Build a character with `CharacterController2D` and `PlayerWalkRun`. Don't add `PlayerJump`.
+    - Add `PlayerMultiJump` before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Set **Extra Jumps** (1 = double jump) and press **Jump** again while in the air.
+  fields:
+    jumpForce: Upward velocity of the jump from the ground, in units per second.
+    airJumpForce: Upward velocity of each air jump. It replaces the current vertical speed, so it also stops a fall.
+    extraJumps: How many jumps are allowed in the air before landing. 1 = double jump, 2 = triple jump, 0 = single jump.
+    jumpCutMultiplier: Fraction of the upward speed kept when the button is released while rising. Set it to 1 to disable variable height.
+    jumpBufferTime: Seconds a press is remembered before landing so the ground jump still comes out.
+  example: |
+    Spawn a puff of smoke on air jumps only, by watching for a sudden rise in upward speed while airborne:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class AirJumpPuff : MonoBehaviour
+    {
+        [SerializeField] private GameObject puffPrefab;
+        private CharacterCore _core;
+        private float _lastVelocityY;
+
+        private void Start() => _core = GetComponent<CharacterCore>();
+
+        private void LateUpdate()
+        {
+            float vy = _core.Controller.Velocity.y;
+            // A sudden jump in upward speed while already in the air = air jump.
+            if (!_core.Controller.IsGrounded && vy > 5f && vy - _lastVelocityY > 5f)
+                Instantiate(puffPrefab, transform.position, Quaternion.identity);
+            _lastVelocityY = vy;
+        }
+    }
+    ```
+  tips:
+    - Pair it with `PlayerWallJump` for classic wall-climbing platformers; wall jumps don't spend extra jumps.
+    - Because walking off a ledge spends an air jump, raise **Extra Jumps** by one or switch to `PlayerJump` if you need coyote time.
+    - Keep **Air Jump Force** a bit lower than **Jump Force** so the second jump reads as a boost, not a reset.
+es:
+  summary: Salto más una cantidad configurable de saltos extra en el aire (doble salto, triple salto, etc.).
+  clip_caption: Un saltito seguido de un segundo salto en el aire; una tercera pulsación no hace nada porque solo hay un salto extra.
+  description: |
+    `PlayerMultiJump` es una alternativa autocontenida a `PlayerJump` que agrega saltos en el aire. Desde el
+    suelo, **Salto** impulsa al personaje con **Jump Force**. En el aire, cada nueva pulsación gasta uno de
+    los **Extra Jumps** y fija la velocidad vertical en **Air Jump Force**, anulando cualquier caída para
+    que el salto aéreo siempre se sienta igual. El contador se recarga en cada frame que el personaje está
+    en el suelo.
+
+    Soltar el botón mientras subes multiplica la velocidad de subida por **Jump Cut Multiplier**, tanto en
+    el salto desde el suelo como en los aéreos, así que los toques dan saltos más cortos. **Jump Buffer
+    Time** aplica al salto desde el suelo: una pulsación justo antes de aterrizar salta en cuanto el
+    personaje toca el piso (recortado si ya no mantienes el botón).
+
+    No tiene coyote time: después de caer de un borde caminando, la primera pulsación ya cuenta como salto
+    aéreo. Igual que `PlayerJump`, no salta cuando `CharacterController2D.IsJumpBlocked` está activo (por
+    ejemplo por `PlayerDropThrough`). Es el salto que pone el menú **GameplayKit > Create Player** en su
+    personaje.
+  setup:
+    - Arma un personaje con `CharacterController2D` y `PlayerWalkRun`. No agregues `PlayerJump`.
+    - Agrega `PlayerMultiJump` antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Configura **Extra Jumps** (1 = doble salto) y pulsa **Salto** otra vez en el aire.
+  fields:
+    jumpForce: Velocidad hacia arriba del salto desde el suelo, en unidades por segundo.
+    airJumpForce: Velocidad hacia arriba de cada salto aéreo. Reemplaza la velocidad vertical actual, así que también frena una caída.
+    extraJumps: Cuántos saltos puedes hacer en el aire antes de aterrizar. 1 = doble salto, 2 = triple salto, 0 = salto simple.
+    jumpCutMultiplier: Fracción de la velocidad de subida que se conserva al soltar el botón mientras subes. Ponlo en 1 para desactivar la altura variable.
+    jumpBufferTime: Segundos que se recuerda una pulsación antes de aterrizar para que el salto desde el suelo igual salga.
+  example: |
+    Suelta una nube de humo solo en los saltos aéreos, detectando un aumento brusco de velocidad en el aire:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class AirJumpPuff : MonoBehaviour
+    {
+        [SerializeField] private GameObject puffPrefab;
+        private CharacterCore _core;
+        private float _lastVelocityY;
+
+        private void Start() => _core = GetComponent<CharacterCore>();
+
+        private void LateUpdate()
+        {
+            float vy = _core.Controller.Velocity.y;
+            // Un salto brusco de velocidad hacia arriba estando en el aire = salto aéreo.
+            if (!_core.Controller.IsGrounded && vy > 5f && vy - _lastVelocityY > 5f)
+                Instantiate(puffPrefab, transform.position, Quaternion.identity);
+            _lastVelocityY = vy;
+        }
+    }
+    ```
+  tips:
+    - Combínalo con `PlayerWallJump` para plataformas clásicos de escalar paredes; los wall jumps no gastan saltos extra.
+    - Como caer de un borde gasta un salto aéreo, sube **Extra Jumps** en uno o cambia a `PlayerJump` si necesitas coyote time.
+    - Deja **Air Jump Force** un poco por debajo de **Jump Force** para que el segundo salto se sienta como un impulso extra y no como un reinicio.

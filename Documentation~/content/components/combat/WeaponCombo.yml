@@ -1,0 +1,95 @@
+name: WeaponCombo
+clip: true
+related: [WeaponMelee, PlayerAttack, WeaponCharge]
+en:
+  summary: Chains several melee hits into a combo as long as each press arrives in time.
+  clip_caption: Three quick presses chain hits 1-2-3 with a bigger finisher; after a pause the combo starts over at hit 1.
+  description: |
+    `WeaponCombo` holds a list of `WeaponMelee` components (**Combo Hits**) and plays them in order. Each
+    successful hit advances to the next one and opens a window of **Combo Window** seconds; if the next
+    press arrives in time the sequence continues, otherwise it goes back to the first hit. After the last
+    hit it wraps around to the first.
+
+    Every hit is a normal `WeaponMelee` with its own damage, hitbox and cooldown, so you can make the
+    finisher wider and stronger. If the current hit is still on cooldown the press is ignored and the
+    combo doesn't advance. `PlayerAttack` always prefers a `WeaponCombo` over loose weapons.
+  setup:
+    - Add one `WeaponMelee` per hit (on the character or on children) and tune each one's **Damage**, **Hitbox Radius** and **Cooldown**.
+    - Add `WeaponCombo` and drag the melee components into **Combo Hits** in order.
+    - With `PlayerAttack` on the character, press **Attack** repeatedly to chain the hits.
+  fields:
+    comboHits: The `WeaponMelee` hits of the combo, in order.
+    comboWindow: Seconds after each hit during which the next press continues the combo. Past that, it restarts from the first hit.
+  api:
+    CurrentComboIndex: Index (0-based) of the hit that the next attack will use.
+    TryAttack: Plays the current hit and advances the combo. Returns false if there are no hits or the current one is on cooldown.
+  example: |
+    Trigger a different animation for each step of the combo:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class ComboAnimator : MonoBehaviour
+    {
+        [SerializeField] private Animator animator;
+        private WeaponCombo _combo;
+
+        private void Awake() => _combo = GetComponent<WeaponCombo>();
+
+        public void Attack()
+        {
+            int step = _combo.CurrentComboIndex;
+            if (_combo.TryAttack()) animator.SetTrigger("Attack" + (step + 1));
+        }
+    }
+    ```
+  tips:
+    - Keep each hit's **Cooldown** below **Combo Window**, or the next press will land on cooldown and the window will run out.
+    - "`WeaponCharge` can't change combo damage: the charged value is ignored for combos."
+es:
+  summary: Encadena varios golpes cuerpo a cuerpo en un combo mientras cada pulsación llegue a tiempo.
+  clip_caption: Tres pulsaciones rápidas encadenan los golpes 1-2-3 con un remate más grande; tras una pausa el combo vuelve al golpe 1.
+  description: |
+    `WeaponCombo` guarda una lista de componentes `WeaponMelee` (**Combo Hits**) y los usa en orden. Cada
+    golpe exitoso pasa al siguiente y abre una ventana de **Combo Window** segundos; si la siguiente
+    pulsación llega a tiempo la secuencia sigue, si no vuelve al primer golpe. Después del último golpe
+    se vuelve a empezar por el primero.
+
+    Cada golpe es un `WeaponMelee` normal con su propio daño, hitbox y cooldown, así que puedes hacer el
+    remate más ancho y fuerte. Si el golpe actual sigue en cooldown la pulsación se ignora y el combo no
+    avanza. `PlayerAttack` siempre prefiere un `WeaponCombo` antes que armas sueltas.
+  setup:
+    - Agrega un `WeaponMelee` por golpe (en el personaje o en hijos) y ajusta en cada uno **Damage**, **Hitbox Radius** y **Cooldown**.
+    - Agrega `WeaponCombo` y arrastra los componentes melee a **Combo Hits**, en orden.
+    - Con `PlayerAttack` en el personaje, pulsa **Attack** varias veces para encadenar los golpes.
+  fields:
+    comboHits: Los golpes `WeaponMelee` del combo, en orden.
+    comboWindow: Segundos tras cada golpe durante los que la siguiente pulsación continúa el combo. Pasado ese tiempo, vuelve al primer golpe.
+  api:
+    CurrentComboIndex: Índice (desde 0) del golpe que usará el próximo ataque.
+    TryAttack: Ejecuta el golpe actual y avanza el combo. Devuelve false si no hay golpes o el actual está en cooldown.
+  example: |
+    Lanza una animación distinta para cada paso del combo:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class ComboAnimator : MonoBehaviour
+    {
+        [SerializeField] private Animator animator;
+        private WeaponCombo _combo;
+
+        private void Awake() => _combo = GetComponent<WeaponCombo>();
+
+        public void Attack()
+        {
+            int step = _combo.CurrentComboIndex;
+            if (_combo.TryAttack()) animator.SetTrigger("Attack" + (step + 1));
+        }
+    }
+    ```
+  tips:
+    - Deja el **Cooldown** de cada golpe por debajo de **Combo Window**, o la siguiente pulsación caerá en cooldown y se agotará la ventana.
+    - "`WeaponCharge` no cambia el daño de un combo: el valor cargado se ignora en los combos."

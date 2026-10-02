@@ -1,0 +1,93 @@
+name: BreakableObject
+clip: true
+related: [DamageableObject, WeaponMelee, PlayerAttack, Collectible]
+en:
+  summary: A crate, vase or wall that breaks after taking enough damage, with optional effect and loot.
+  clip_caption: One swing breaks a small crate and drops a coin; the big crate needs three hits.
+  description: |
+    `BreakableObject` implements `IDamageable`, so anything in the kit that deals damage can break it:
+    `WeaponMelee`, `WeaponHitscan`, projectiles, a `HazardZone` or your own scripts calling
+    `ApplyDamage`. Each hit subtracts its amount from **Health**; hits of zero or less are ignored, and so
+    is any damage after the object has already broken.
+
+    When **Health** reaches zero it spawns **Break Effect Prefab** (if set) and one copy of every prefab in
+    **Loot Drops** at its own position, fires `OnBroken` and destroys its GameObject. There is no
+    invulnerability window: several quick hits all count.
+  setup:
+    - Create a GameObject with a solid `Collider2D` (a `BoxCollider2D` for a crate) and add `BreakableObject`.
+    - Set **Health** to the total damage it should take (the default weapon hit is 10, so 30 means three hits).
+    - Optionally assign a particle prefab to **Break Effect Prefab** and coins or hearts to **Loot Drops**.
+  fields:
+    health: Damage the object can take before breaking. The default 1 makes it break with any hit.
+    breakEffectPrefab: Prefab spawned where the object breaks (dust, splinters, a sound). Leave empty for none.
+    lootDrops: Prefabs spawned at the object's position when it breaks, one of each. Great with `Collectible` or `HealthPickup` prefabs.
+  events:
+    OnBroken: C# event fired right before the object is destroyed, after effect and loot are spawned.
+  api:
+    ApplyDamage: "`IDamageable` entry point: subtracts `amount` from the remaining health and breaks the object when it reaches zero. Hit point, direction and instigator are ignored."
+  example: |
+    Count how many crates the player has smashed:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    public class CrateCounter : MonoBehaviour
+    {
+        private int _broken;
+
+        private void Start()
+        {
+            foreach (var crate in FindObjectsByType<BreakableObject>(FindObjectsSortMode.None))
+                crate.OnBroken += () => Debug.Log($"Crates broken: {++_broken}");
+        }
+    }
+    ```
+  tips:
+    - Loot spawns exactly at the object's center; give pickups a trigger collider so the player collects them by walking through.
+    - If you need a health bar, hit flashes or death events on a destructible prop, use `DamageableObject` instead.
+es:
+  summary: Una caja, jarrón o pared que se rompe tras recibir suficiente daño, con efecto y botín opcionales.
+  clip_caption: Un golpe rompe una caja pequeña que suelta una moneda; la caja grande necesita tres golpes.
+  description: |
+    `BreakableObject` implementa `IDamageable`, así que cualquier cosa del kit que haga daño puede
+    romperlo: `WeaponMelee`, `WeaponHitscan`, proyectiles, una `HazardZone` o tus propios scripts llamando
+    a `ApplyDamage`. Cada golpe resta su cantidad de **Health**; los golpes de cero o menos se ignoran, igual
+    que el daño que llegue cuando ya se rompió.
+
+    Cuando **Health** llega a cero instancia **Break Effect Prefab** (si lo asignaste) y una copia de cada
+    prefab de **Loot Drops** en su propia posición, dispara `OnBroken` y destruye su GameObject. No hay
+    ventana de invulnerabilidad: varios golpes seguidos cuentan todos.
+  setup:
+    - Crea un GameObject con un `Collider2D` sólido (un `BoxCollider2D` para una caja) y agrégale `BreakableObject`.
+    - Ajusta **Health** al daño total que debe aguantar (el golpe por defecto es 10, así que 30 son tres golpes).
+    - Si quieres, asigna un prefab de partículas en **Break Effect Prefab** y monedas o corazones en **Loot Drops**.
+  fields:
+    health: Daño que aguanta antes de romperse. El valor por defecto, 1, hace que se rompa con cualquier golpe.
+    breakEffectPrefab: Prefab que aparece donde se rompe (polvo, astillas, un sonido). Déjalo vacío si no quieres efecto.
+    lootDrops: Prefabs que aparecen en la posición del objeto al romperse, uno de cada uno. Combina muy bien con prefabs de `Collectible` o `HealthPickup`.
+  events:
+    OnBroken: Evento C# que se dispara justo antes de destruir el objeto, después de crear el efecto y el botín.
+  api:
+    ApplyDamage: "Punto de entrada de `IDamageable`: resta `amount` a la vida restante y rompe el objeto al llegar a cero. Ignora el punto, la dirección y quién golpea."
+  example: |
+    Cuenta cuántas cajas ha destrozado el jugador:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    public class CrateCounter : MonoBehaviour
+    {
+        private int _broken;
+
+        private void Start()
+        {
+            foreach (var crate in FindObjectsByType<BreakableObject>(FindObjectsSortMode.None))
+                crate.OnBroken += () => Debug.Log($"Cajas rotas: {++_broken}");
+        }
+    }
+    ```
+  tips:
+    - El botín aparece justo en el centro del objeto; dale a los recogibles un collider trigger para que el jugador los tome al pasar.
+    - Si necesitas barra de vida, parpadeo al recibir daño o eventos de muerte en un objeto destructible, usa `DamageableObject`.

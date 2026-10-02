@@ -1,0 +1,105 @@
+name: WeaponProjectile
+clip: true
+related: [ProjectileBehaviour, PlayerAttack, WeaponHitscan, CharacterAimAndOrient, EnemyShootOnSight]
+en:
+  summary: Fires physical projectiles — bullets, arrows, fireballs — from a prefab.
+  clip_caption: Three bullets break a training dummy and the fourth flies on until it hits the wall.
+  description: |
+    On each shot, `WeaponProjectile` instantiates **Projectile Prefab** at **Fire Point** (or the object's
+    position) and launches it in the aim direction with **Projectile Speed** and **Damage**. The flight,
+    bouncing and impact are handled by the `ProjectileBehaviour` on the prefab; the shooter is passed as
+    the instigator so the projectile never hits whoever fired it. After a shot the weapon waits
+    **Cooldown** seconds.
+
+    With `PlayerAttack` the shot goes towards `CharacterAimAndOrient` or straight ahead in the facing
+    direction; enemies use it through `EnemyShootOnSight` or `AIActionShoot`. If no prefab is assigned the
+    weapon simply doesn't fire.
+  setup:
+    - "Create the projectile prefab: a sprite with a `Rigidbody2D`, a trigger `Collider2D` and `ProjectileBehaviour`."
+    - Add `WeaponProjectile` to the character (with `PlayerAttack`) and drag the prefab into **Projectile Prefab**.
+    - Optionally assign a muzzle child to **Fire Point**, then press **Attack**.
+  fields:
+    projectilePrefab: The `ProjectileBehaviour` prefab spawned on each shot. Required.
+    firePoint: Optional transform where projectiles spawn. Empty = the object's position.
+    damage: Damage each projectile deals on impact.
+    projectileSpeed: Launch speed in units per second.
+    cooldown: Seconds between shots.
+  api:
+    IsOnCooldown: True while waiting to be able to fire again.
+    TryFire: "Fires in the given direction if not on cooldown and a prefab is set; returns whether it fired. The overload with a damage value overrides **Damage** (used by `WeaponCharge`)."
+  example: |
+    A turret that fires left every two seconds:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class SimpleTurret : MonoBehaviour
+    {
+        [SerializeField] private float interval = 2f;
+        private WeaponProjectile _weapon;
+        private float _timer;
+
+        private void Awake() => _weapon = GetComponent<WeaponProjectile>();
+
+        private void Update()
+        {
+            _timer += Time.deltaTime;
+            if (_timer >= interval && _weapon.TryFire(Vector2.left)) _timer = 0f;
+        }
+    }
+    ```
+  tips:
+    - Projectiles spawn without rotation; for arrows that should point along their flight, rotate them in a script on the prefab.
+    - Move **Fire Point** out of walls; a projectile born inside a solid collider is destroyed (or bounces) immediately.
+es:
+  summary: Dispara proyectiles físicos — balas, flechas, bolas de fuego — a partir de un prefab.
+  clip_caption: Tres balas rompen un muñeco de práctica y la cuarta sigue de largo hasta chocar con la pared.
+  description: |
+    En cada disparo, `WeaponProjectile` instancia **Projectile Prefab** en **Fire Point** (o en la
+    posición del objeto) y lo lanza en la dirección de apuntado con **Projectile Speed** y **Damage**. El
+    vuelo, los rebotes y el impacto los maneja el `ProjectileBehaviour` del prefab; el tirador se pasa
+    como instigador, así que el proyectil nunca golpea a quien lo disparó. Tras un disparo el arma
+    espera **Cooldown** segundos.
+
+    Con `PlayerAttack` el disparo va hacia `CharacterAimAndOrient` o derecho hacia donde mira el
+    personaje; los enemigos lo usan con `EnemyShootOnSight` o `AIActionShoot`. Si no hay prefab asignado
+    el arma simplemente no dispara.
+  setup:
+    - "Crea el prefab del proyectil: un sprite con `Rigidbody2D`, un `Collider2D` trigger y `ProjectileBehaviour`."
+    - Agrega `WeaponProjectile` al personaje (con `PlayerAttack`) y arrastra el prefab a **Projectile Prefab**.
+    - Si quieres, asigna un hijo en la boca del cañón a **Fire Point** y pulsa **Attack**.
+  fields:
+    projectilePrefab: El prefab con `ProjectileBehaviour` que se crea en cada disparo. Obligatorio.
+    firePoint: Transform opcional donde aparecen los proyectiles. Vacío = la posición del objeto.
+    damage: Daño que hace cada proyectil al impactar.
+    projectileSpeed: Velocidad de lanzamiento, en unidades por segundo.
+    cooldown: Segundos entre disparos.
+  api:
+    IsOnCooldown: Verdadero mientras espera para poder disparar otra vez.
+    TryFire: "Dispara en la dirección indicada si no está en cooldown y hay prefab; devuelve si disparó. La sobrecarga con un valor de daño reemplaza **Damage** (la usa `WeaponCharge`)."
+  example: |
+    Una torreta que dispara a la izquierda cada dos segundos:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class SimpleTurret : MonoBehaviour
+    {
+        [SerializeField] private float interval = 2f;
+        private WeaponProjectile _weapon;
+        private float _timer;
+
+        private void Awake() => _weapon = GetComponent<WeaponProjectile>();
+
+        private void Update()
+        {
+            _timer += Time.deltaTime;
+            if (_timer >= interval && _weapon.TryFire(Vector2.left)) _timer = 0f;
+        }
+    }
+    ```
+  tips:
+    - Los proyectiles nacen sin rotación; para flechas que apunten hacia donde vuelan, rótalas con un script en el prefab.
+    - Saca **Fire Point** de las paredes; un proyectil que nace dentro de un collider sólido se destruye (o rebota) al instante.

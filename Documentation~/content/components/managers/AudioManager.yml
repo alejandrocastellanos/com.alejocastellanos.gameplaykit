@@ -1,0 +1,107 @@
+name: AudioManager
+clip: false
+related: [PauseManager, SceneTransitionManager, GameManager]
+en:
+  summary: Plays music with smooth crossfades between tracks and one-shot sound effects from anywhere.
+  description: |
+    `AudioManager` is a persistent singleton (`AudioManager.Instance`, `DontDestroyOnLoad`) for music and
+    sound effects. Music uses two `AudioSource`s: `PlayMusic` starts the new clip on the idle source at
+    volume 0 and fades it in while the current track fades out over **Music Fade Duration**, then stops the
+    old one. Calling `PlayMusic` again during a fade cancels it and starts a new one. The fade runs on
+    unscaled time, so it keeps going while the game is paused.
+
+    Sound effects go through a dedicated source with `PlayOneShot`, so several can overlap. If you leave the
+    sources empty, it creates its own three children (*Music A*, *Music B*, *SFX*) on `Awake` — it works
+    the moment you add it. Assign your own sources when you want to route them to an Audio Mixer. You can
+    keep it under a parent "Managers" object: on `Awake` it moves itself to the scene root, since
+    `DontDestroyOnLoad` only works on root objects.
+  setup:
+    - Add `AudioManager` to a manager object in your first scene.
+    - Optionally assign your own `AudioSource`s (for example routed to Music and SFX mixer groups).
+    - Call `AudioManager.Instance.PlayMusic(clip)` and `PlaySfx(clip)` from your scripts.
+  fields:
+    musicSourceA: First music source. Empty creates one automatically (looping, no play on awake).
+    musicSourceB: Second music source used for the crossfade. Empty creates one automatically.
+    musicFadeDuration: Seconds of the crossfade between tracks. 0 switches instantly.
+    sfxSource: Source used for one-shot effects. Empty creates one automatically.
+  api:
+    Instance: The persistent AudioManager (null if none).
+    PlayMusic: Crossfades to a clip; `loop` defaults to true. Null clips are ignored.
+    PlaySfx: Plays a one-shot effect at an optional volume (0–1). Null clips are ignored.
+    CurrentMusic: The last clip requested with `PlayMusic`.
+    IsMusicPlaying: True while the active music source is playing.
+  example: |
+    Change the music when the player enters a boss arena:
+
+    ```csharp
+    using GameplayKit.Managers;
+    using UnityEngine;
+
+    public class BossMusicZone : MonoBehaviour
+    {
+        [SerializeField] private AudioClip bossTheme;
+        [SerializeField] private AudioClip roar;
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (!other.CompareTag("Player") || AudioManager.Instance == null) return;
+            if (AudioManager.Instance.CurrentMusic != bossTheme) AudioManager.Instance.PlayMusic(bossTheme);
+            AudioManager.Instance.PlaySfx(roar, 0.8f);
+        }
+    }
+    ```
+  tips:
+    - Check `CurrentMusic` before calling `PlayMusic` so re-entering a zone doesn't restart the same track.
+    - Only one AudioManager survives; put it in your first scene and don't duplicate it in later scenes with different settings.
+es:
+  summary: Reproduce música con fundidos suaves entre pistas y efectos de sonido puntuales desde cualquier lugar.
+  description: |
+    `AudioManager` es un singleton persistente (`AudioManager.Instance`, `DontDestroyOnLoad`) para música y
+    efectos. La música usa dos `AudioSource`: `PlayMusic` arranca el clip nuevo en la fuente libre con volumen
+    0 y lo sube mientras la pista actual baja durante **Music Fade Duration**; luego detiene la vieja. Llamar
+    `PlayMusic` otra vez durante un fundido lo cancela y empieza uno nuevo. El fundido usa tiempo sin
+    escalar, así que sigue aunque el juego esté en pausa.
+
+    Los efectos van por una fuente dedicada con `PlayOneShot`, así varios pueden sonar a la vez. Si dejas las
+    fuentes vacías, crea sus propios tres hijos (*Music A*, *Music B*, *SFX*) en `Awake` — funciona apenas lo
+    agregas. Asigna tus propias fuentes cuando quieras enviarlas a un Audio Mixer. Puedes dejarlo dentro de
+    un objeto padre "Managers": en `Awake` se mueve solo a la raíz de la escena, porque `DontDestroyOnLoad`
+    solo funciona con objetos raíz.
+  setup:
+    - Agrega `AudioManager` a un objeto de managers en tu primera escena.
+    - Opcionalmente asigna tus propios `AudioSource` (por ejemplo enviados a los grupos Music y SFX de un mixer).
+    - Llama `AudioManager.Instance.PlayMusic(clip)` y `PlaySfx(clip)` desde tus scripts.
+  fields:
+    musicSourceA: Primera fuente de música. Vacío crea una automáticamente (en loop, sin play on awake).
+    musicSourceB: Segunda fuente de música, usada para el fundido. Vacío crea una automáticamente.
+    musicFadeDuration: Segundos del fundido entre pistas. 0 cambia al instante.
+    sfxSource: Fuente para los efectos puntuales. Vacío crea una automáticamente.
+  api:
+    Instance: El AudioManager persistente (null si no hay).
+    PlayMusic: Hace un fundido hacia un clip; `loop` es true por defecto. Los clips nulos se ignoran.
+    PlaySfx: Reproduce un efecto puntual con un volumen opcional (0–1). Los clips nulos se ignoran.
+    CurrentMusic: El último clip pedido con `PlayMusic`.
+    IsMusicPlaying: Verdadero mientras la fuente de música activa está sonando.
+  example: |
+    Cambia la música cuando el jugador entra a la arena del jefe:
+
+    ```csharp
+    using GameplayKit.Managers;
+    using UnityEngine;
+
+    public class BossMusicZone : MonoBehaviour
+    {
+        [SerializeField] private AudioClip bossTheme;
+        [SerializeField] private AudioClip roar;
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (!other.CompareTag("Player") || AudioManager.Instance == null) return;
+            if (AudioManager.Instance.CurrentMusic != bossTheme) AudioManager.Instance.PlayMusic(bossTheme);
+            AudioManager.Instance.PlaySfx(roar, 0.8f);
+        }
+    }
+    ```
+  tips:
+    - Revisa `CurrentMusic` antes de llamar `PlayMusic` para que volver a entrar a una zona no reinicie la misma pista.
+    - Solo sobrevive un AudioManager; ponlo en tu primera escena y no lo dupliques en escenas posteriores con otra configuración.

@@ -5,6 +5,13 @@ entorno interactivo, cámara, managers y UI. Todo se arma por componentes desde 
 sin escribir código para combinarlos, y funciona con valores por defecto (capas, tags y referencias
 opcionales).
 
+## Documentación
+
+La documentación completa (inglés y español), con un clip de cada componente, guías y referencia del
+Inspector, vive en `Documentation~/` y se publica en GitHub Pages con el workflow
+`.github/workflows/docs.yml` (activa *Settings → Pages → Source: GitHub Actions*). Para verla en local:
+`cd Documentation~ && pip install -r requirements.txt && python tools/generate.py && mkdocs serve`.
+
 ## Empezar en un minuto
 
 - **GameplayKit → Create Demo Scene** genera un nivel jugable que recorre las mecánicas principales.
@@ -88,7 +95,7 @@ Como paquete local (desarrollo), en el `Packages/manifest.json` del proyecto:
 Desde git, una vez publicado:
 
 ```
-"com.alejocastellanos.gameplaykit": "https://github.com/<usuario>/<repo>.git#v1.0.0"
+"com.alejocastellanos.gameplaykit": "https://github.com/<usuario>/<repo>.git#v1.1.0"
 ```
 
 Requiere Unity 6000.0 o superior.

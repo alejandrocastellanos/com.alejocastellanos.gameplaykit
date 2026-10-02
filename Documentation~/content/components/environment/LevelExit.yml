@@ -1,0 +1,90 @@
+name: LevelExit
+clip: true
+related: [SceneTransitionManager, InventoryManager, ItemPickup, GameManager]
+en:
+  summary: The level goal that loads the next scene when the player reaches it, optionally requiring an item.
+  clip_caption: Without the star the exit ignores the player; after picking up the star, touching the exit triggers it (scene loading is disabled in this clip).
+  description: |
+    `LevelExit` goes on a trigger collider. When a collider with **Player Tag** enters it, it checks
+    **Required Item Id** (if set) against the player's `IKeyHolder`, such as `InventoryManager`; without the
+    item nothing happens and the player can come back later. The item is not consumed.
+
+    Once it passes, `Triggered` becomes true, `OnExitReached` fires and the scene is loaded: **Scene Name**
+    if you set one, otherwise the next scene in the build list. If a `SceneTransitionManager` exists the
+    load uses its fade; otherwise it calls `SceneManager.LoadScene` directly. With no **Scene Name** and no
+    next scene in the build list, it logs a warning and stays put. It triggers only once.
+  setup:
+    - Create a GameObject with a `BoxCollider2D` marked **Is Trigger** at the end of the level and add `LevelExit`.
+    - Give the player the **Player** tag and add your levels to **File > Build Profiles** in order (or type a **Scene Name**).
+    - Optionally set **Required Item Id** and place an `ItemPickup` with that id somewhere in the level.
+  fields:
+    sceneName: Scene to load. Empty loads the next scene in the build list.
+    playerTag: Tag that can use the exit. The tag of the touching collider or of its Rigidbody2D must match.
+    requiredItemId: Item the player must carry (checked through `IKeyHolder`, e.g. `InventoryManager`). Empty means no requirement.
+  events:
+    OnExitReached: C# event fired once when the player uses the exit, right before the scene starts loading.
+  api:
+    Triggered: True once the exit has been used. Further touches are ignored.
+  example: |
+    Save progress the moment the exit is reached:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    [RequireComponent(typeof(LevelExit))]
+    public class SaveOnExit : MonoBehaviour
+    {
+        [SerializeField] private int levelNumber = 1;
+
+        private void Awake() =>
+            GetComponent<LevelExit>().OnExitReached += () => PlayerPrefs.SetInt("UnlockedLevel", levelNumber + 1);
+    }
+    ```
+  tips:
+    - Add a `SceneTransitionManager` to any GameObject in the first scene for a fade instead of a hard cut; it creates its own fade layer.
+    - Use **Required Item Id** for "find the key to finish the level"; show the missing item in the HUD so players know why the exit isn't working.
+es:
+  summary: La meta del nivel, que carga la siguiente escena cuando el jugador la alcanza; puede exigir un ítem.
+  clip_caption: Sin la estrella la salida ignora al jugador; tras recogerla, tocar la salida la activa (en este clip la carga de escena está desactivada).
+  description: |
+    `LevelExit` va en un collider trigger. Cuando entra un collider con **Player Tag**, revisa
+    **Required Item Id** (si lo pusiste) en el `IKeyHolder` del jugador, como `InventoryManager`; sin el ítem
+    no pasa nada y el jugador puede volver después. El ítem no se gasta.
+
+    Si pasa el chequeo, `Triggered` pasa a verdadero, se dispara `OnExitReached` y se carga la escena:
+    **Scene Name** si la escribiste, o la siguiente de la lista del build. Si existe un
+    `SceneTransitionManager`, la carga usa su fundido; si no, llama directamente a `SceneManager.LoadScene`.
+    Sin **Scene Name** y sin escena siguiente en el build, registra un aviso y no hace nada más. Se activa
+    una sola vez.
+  setup:
+    - Crea un GameObject con un `BoxCollider2D` marcado como **Is Trigger** al final del nivel y agrégale `LevelExit`.
+    - Dale al jugador el tag **Player** y agrega tus niveles en orden en **File > Build Profiles** (o escribe un **Scene Name**).
+    - Si quieres, pon un **Required Item Id** y coloca en el nivel un `ItemPickup` con ese id.
+  fields:
+    sceneName: Escena a cargar. Vacío carga la siguiente de la lista del build.
+    playerTag: Tag que puede usar la salida. Debe coincidir el tag del collider que la toca o el de su Rigidbody2D.
+    requiredItemId: Ítem que debe llevar el jugador (se revisa con `IKeyHolder`, por ejemplo `InventoryManager`). Vacío significa sin requisito.
+  events:
+    OnExitReached: Evento C# que se dispara una vez cuando el jugador usa la salida, justo antes de empezar a cargar la escena.
+  api:
+    Triggered: Verdadero desde que se usó la salida. Los toques siguientes se ignoran.
+  example: |
+    Guarda el progreso en cuanto se alcanza la salida:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    [RequireComponent(typeof(LevelExit))]
+    public class SaveOnExit : MonoBehaviour
+    {
+        [SerializeField] private int levelNumber = 1;
+
+        private void Awake() =>
+            GetComponent<LevelExit>().OnExitReached += () => PlayerPrefs.SetInt("UnlockedLevel", levelNumber + 1);
+    }
+    ```
+  tips:
+    - Agrega un `SceneTransitionManager` a cualquier GameObject de la primera escena para tener un fundido en vez de un corte seco; crea su propia capa de fundido.
+    - Usa **Required Item Id** para "encuentra la llave para terminar el nivel"; muestra en el HUD el ítem que falta para que se entienda por qué la salida no funciona.

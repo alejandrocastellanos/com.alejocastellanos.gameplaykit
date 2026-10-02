@@ -1,0 +1,103 @@
+name: EnemyPatrol
+clip: true
+related: [EnemyPatrolWithinBounds, EnemyMeleeOnContact, EnemyChase, AIActionPatrolPoints]
+en:
+  summary: Walks back and forth, turning around at walls and at platform edges, with zero configuration.
+  clip_caption: An enemy turns around at the edge of the platform and again when it reaches the wall.
+  description: |
+    The enemy walks horizontally at **Speed** and flips direction (and `localScale.x`) when either check
+    fires: a **wall check** ray forward hits something solid, or an **edge check** ray down, just in front
+    of its feet, finds no ground. It always starts walking to the right.
+
+    Without **Wall Check** / **Edge Check** transforms it uses the edges of its own `Collider2D`: the wall
+    ray starts at the collider's center and reaches **Wall Check Distance** past its front edge, and the
+    edge ray starts slightly ahead of the front-bottom corner and looks **Edge Check Distance** down. Both
+    rays ignore the enemy's own colliders and trigger colliders, so the default *Everything* masks work.
+    Note that other solid characters, the player included, count as walls.
+  setup:
+    - Give the enemy a `Collider2D` and a `Rigidbody2D` (Freeze Rotation Z); `EnemyPatrol` requires the body.
+    - Add `EnemyPatrol` and place the enemy on a platform; it turns at walls and edges on its own.
+    - Optional — add `EnemyMeleeOnContact` and `DamageableObject`, or use the **Create Enemy** menu item that builds this setup.
+  fields:
+    speed: Walking speed in units per second.
+    wallCheck: Optional origin for the forward wall ray. Leave empty to use the collider's center.
+    edgeCheck: Optional origin for the downward edge ray, usually a child just in front of the feet. Leave empty to use the collider's front-bottom corner.
+    wallCheckDistance: How far past the origin (or past the collider's front edge) a wall is detected, in units.
+    edgeCheckDistance: How far down the edge ray looks for ground. Raise it if the enemy turns around on small steps or slopes.
+    obstacleLayers: Layers that count as walls.
+    groundLayers: Layers that count as ground for the edge check.
+  example: |
+    `EnemyPatrol` has no public API; to stop and resume a patrolling enemy (for a cutscene, say) just
+    toggle the component and freeze the body:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class FreezeEnemies : MonoBehaviour
+    {
+        public void SetFrozen(bool frozen)
+        {
+            foreach (var patrol in FindObjectsByType<EnemyPatrol>(FindObjectsSortMode.None))
+            {
+                patrol.enabled = !frozen;
+                if (frozen) patrol.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+            }
+        }
+    }
+    ```
+  tips:
+    - Because the player counts as a wall, a patrolling enemy turns around in front of it; with `EnemyMeleeOnContact` the player still gets hurt by walking into it.
+    - Set **Obstacle Layers** to exclude the player's layer if you want enemies to walk into the player instead.
+    - For a fixed patrol zone on open ground, use `EnemyPatrolWithinBounds`.
+es:
+  summary: Camina de un lado a otro y se da vuelta en paredes y bordes de plataforma, sin configurar nada.
+  clip_caption: Un enemigo se da vuelta en el borde de la plataforma y otra vez al llegar a la pared.
+  description: |
+    El enemigo camina en horizontal a **Speed** y cambia de dirección (y de `localScale.x`) cuando se
+    cumple alguno de los chequeos: un rayo de **pared** hacia adelante choca con algo sólido, o un rayo de
+    **borde** hacia abajo, justo delante de sus pies, no encuentra suelo. Siempre empieza caminando hacia
+    la derecha.
+
+    Sin transforms en **Wall Check** / **Edge Check** usa los bordes de su propio `Collider2D`: el rayo de
+    pared sale del centro del collider y llega **Wall Check Distance** más allá de su borde delantero, y el
+    rayo de borde sale un poco por delante de la esquina inferior delantera y mira **Edge Check Distance**
+    hacia abajo. Ambos ignoran los colliders del propio enemigo y los triggers, por eso las máscaras por
+    defecto *Everything* funcionan. Ojo: otros personajes sólidos, incluido el jugador, cuentan como
+    pared.
+  setup:
+    - Dale al enemigo un `Collider2D` y un `Rigidbody2D` (Freeze Rotation Z); `EnemyPatrol` requiere el cuerpo.
+    - Agrega `EnemyPatrol` y pon al enemigo sobre una plataforma; se da vuelta solo en paredes y bordes.
+    - Opcional — agrega `EnemyMeleeOnContact` y `DamageableObject`, o usa el menú **Create Enemy**, que arma justo eso.
+  fields:
+    speed: Velocidad de caminata en unidades por segundo.
+    wallCheck: Origen opcional del rayo de pared. Déjalo vacío para usar el centro del collider.
+    edgeCheck: Origen opcional del rayo de borde, normalmente un hijo justo delante de los pies. Déjalo vacío para usar la esquina inferior delantera del collider.
+    wallCheckDistance: Hasta qué distancia más allá del origen (o del borde delantero del collider) se detecta una pared, en unidades.
+    edgeCheckDistance: Cuánto mira hacia abajo el rayo de borde buscando suelo. Súbelo si el enemigo se da vuelta en escalones o pendientes pequeñas.
+    obstacleLayers: Capas que cuentan como pared.
+    groundLayers: Capas que cuentan como suelo para el chequeo de borde.
+  example: |
+    `EnemyPatrol` no tiene API pública; para detener y reanudar a un enemigo que patrulla (en una
+    cinemática, por ejemplo) basta con desactivar el componente y frenar el cuerpo:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class FreezeEnemies : MonoBehaviour
+    {
+        public void SetFrozen(bool frozen)
+        {
+            foreach (var patrol in FindObjectsByType<EnemyPatrol>(FindObjectsSortMode.None))
+            {
+                patrol.enabled = !frozen;
+                if (frozen) patrol.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+            }
+        }
+    }
+    ```
+  tips:
+    - Como el jugador cuenta como pared, un enemigo que patrulla se da vuelta frente a él; con `EnemyMeleeOnContact` el jugador igual se lastima si camina hacia el enemigo.
+    - Quita la capa del jugador de **Obstacle Layers** si quieres que los enemigos lo choquen en vez de darse vuelta.
+    - Para una zona de patrulla fija en terreno abierto, usa `EnemyPatrolWithinBounds`.

@@ -1,0 +1,73 @@
+name: CharacterAnimatorBridge
+clip: false
+related: [CharacterCore, CharacterController2D, CharacterHealth, CharacterDeath]
+en:
+  summary: Feeds speed, grounded, movement state, death and hits into your Animator without writing code.
+  description: |
+    Every `LateUpdate`, `CharacterAnimatorBridge` writes the character's state into the Animator
+    Controller's parameters: **Speed** (float, absolute horizontal velocity), **VelocityY** (float),
+    **Grounded** (bool), **MovementState** (int) and **Dead** (bool, true while the condition is `Dead`).
+    When the character takes damage it fires the **Hit** trigger. Speed, VelocityY and Grounded come from
+    `CharacterController2D`; MovementState and Dead come from `CharacterCore`; Hit listens to any
+    `IHealthSource` on the object or its parents (`CharacterHealth`, `DamageableObject`).
+
+    Only parameters that really exist in the controller are written. It reads the controller's parameter
+    list once (and again if you swap the controller), so a missing parameter is silently ignored: you can
+    start with just **Speed** and add the rest later. Nothing happens while there is no Animator or the
+    Animator has no controller.
+
+    **MovementState** is the index of the `MovementState` enum: 0 Idle, 1 Walking, 2 Running, 3 Jumping,
+    4 Falling, 5 Dashing, 6 WallSliding, 7 Crouching, 8 Swimming. Use it in transition conditions
+    (*Equals 2* → run animation).
+  setup:
+    - Add an `Animator` with an Animator Controller to the character (or to a child sprite object).
+    - Add `CharacterAnimatorBridge` to the character root, next to `CharacterCore`.
+    - "Create the parameters you want in the controller with these exact names and types: Speed (Float), VelocityY (Float), Grounded (Bool), MovementState (Int), Dead (Bool), Hit (Trigger)."
+    - Use them in your transitions; rename any of them in the Inspector if your controller already uses other names.
+  fields:
+    animator: Animator to drive. Empty uses the first Animator on the object or its children.
+    speedParameter: Float parameter that receives the absolute horizontal speed, in units per second.
+    verticalVelocityParameter: Float parameter that receives the vertical velocity (positive going up, negative falling).
+    groundedParameter: Bool parameter that is true while `CharacterController2D` detects ground.
+    movementStateParameter: Int parameter that receives the current `MovementState` as a number (0 Idle … 8 Swimming).
+    deadParameter: Bool parameter that is true while the character's condition is `Dead`.
+    hitTrigger: Trigger parameter fired every time the health source reports damage.
+  tips:
+    - Clear a parameter name in the Inspector to stop writing that value; an empty name never matches a parameter.
+    - Match the types exactly (Float, Bool, Int, Trigger); the bridge picks the setter by value type, not by what the controller declares.
+    - "`CharacterDeath` also fires its own **Die** trigger on death; use either that trigger or the **Dead** bool, not both, for the death transition."
+es:
+  summary: Envía velocidad, suelo, estado de movimiento, muerte y golpes a tu Animator sin escribir código.
+  description: |
+    Cada `LateUpdate`, `CharacterAnimatorBridge` escribe el estado del personaje en los parámetros del
+    Animator Controller: **Speed** (float, velocidad horizontal absoluta), **VelocityY** (float),
+    **Grounded** (bool), **MovementState** (int) y **Dead** (bool, verdadero mientras la condición sea
+    `Dead`). Cuando el personaje recibe daño dispara el trigger **Hit**. Speed, VelocityY y Grounded salen
+    de `CharacterController2D`; MovementState y Dead de `CharacterCore`; Hit escucha a cualquier
+    `IHealthSource` del objeto o sus padres (`CharacterHealth`, `DamageableObject`).
+
+    Solo se escriben los parámetros que existen de verdad en el controller. Lee la lista de parámetros una
+    vez (y otra vez si cambias el controller), así que un parámetro que falta se ignora sin errores: puedes
+    empezar solo con **Speed** y agregar el resto después. No hace nada mientras no haya Animator o el
+    Animator no tenga controller.
+
+    **MovementState** es el índice del enum `MovementState`: 0 Idle, 1 Walking, 2 Running, 3 Jumping,
+    4 Falling, 5 Dashing, 6 WallSliding, 7 Crouching, 8 Swimming. Úsalo en las condiciones de las
+    transiciones (*Equals 2* → animación de correr).
+  setup:
+    - Agrega un `Animator` con un Animator Controller al personaje (o a un hijo con el sprite).
+    - Agrega `CharacterAnimatorBridge` a la raíz del personaje, junto a `CharacterCore`.
+    - "Crea en el controller los parámetros que quieras con estos nombres y tipos exactos: Speed (Float), VelocityY (Float), Grounded (Bool), MovementState (Int), Dead (Bool), Hit (Trigger)."
+    - Úsalos en tus transiciones; cambia cualquier nombre en el Inspector si tu controller ya usa otros.
+  fields:
+    animator: Animator a controlar. Vacío usa el primer Animator del objeto o de sus hijos.
+    speedParameter: Parámetro Float que recibe la velocidad horizontal absoluta, en unidades por segundo.
+    verticalVelocityParameter: Parámetro Float que recibe la velocidad vertical (positiva subiendo, negativa cayendo).
+    groundedParameter: Parámetro Bool que es verdadero mientras `CharacterController2D` detecta suelo.
+    movementStateParameter: Parámetro Int que recibe el `MovementState` actual como número (0 Idle … 8 Swimming).
+    deadParameter: Parámetro Bool que es verdadero mientras la condición del personaje sea `Dead`.
+    hitTrigger: Parámetro Trigger que se dispara cada vez que la fuente de vida reporta daño.
+  tips:
+    - Borra el nombre de un parámetro en el Inspector para dejar de escribir ese valor; un nombre vacío nunca coincide con un parámetro.
+    - Respeta los tipos exactos (Float, Bool, Int, Trigger); el puente elige el setter según el tipo del valor, no según lo que declare el controller.
+    - "`CharacterDeath` también dispara su propio trigger **Die** al morir; para la transición de muerte usa ese trigger o el bool **Dead**, no los dos."

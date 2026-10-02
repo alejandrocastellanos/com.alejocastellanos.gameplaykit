@@ -1,0 +1,143 @@
+name: CharacterHealth
+clip: true
+related: [CharacterDeath, CharacterKnockback, DamageFlash, HealthPickup, UIHealthBar]
+en:
+  summary: Gives a character hit points, damage, healing, short invulnerability after each hit, and death.
+  clip_caption: Standing on spikes drains HP in steps with a red flash after each hit, then a heart pickup heals it back.
+  description: |
+    `CharacterHealth` stores the character's hit points. It starts at **Max Health** and every source of
+    damage in the kit reaches it through the `IDamageable` interface: weapons, `HazardZone`,
+    `EnemyMeleeOnContact`, projectiles... When `CurrentHealth` hits 0 the character is marked dead and
+    `OnDeath` fires once; add `CharacterDeath` to react to it (freeze abilities, play an animation).
+
+    After each hit the character is invulnerable for **Invulnerability Duration** seconds and ignores any
+    other damage, so standing on spikes hurts in steps instead of every frame. Damage is also ignored
+    while dead, and amounts of 0 or less do nothing. `Heal` never goes above the maximum and does nothing
+    once the character is dead; `ResetHealth` revives it with full health (that is what
+    `CharacterRespawn` calls).
+
+    When the damage arrives through `ApplyDamage` with a direction and the object has a
+    `CharacterKnockback`, it is pushed back automatically. It does not need `CharacterCore`, so you can
+    also use it on simple enemies or props. Many kit components listen to it: `UIHealthBar`,
+    `DamageFlash`, `DamagePopupSpawner`, `CharacterAnimatorBridge`, `AIDecisionHealthThreshold`,
+    `PlayerRollDodge` (invulnerable while rolling) and `LevelManager` (kills characters that fall below
+    the void).
+  setup:
+    - Add `CharacterHealth` to your player or enemy (the **GameplayKit > Create Player** menu already includes it).
+    - Set **Max Health** and **Invulnerability Duration**.
+    - Add `CharacterDeath` (and `CharacterRespawn` for the player) so something happens when health reaches 0.
+    - Optionally add `DamageFlash`, `CharacterKnockback` and a `UIHealthBar` for feedback.
+  fields:
+    maxHealth: Maximum and starting hit points (100 by default).
+    invulnerabilityDuration: Seconds of immunity after taking a hit (0.5 by default). Set it to 0 to receive every hit, for example on enemies hit by fast weapons.
+  events:
+    OnHealthChanged: "C# event fired after damage, healing or a reset, with `(current, max)`. Ideal for health bars."
+    OnDamaged: C# event fired with the damage amount every time a hit actually lands.
+    OnHealed: C# event fired with the amount every time `Heal` succeeds.
+    OnDeath: C# event fired once when health reaches 0.
+  api:
+    MaxHealth: The configured maximum health.
+    CurrentHealth: Current hit points, between 0 and `MaxHealth`.
+    IsInvulnerable: True while the post-hit (or granted) immunity is active.
+    IsDead: True from the moment health reaches 0 until `ResetHealth` is called.
+    Active: Static list of every enabled `CharacterHealth` in the scene.
+    ApplyDamage: "`IDamageable` entry point used by weapons: applies the damage and, if there is a `CharacterKnockback` and a direction, pushes the character."
+    TakeDamage: Subtracts health directly, without knockback. Respects invulnerability and death.
+    GrantInvulnerability: Makes the character immune for some seconds without shortening a longer immunity already running.
+    Heal: Restores health up to the maximum. Ignored if the character is dead.
+    ResetHealth: Revives the character with full health and clears invulnerability.
+  example: |
+    Play a sound when the player is hurt and heal from a script:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class HurtSound : MonoBehaviour
+    {
+        [SerializeField] private AudioSource hurt;
+        private CharacterHealth _health;
+
+        private void Awake() => _health = GetComponent<CharacterHealth>();
+        private void OnEnable() => _health.OnDamaged += PlayHurt;
+        private void OnDisable() => _health.OnDamaged -= PlayHurt;
+
+        private void PlayHurt(float amount) => hurt.Play();
+
+        public void DrinkPotion() => _health.Heal(30f);
+    }
+    ```
+  tips:
+    - Keep **Invulnerability Duration** a bit shorter than the interval of your hazards if you want every tick to hurt.
+    - "`TakeDamage` skips knockback; call `ApplyDamage` with a direction from your own damage sources if you want the push."
+    - For crates, barrels and props that don't need invulnerability or death logic, `DamageableObject` is lighter.
+es:
+  summary: Le da al personaje puntos de vida, daño, curación, invulnerabilidad breve tras cada golpe y muerte.
+  clip_caption: Parado sobre pinchos, la vida baja a saltos con un destello rojo tras cada golpe y luego un corazón la recupera.
+  description: |
+    `CharacterHealth` guarda los puntos de vida del personaje. Empieza en **Max Health** y todas las
+    fuentes de daño del kit llegan a él por la interfaz `IDamageable`: armas, `HazardZone`,
+    `EnemyMeleeOnContact`, proyectiles... Cuando `CurrentHealth` llega a 0 el personaje queda muerto y
+    `OnDeath` se dispara una sola vez; agrega `CharacterDeath` para reaccionar (congelar habilidades,
+    animación de muerte).
+
+    Después de cada golpe el personaje es invulnerable durante **Invulnerability Duration** segundos e
+    ignora cualquier otro daño, así que pararse sobre pinchos duele a saltos y no en cada frame. El daño
+    también se ignora estando muerto, y las cantidades de 0 o menos no hacen nada. `Heal` nunca pasa del
+    máximo y no hace nada si ya murió; `ResetHealth` lo revive con la vida llena (es lo que llama
+    `CharacterRespawn`).
+
+    Si el daño llega por `ApplyDamage` con una dirección y el objeto tiene `CharacterKnockback`, sale
+    empujado automáticamente. No necesita `CharacterCore`, así que sirve también para enemigos simples u
+    objetos. Muchos componentes del kit lo escuchan: `UIHealthBar`, `DamageFlash`, `DamagePopupSpawner`,
+    `CharacterAnimatorBridge`, `AIDecisionHealthThreshold`, `PlayerRollDodge` (invulnerable mientras
+    rueda) y `LevelManager` (mata a quien cae por debajo del vacío).
+  setup:
+    - Agrega `CharacterHealth` a tu jugador o enemigo (el menú **GameplayKit > Create Player** ya lo incluye).
+    - Ajusta **Max Health** e **Invulnerability Duration**.
+    - Agrega `CharacterDeath` (y `CharacterRespawn` en el jugador) para que pase algo cuando la vida llegue a 0.
+    - Si quieres feedback, suma `DamageFlash`, `CharacterKnockback` y un `UIHealthBar`.
+  fields:
+    maxHealth: Vida máxima e inicial (100 por defecto).
+    invulnerabilityDuration: Segundos de inmunidad tras recibir un golpe (0.5 por defecto). Ponlo en 0 para recibir todos los golpes, por ejemplo en enemigos que reciben armas rápidas.
+  events:
+    OnHealthChanged: "Evento C# que se dispara tras un daño, una curación o un reinicio, con `(current, max)`. Ideal para barras de vida."
+    OnDamaged: Evento C# con la cantidad de daño, cada vez que un golpe entra de verdad.
+    OnHealed: Evento C# con la cantidad curada, cada vez que `Heal` tiene efecto.
+    OnDeath: Evento C# que se dispara una vez cuando la vida llega a 0.
+  api:
+    MaxHealth: La vida máxima configurada.
+    CurrentHealth: Vida actual, entre 0 y `MaxHealth`.
+    IsInvulnerable: Verdadero mientras dura la inmunidad tras un golpe (o la concedida por código).
+    IsDead: Verdadero desde que la vida llega a 0 hasta que se llama a `ResetHealth`.
+    Active: Lista estática con todos los `CharacterHealth` activos de la escena.
+    ApplyDamage: "Punto de entrada de `IDamageable` que usan las armas: aplica el daño y, si hay `CharacterKnockback` y una dirección, empuja al personaje."
+    TakeDamage: Resta vida directamente, sin empujón. Respeta la invulnerabilidad y la muerte.
+    GrantInvulnerability: Vuelve inmune al personaje unos segundos sin acortar una inmunidad más larga que ya esté activa.
+    Heal: Recupera vida hasta el máximo. Se ignora si el personaje está muerto.
+    ResetHealth: Revive al personaje con la vida llena y quita la invulnerabilidad.
+  example: |
+    Reproduce un sonido cuando el jugador recibe daño y cúralo desde un script:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class HurtSound : MonoBehaviour
+    {
+        [SerializeField] private AudioSource hurt;
+        private CharacterHealth _health;
+
+        private void Awake() => _health = GetComponent<CharacterHealth>();
+        private void OnEnable() => _health.OnDamaged += PlayHurt;
+        private void OnDisable() => _health.OnDamaged -= PlayHurt;
+
+        private void PlayHurt(float amount) => hurt.Play();
+
+        public void DrinkPotion() => _health.Heal(30f);
+    }
+    ```
+  tips:
+    - Deja **Invulnerability Duration** un poco por debajo del intervalo de tus trampas si quieres que cada golpe cuente.
+    - "`TakeDamage` no empuja; desde tus propias fuentes de daño llama a `ApplyDamage` con una dirección si quieres el knockback."
+    - Para cajas, barriles y objetos que no necesitan invulnerabilidad ni lógica de muerte, `DamageableObject` es más liviano.

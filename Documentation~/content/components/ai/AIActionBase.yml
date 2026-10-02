@@ -1,0 +1,199 @@
+name: AIActionBase
+clip: false
+related: [AIBrain, AIDecisionBase, AIActionMoveToTarget, AIActionWait]
+en:
+  summary: Base class for AI actions — inherit from it to teach an AIBrain new things an enemy can do in a state.
+  description: |
+    An action is *something an enemy does while a state is active*: walk between points, chase, shoot,
+    wait. `AIActionBase` is an abstract `MonoBehaviour` with one required method and two optional hooks:
+
+    - `PerformAction(AIBrain brain)` (abstract) is called by the `AIBrain` **every frame** (from its
+      `Update`) while a state that lists this action is active. Use `Time.deltaTime` for timers and read
+      the shared target with `brain.Target`, which can be null.
+    - `OnEnterState(AIBrain brain)` runs once when the brain enters a state that contains the action.
+      Reset timers or counters here.
+    - `OnExitState(AIBrain brain)` runs once when the brain leaves that state. Stop movement here, as the
+      built-in movement actions do by zeroing the horizontal velocity.
+
+    You don't write an `Update` in your action: the brain decides when it runs, and only in the states
+    it is listed in. Unticking the component in the Inspector skips its `PerformAction` (the enter and
+    exit hooks still run on state changes). The action
+    lives on a GameObject like any component, so it uses its own `transform` and `GetComponent` calls;
+    put movement actions on the enemy root, next to its `Rigidbody2D`. A single action component can
+    appear in several states and keeps its fields between them (that is how `AIActionPatrolPoints`
+    remembers the next waypoint after a chase).
+  setup:
+    - Create a C# script, add `using GameplayKit.AI;` and make the class inherit from `AIActionBase`.
+    - Override `PerformAction` (and `OnEnterState` / `OnExitState` if you need them), exposing settings with `[SerializeField]`.
+    - Add the component to the enemy that has the `AIBrain`.
+    - Drag the component into the **Actions** list of one or more states in the `AIBrain`.
+  api:
+    PerformAction: Called every frame while the action's state is active. Required.
+    OnEnterState: Called once when the brain enters a state containing this action. Empty by default.
+    OnExitState: Called once when the brain leaves that state. Empty by default.
+  example: |
+    The built-in `AIActionMoveToTarget` and `AIActionFlee` don't flip the sprite. This small action
+    turns the enemy towards its target; list it in the same state as the movement action:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class AIActionFaceTarget : AIActionBase
+    {
+        public override void PerformAction(AIBrain brain)
+        {
+            if (brain.Target == null) return;
+
+            float direction = Mathf.Sign(brain.Target.position.x - transform.position.x);
+            Vector3 scale = transform.localScale;
+            scale.x = Mathf.Abs(scale.x) * direction;
+            transform.localScale = scale;
+        }
+    }
+    ```
+
+    A fuller action that uses all three hooks: the enemy hops towards the target at a fixed rhythm and
+    stops dead when the state ends.
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    [RequireComponent(typeof(Rigidbody2D))]
+    public class AIActionHopTowardTarget : AIActionBase
+    {
+        [SerializeField] private float hopInterval = 0.8f;
+        [SerializeField] private Vector2 hopVelocity = new Vector2(3f, 6f);
+
+        private Rigidbody2D _rb;
+        private float _timer;
+
+        private void Awake() => _rb = GetComponent<Rigidbody2D>();
+
+        public override void OnEnterState(AIBrain brain)
+        {
+            _timer = 0f; // first hop right away
+        }
+
+        public override void PerformAction(AIBrain brain)
+        {
+            if (brain.Target == null) return;
+
+            _timer -= Time.deltaTime;
+            if (_timer > 0f) return;
+
+            float direction = Mathf.Sign(brain.Target.position.x - transform.position.x);
+            _rb.linearVelocity = new Vector2(direction * hopVelocity.x, hopVelocity.y);
+            _timer = hopInterval;
+        }
+
+        public override void OnExitState(AIBrain brain)
+        {
+            _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
+        }
+    }
+    ```
+  tips:
+    - Always handle `brain.Target == null`; a spawned enemy may run a frame before it gets a target.
+    - Keep each action focused on one job and combine several in a state (move + face target + shoot) instead of writing one big action.
+    - If an action needs a timer that restarts each time the state is entered, reset it in `OnEnterState`; otherwise it keeps its value from the last visit.
+es:
+  summary: Clase base para acciones de IA — hereda de ella para enseñarle a un AIBrain cosas nuevas que un enemigo puede hacer en un estado.
+  description: |
+    Una acción es *algo que un enemigo hace mientras un estado está activo*: caminar entre puntos,
+    perseguir, disparar, esperar. `AIActionBase` es un `MonoBehaviour` abstracto con un método obligatorio
+    y dos ganchos opcionales:
+
+    - `PerformAction(AIBrain brain)` (abstracto) lo llama el `AIBrain` **en cada frame** (desde su
+      `Update`) mientras esté activo un estado que incluya esta acción. Usa `Time.deltaTime` para los
+      temporizadores y lee el objetivo compartido con `brain.Target`, que puede ser null.
+    - `OnEnterState(AIBrain brain)` se ejecuta una vez cuando el cerebro entra a un estado que contiene la
+      acción. Reinicia temporizadores o contadores aquí.
+    - `OnExitState(AIBrain brain)` se ejecuta una vez cuando el cerebro sale de ese estado. Detén el
+      movimiento aquí, como hacen las acciones de movimiento incluidas poniendo en cero la velocidad
+      horizontal.
+
+    No escribes un `Update` en tu acción: el cerebro decide cuándo corre, y solo en los estados donde
+    aparece. Si desmarcas el componente en el Inspector, el cerebro se salta su `PerformAction` (los
+    hooks de entrada y salida siguen corriendo al cambiar de estado). La acción
+    vive en un GameObject como cualquier componente, así que usa su propio `transform` y sus propias
+    llamadas a `GetComponent`; pon las acciones de movimiento en la raíz del enemigo, junto a su
+    `Rigidbody2D`. Un mismo componente de acción puede aparecer en varios estados y conserva sus campos
+    entre ellos (así `AIActionPatrolPoints` recuerda el siguiente punto después de una persecución).
+  setup:
+    - Crea un script de C#, agrega `using GameplayKit.AI;` y haz que la clase herede de `AIActionBase`.
+    - Sobrescribe `PerformAction` (y `OnEnterState` / `OnExitState` si los necesitas), exponiendo la configuración con `[SerializeField]`.
+    - Agrega el componente al enemigo que tiene el `AIBrain`.
+    - Arrastra el componente a la lista **Actions** de uno o más estados del `AIBrain`.
+  api:
+    PerformAction: Se llama en cada frame mientras el estado de la acción está activo. Obligatorio.
+    OnEnterState: Se llama una vez cuando el cerebro entra a un estado que contiene esta acción. Vacío por defecto.
+    OnExitState: Se llama una vez cuando el cerebro sale de ese estado. Vacío por defecto.
+  example: |
+    `AIActionMoveToTarget` y `AIActionFlee` no voltean el sprite. Esta acción pequeña gira al enemigo
+    hacia su objetivo; ponla en el mismo estado que la acción de movimiento:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class AIActionFaceTarget : AIActionBase
+    {
+        public override void PerformAction(AIBrain brain)
+        {
+            if (brain.Target == null) return;
+
+            float direction = Mathf.Sign(brain.Target.position.x - transform.position.x);
+            Vector3 scale = transform.localScale;
+            scale.x = Mathf.Abs(scale.x) * direction;
+            transform.localScale = scale;
+        }
+    }
+    ```
+
+    Una acción más completa que usa los tres ganchos: el enemigo da saltitos hacia el objetivo con un
+    ritmo fijo y se frena en seco cuando termina el estado.
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    [RequireComponent(typeof(Rigidbody2D))]
+    public class AIActionHopTowardTarget : AIActionBase
+    {
+        [SerializeField] private float hopInterval = 0.8f;
+        [SerializeField] private Vector2 hopVelocity = new Vector2(3f, 6f);
+
+        private Rigidbody2D _rb;
+        private float _timer;
+
+        private void Awake() => _rb = GetComponent<Rigidbody2D>();
+
+        public override void OnEnterState(AIBrain brain)
+        {
+            _timer = 0f; // el primer salto sale enseguida
+        }
+
+        public override void PerformAction(AIBrain brain)
+        {
+            if (brain.Target == null) return;
+
+            _timer -= Time.deltaTime;
+            if (_timer > 0f) return;
+
+            float direction = Mathf.Sign(brain.Target.position.x - transform.position.x);
+            _rb.linearVelocity = new Vector2(direction * hopVelocity.x, hopVelocity.y);
+            _timer = hopInterval;
+        }
+
+        public override void OnExitState(AIBrain brain)
+        {
+            _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
+        }
+    }
+    ```
+  tips:
+    - Siempre contempla `brain.Target == null`; un enemigo generado puede correr un frame antes de recibir objetivo.
+    - Mantén cada acción enfocada en una tarea y combina varias en un estado (moverse + mirar al objetivo + disparar) en vez de escribir una acción gigante.
+    - Si una acción necesita un temporizador que se reinicie cada vez que se entra al estado, reinícialo en `OnEnterState`; si no, conserva el valor de la visita anterior.

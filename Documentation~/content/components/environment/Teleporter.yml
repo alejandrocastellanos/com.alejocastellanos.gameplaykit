@@ -1,0 +1,52 @@
+name: Teleporter
+clip: true
+related: [PlayerTeleportBlink, Checkpoint, CameraFollow, MovingPlatform]
+en:
+  summary: A portal that instantly moves whoever enters it to a destination point, keeping their momentum.
+  clip_caption: The player walks into the left portal, comes out of the right one, then walks back in and returns.
+  description: |
+    `Teleporter` works with a trigger collider. When a collider with **Target Tag** enters (an empty tag
+    accepts anything), the object that owns it, its `Rigidbody2D` if it has one, is moved to
+    **Destination**'s position. With **Preserve Velocity** on, it keeps moving at the same speed and
+    direction; otherwise it arrives stopped.
+
+    After a jump the traveller can't teleport again for **Cooldown** seconds, and that timer is shared by
+    every teleporter. That's what makes two-way portals work: point A at B and B at A, and arriving inside B
+    won't bounce you straight back to A. Without a **Destination** it does nothing.
+  setup:
+    - Create a GameObject with a `BoxCollider2D` marked **Is Trigger** and add `Teleporter`.
+    - Create the exit (an empty GameObject or a second teleporter) and drag it into **Destination**.
+    - Give the player the **Player** tag. For a pair of portals, make each one the other's **Destination**.
+  fields:
+    destination: Transform the traveller is moved to. Its position is read at the moment of teleporting, so it can move.
+    targetTag: Tag of the objects that can teleport (the collider's or its Rigidbody2D's). Empty lets everything through, boxes and enemies included.
+    cooldown: Seconds after a teleport during which the same object can't teleport again, through any teleporter.
+    preserveVelocity: Keeps the traveller's velocity after the jump. Turn it off to make it arrive standing still.
+  tips:
+    - If the camera uses `CameraFollow` with smoothing, the view will sweep to the new place; that's often a nice effect, but long jumps may feel better with a fade.
+    - Put the destination slightly above the ground so the character lands instead of spawning inside the floor.
+es:
+  summary: Un portal que mueve al instante a quien entra hasta un punto de destino, conservando su impulso.
+  clip_caption: El jugador entra al portal izquierdo, sale por el derecho, luego vuelve a entrar y regresa.
+  description: |
+    `Teleporter` funciona con un collider trigger. Cuando entra un collider con **Target Tag** (un tag vacío
+    acepta cualquier cosa), el objeto dueño, su `Rigidbody2D` si lo tiene, se mueve a la posición de
+    **Destination**. Con **Preserve Velocity** activo sigue moviéndose a la misma velocidad y dirección; si
+    no, llega detenido.
+
+    Tras un salto, el viajero no puede volver a teletransportarse durante **Cooldown** segundos, y ese
+    temporizador es compartido por todos los teletransportadores. Eso hace que funcionen los portales de
+    ida y vuelta: apunta A hacia B y B hacia A, y aparecer dentro de B no te devolverá de inmediato a A. Sin
+    **Destination** no hace nada.
+  setup:
+    - Crea un GameObject con un `BoxCollider2D` marcado como **Is Trigger** y agrégale `Teleporter`.
+    - Crea la salida (un GameObject vacío u otro teletransportador) y arrástrala a **Destination**.
+    - Dale al jugador el tag **Player**. Para un par de portales, haz que cada uno sea el **Destination** del otro.
+  fields:
+    destination: Transform al que se mueve el viajero. Su posición se lee en el momento del salto, así que puede moverse.
+    targetTag: Tag de los objetos que pueden teletransportarse (el del collider o el de su Rigidbody2D). Vacío deja pasar todo, incluidas cajas y enemigos.
+    cooldown: Segundos tras un salto durante los que el mismo objeto no puede volver a teletransportarse, por ningún portal.
+    preserveVelocity: Conserva la velocidad del viajero tras el salto. Desactívalo para que llegue quieto.
+  tips:
+    - Si la cámara usa `CameraFollow` con suavizado, la vista hará un barrido hasta el nuevo lugar; suele verse bien, pero los saltos largos pueden quedar mejor con un fundido.
+    - Pon el destino un poco por encima del suelo para que el personaje caiga en vez de aparecer dentro del piso.

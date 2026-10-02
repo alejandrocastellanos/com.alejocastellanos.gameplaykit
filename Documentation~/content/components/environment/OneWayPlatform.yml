@@ -1,0 +1,44 @@
+name: OneWayPlatform
+clip: true
+related: [PlayerDropThrough, PlayerJump, MovingPlatform, FallingPlatform]
+en:
+  summary: A platform you can jump through from below and stand on from above.
+  clip_caption: The player jumps up through the platform, lands on top, then walks off the edge.
+  description: |
+    `OneWayPlatform` sets up Unity's `PlatformEffector2D` for you. It requires the effector (added
+    automatically), adds a `BoxCollider2D` if the object has no collider (an existing Edge or Polygon
+    collider is respected) and marks the collider as **Used By Effector**. When you add it in the Editor it
+    also turns on the effector's **Use One Way** and copies **Surface Arc** into it.
+
+    The result: characters and objects pass through the platform from below and from the sides, and land
+    on it from above. Add `PlayerDropThrough` to the player to let it drop down through the platform by
+    pressing down + jump.
+  setup:
+    - Create a thin GameObject (for example 4 × 0.3) and add `OneWayPlatform`; the effector and collider are configured for you.
+    - Add `PlayerJump` to your player to jump onto it from below.
+    - Optionally add `PlayerDropThrough` to the player so it can drop down through it.
+  fields:
+    surfaceArc: Angle in degrees of the solid top surface, copied to the effector's **Surface Arc** when the component is added in the Editor. Changing it later doesn't update the effector; edit the `PlatformEffector2D` directly.
+  tips:
+    - Keep platforms thin; with a very tall collider a character can get stuck halfway through when its jump runs out.
+    - Combine it with `MovingPlatform` for moving ledges the player can reach from underneath.
+es:
+  summary: Una plataforma que se atraviesa saltando desde abajo y es sólida desde arriba.
+  clip_caption: El jugador salta atravesando la plataforma, cae encima y luego sale por el borde.
+  description: |
+    `OneWayPlatform` configura por ti el `PlatformEffector2D` de Unity. Requiere el effector (se agrega
+    solo), agrega un `BoxCollider2D` si el objeto no tiene collider (si ya tiene uno Edge o Polygon, lo
+    respeta) y marca el collider como **Used By Effector**. Al agregarlo en el Editor también activa
+    **Use One Way** en el effector y le copia **Surface Arc**.
+
+    El resultado: personajes y objetos atraviesan la plataforma desde abajo y de lado, y se apoyan en ella
+    desde arriba. Agrega `PlayerDropThrough` al jugador para que pueda bajar atravesándola con abajo + salto.
+  setup:
+    - Crea un GameObject delgado (por ejemplo 4 × 0.3) y agrégale `OneWayPlatform`; el effector y el collider se configuran solos.
+    - Agrega `PlayerJump` a tu jugador para subir saltando desde abajo.
+    - Si quieres, agrega `PlayerDropThrough` al jugador para que pueda bajar atravesándola.
+  fields:
+    surfaceArc: Ángulo en grados de la superficie sólida superior, que se copia al **Surface Arc** del effector cuando agregas el componente en el Editor. Cambiarlo después no actualiza el effector; edita el `PlatformEffector2D` directamente.
+  tips:
+    - Mantén las plataformas delgadas; con un collider muy alto el personaje puede quedar atascado a medio camino cuando se le acaba el salto.
+    - Combínala con `MovingPlatform` para cornisas móviles a las que se llega desde abajo.

@@ -1,0 +1,87 @@
+name: CharacterFallDamage
+clip: true
+related: [CharacterHealth, CharacterGravityController, PlayerRollDodge, DamageFlash]
+en:
+  summary: Hurts the character when it lands after falling farther than a safe height.
+  clip_caption: A short drop onto a step causes no damage, while the long fall to the ground takes a chunk of HP.
+  description: |
+    `CharacterFallDamage` remembers the height where the character left the ground and, on landing,
+    measures how far it fell. Falls up to **Min Fall Distance** units are free; beyond that each extra
+    unit costs **Damage Per Unit**, capped at **Max Damage**. With the defaults, a 10-unit fall deals
+    (10 − 5) × 4 = 20 damage.
+
+    The height is measured from the moment the character stops being grounded, so it includes the rise
+    of a jump: jumping off a ledge counts from the top of the jump arc. If the character spawns in the
+    air, the first landing is measured from where it appeared. Damage goes through
+    `CharacterHealth.TakeDamage`, so it is ignored while the character is invulnerable (for example
+    during a roll) and causes no knockback.
+  setup:
+    - Build a character with `CharacterController2D` and `CharacterHealth` (required, added automatically).
+    - Add `CharacterFallDamage` before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Tune **Min Fall Distance** to the height of your tallest normal jump so regular jumps never hurt.
+  fields:
+    minFallDistance: Safe fall height in units. Falls up to this distance cause no damage.
+    damagePerUnit: Damage for each unit fallen beyond **Min Fall Distance**.
+    maxDamage: Upper limit of damage from a single fall. Set it to your max health or higher to make big falls lethal.
+  api:
+    AbilityEnabled: Turn fall damage off and on at runtime (for example while a parachute is open).
+  example: |
+    Disable fall damage while the player has a power-up:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class FeatherBoots : MonoBehaviour
+    {
+        public void Equip(bool on)
+        {
+            GetComponent<CharacterFallDamage>().AbilityEnabled = !on;
+        }
+    }
+    ```
+  tips:
+    - Check the height of your jump with `CharacterGravityController` in place; stronger fall gravity doesn't change the distance, only the speed.
+    - Use a `DamageFlash` so the player understands why health dropped on landing.
+es:
+  summary: Le hace daño al personaje cuando aterriza tras caer desde más alto que una altura segura.
+  clip_caption: Una caída corta a un escalón no hace daño, mientras que la caída larga hasta el suelo le quita buena parte de la vida.
+  description: |
+    `CharacterFallDamage` recuerda la altura desde la que el personaje dejó el suelo y, al aterrizar,
+    mide cuánto cayó. Las caídas de hasta **Min Fall Distance** unidades son gratis; a partir de ahí
+    cada unidad extra cuesta **Damage Per Unit**, con un tope de **Max Damage**. Con los valores por
+    defecto, una caída de 10 unidades hace (10 − 5) × 4 = 20 de daño.
+
+    La altura se mide desde que el personaje deja de estar en el suelo, así que incluye la subida de un
+    salto: saltar desde una cornisa cuenta desde lo más alto del arco. Si el personaje aparece en el
+    aire, el primer aterrizaje se mide desde donde apareció. El daño pasa por
+    `CharacterHealth.TakeDamage`, así que se ignora mientras el personaje es invulnerable (por ejemplo
+    al rodar) y no produce empujón.
+  setup:
+    - Arma un personaje con `CharacterController2D` y `CharacterHealth` (obligatorio, se agrega solo).
+    - Agrega `CharacterFallDamage` antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Ajusta **Min Fall Distance** a la altura de tu salto normal más alto para que los saltos comunes nunca duelan.
+  fields:
+    minFallDistance: Altura de caída segura, en unidades. Hasta esa distancia no hay daño.
+    damagePerUnit: Daño por cada unidad caída por encima de **Min Fall Distance**.
+    maxDamage: Daño máximo de una sola caída. Ponlo igual o por encima de la vida máxima para que las caídas grandes maten.
+  api:
+    AbilityEnabled: Apaga y enciende el daño por caída en tiempo de ejecución (por ejemplo, con un paracaídas abierto).
+  example: |
+    Desactiva el daño por caída mientras el jugador tiene un power-up:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class FeatherBoots : MonoBehaviour
+    {
+        public void Equip(bool on)
+        {
+            GetComponent<CharacterFallDamage>().AbilityEnabled = !on;
+        }
+    }
+    ```
+  tips:
+    - Mide la altura de tu salto con `CharacterGravityController` ya puesto; más gravedad al caer no cambia la distancia, solo la velocidad.
+    - Usa `DamageFlash` para que el jugador entienda por qué perdió vida al aterrizar.

@@ -1,0 +1,103 @@
+name: CameraFollow
+clip: true
+related: [CameraBounds, CameraShake, CameraZoomBySpeed, LevelManager]
+en:
+  summary: Smoothly follows the player (or any target) with an offset, so the camera glides instead of snapping.
+  clip_caption: The camera trails the player smoothly as it walks, runs and jumps through the level.
+  description: |
+    Add `CameraFollow` to your camera and it moves towards `target position + Offset` every `LateUpdate`
+    using `Vector3.SmoothDamp`, so it lags slightly behind fast moves and settles softly when the player
+    stops. It follows on every axis, including vertical jumps.
+
+    **Target** is optional: when it's empty, the camera looks for the GameObject tagged **Player** and, the
+    first time it finds it, jumps straight to it (no sweep from the origin). If the player is destroyed and
+    a new one appears, it keeps searching each frame until it finds it again.
+
+    Keep the Z of **Offset** negative (default `-10`) so a 2D camera stays in front of the scene. It plays
+    well with the other camera components: `CameraBounds` runs after it to clamp the position, and
+    `CameraShake` adds its tremble on top without ever pulling the camera back.
+  setup:
+    - Select your Main Camera and add `CameraFollow`.
+    - Tag your player **Player**, or drag any Transform into **Target**.
+    - Adjust **Offset** (for example Y = 2 to show more above the character) and **Smooth Time**.
+  fields:
+    target: Transform to follow. Empty finds the object tagged Player at runtime.
+    offset: Added to the target's position. Keep Z negative (default -10) for 2D; raise Y to frame more of what's above the character.
+    smoothTime: Approximate seconds the camera takes to catch up. Lower for a tight camera, higher for a floaty one; 0 sticks to the target.
+  api:
+    SetTarget: Changes what the camera follows at runtime (a boss, a cutscene point, a respawned player).
+  example: |
+    Point the camera at a boss while it's introduced, then back at the player:
+
+    ```csharp
+    using System.Collections;
+    using GameplayKit.CameraSystem;
+    using UnityEngine;
+
+    public class BossIntro : MonoBehaviour
+    {
+        [SerializeField] private CameraFollow cameraFollow;
+        [SerializeField] private Transform boss;
+        [SerializeField] private Transform player;
+
+        public IEnumerator Play()
+        {
+            cameraFollow.SetTarget(boss);
+            yield return new WaitForSeconds(2f);
+            cameraFollow.SetTarget(player);
+        }
+    }
+    ```
+  tips:
+    - Add `CameraBounds` so the camera never shows outside the level.
+    - A **Smooth Time** around 0.1–0.25 feels good for platformers; long values make fast characters leave the screen.
+es:
+  summary: Sigue suavemente al jugador (o a cualquier objetivo) con un offset, para que la cámara se deslice en vez de saltar.
+  clip_caption: La cámara sigue suavemente al jugador mientras camina, corre y salta por el nivel.
+  description: |
+    Agrega `CameraFollow` a tu cámara y se moverá hacia `posición del objetivo + Offset` en cada
+    `LateUpdate` usando `Vector3.SmoothDamp`, así queda un poco atrás en los movimientos rápidos y se acomoda
+    suave cuando el jugador se detiene. Sigue en todos los ejes, incluidos los saltos.
+
+    **Target** es opcional: si está vacío, la cámara busca el GameObject con tag **Player** y, la primera vez
+    que lo encuentra, salta directo a él (sin barrido desde el origen). Si el jugador se destruye y aparece
+    otro, sigue buscándolo cada frame hasta encontrarlo de nuevo.
+
+    Mantén negativa la Z de **Offset** (por defecto `-10`) para que una cámara 2D quede delante de la escena.
+    Se lleva bien con los otros componentes de cámara: `CameraBounds` corre después para limitar la posición
+    y `CameraShake` suma su temblor encima sin devolver nunca la cámara a una posición vieja.
+  setup:
+    - Selecciona tu Main Camera y agrega `CameraFollow`.
+    - Ponle el tag **Player** a tu jugador, o arrastra cualquier Transform a **Target**.
+    - Ajusta **Offset** (por ejemplo Y = 2 para ver más arriba del personaje) y **Smooth Time**.
+  fields:
+    target: Transform a seguir. Vacío busca en ejecución el objeto con tag Player.
+    offset: Se suma a la posición del objetivo. Mantén Z negativa (por defecto -10) en 2D; sube Y para encuadrar más de lo que hay sobre el personaje.
+    smoothTime: Segundos aproximados que tarda la cámara en alcanzar al objetivo. Más bajo para una cámara pegada, más alto para una flotante; 0 la deja fija al objetivo.
+  api:
+    SetTarget: Cambia en ejecución lo que sigue la cámara (un jefe, un punto de cinemática, un jugador que reapareció).
+  example: |
+    Apunta la cámara a un jefe mientras se presenta y luego de vuelta al jugador:
+
+    ```csharp
+    using System.Collections;
+    using GameplayKit.CameraSystem;
+    using UnityEngine;
+
+    public class BossIntro : MonoBehaviour
+    {
+        [SerializeField] private CameraFollow cameraFollow;
+        [SerializeField] private Transform boss;
+        [SerializeField] private Transform player;
+
+        public IEnumerator Play()
+        {
+            cameraFollow.SetTarget(boss);
+            yield return new WaitForSeconds(2f);
+            cameraFollow.SetTarget(player);
+        }
+    }
+    ```
+  tips:
+    - Agrega `CameraBounds` para que la cámara nunca muestre fuera del nivel.
+    - Un **Smooth Time** de 0.1 a 0.25 se siente bien en plataformas; valores largos hacen que los personajes rápidos se salgan de la pantalla.

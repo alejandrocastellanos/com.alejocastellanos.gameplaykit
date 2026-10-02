@@ -1,0 +1,115 @@
+name: PlayerLedgeClimb
+clip: true
+related: [PlayerLedgeGrab, PlayerJump, PlayerWalkRun]
+en:
+  summary: Press jump while hanging from a ledge to pull the character up and stand on top of it.
+  clip_caption: Catching a ledge, pressing jump to climb onto the platform, then walking away on top.
+  description: |
+    This ability works on top of `PlayerLedgeGrab` (adding it adds the grab automatically). While the
+    character is hanging, pressing **Jump** starts a short climb that lasts **Climb Duration** seconds: the
+    first half moves the character straight up, the second half moves it forward over the ledge, so it never
+    cuts diagonally through the corner.
+
+    The final position is computed from the real corner the grab found (`PlayerLedgeGrab.LedgePoint`): the
+    feet end up on the top face, and the body is pushed past the edge by half the collider width plus
+    **Forward Margin**. When the climb finishes the velocity is cleared and the grab is released, so the
+    character simply stands on the ledge and normal movement takes over.
+
+    Only a fresh press counts, and the climb can't be restarted while it is in progress. `PlayerJump` on
+    the same character doesn't fire from the ledge because the character isn't grounded while hanging
+    (with `PlayerMultiJump`, the press may spend an air jump).
+  setup:
+    - Set up `PlayerLedgeGrab` on your character first (or let this component add it for you).
+    - Add `PlayerLedgeClimb` before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Hang from a ledge and press **Jump** to climb on top.
+  fields:
+    forwardMargin: Extra distance past the edge, on top of half the character's width, where the climb ends. Raise it if the character ends up balanced on the very edge.
+    climbDuration: Seconds the climb takes (half going up, half going forward). Match it to your climb animation.
+  api:
+    IsClimbing: True while the climb is in progress. Use it to play the climb animation or block other actions.
+  example: |
+    Trigger a climb animation and a sound when the climb starts:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class LedgeClimbFeedback : MonoBehaviour
+    {
+        [SerializeField] private Animator animator;
+        [SerializeField] private AudioSource climbSound;
+        private PlayerLedgeClimb _climb;
+        private bool _wasClimbing;
+
+        private void Awake() => _climb = GetComponent<PlayerLedgeClimb>();
+
+        private void Update()
+        {
+            if (_climb.IsClimbing && !_wasClimbing)
+            {
+                animator.SetTrigger("Climb");
+                climbSound.Play();
+            }
+            _wasClimbing = _climb.IsClimbing;
+        }
+    }
+    ```
+  tips:
+    - Set **Climb Duration** to the length of your climb animation so the sprite and the collider stay in sync.
+    - The climb moves the character by setting its position, so leave enough headroom above the ledge for the whole collider; a low ceiling will make it overlap.
+es:
+  summary: Pulsa salto mientras cuelgas de un borde para subir al personaje y dejarlo de pie encima.
+  clip_caption: Se agarra de un borde, pulsa salto para trepar a la plataforma y se aleja caminando por arriba.
+  description: |
+    Esta habilidad trabaja sobre `PlayerLedgeGrab` (al agregarla se agrega el agarre automáticamente).
+    Mientras el personaje cuelga, pulsar **Salto** inicia una trepada corta que dura **Climb Duration**
+    segundos: la primera mitad lo sube en vertical y la segunda lo lleva hacia adelante sobre el borde, así
+    nunca atraviesa la esquina en diagonal.
+
+    La posición final se calcula desde la esquina real que encontró el agarre
+    (`PlayerLedgeGrab.LedgePoint`): los pies quedan sobre la cara superior y el cuerpo avanza más allá del
+    borde la mitad del ancho del collider más **Forward Margin**. Al terminar se borra la velocidad y se suelta
+    el agarre, así el personaje queda de pie sobre la cornisa y el movimiento normal vuelve a mandar.
+
+    Solo cuenta una pulsación nueva, y la trepada no se puede reiniciar mientras ocurre. `PlayerJump` en el
+    mismo personaje no salta desde el borde porque mientras cuelga no está en el suelo (con
+    `PlayerMultiJump`, la pulsación puede gastar un salto en el aire).
+  setup:
+    - Configura primero `PlayerLedgeGrab` en tu personaje (o deja que este componente lo agregue por ti).
+    - Agrega `PlayerLedgeClimb` antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Cuélgate de un borde y pulsa **Salto** para subir.
+  fields:
+    forwardMargin: Distancia extra más allá del borde, además de la mitad del ancho del personaje, donde termina la trepada. Súbela si el personaje queda en la orillita.
+    climbDuration: Segundos que dura la trepada (mitad subiendo, mitad avanzando). Ajústalo a tu animación de trepar.
+  api:
+    IsClimbing: Verdadero mientras dura la trepada. Úsalo para la animación o para bloquear otras acciones.
+  example: |
+    Lanza una animación y un sonido cuando empieza la trepada:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class LedgeClimbFeedback : MonoBehaviour
+    {
+        [SerializeField] private Animator animator;
+        [SerializeField] private AudioSource climbSound;
+        private PlayerLedgeClimb _climb;
+        private bool _wasClimbing;
+
+        private void Awake() => _climb = GetComponent<PlayerLedgeClimb>();
+
+        private void Update()
+        {
+            if (_climb.IsClimbing && !_wasClimbing)
+            {
+                animator.SetTrigger("Climb");
+                climbSound.Play();
+            }
+            _wasClimbing = _climb.IsClimbing;
+        }
+    }
+    ```
+  tips:
+    - Pon **Climb Duration** igual a la duración de tu animación de trepar para que el sprite y el collider vayan sincronizados.
+    - La trepada mueve al personaje fijando su posición, así que deja espacio suficiente sobre la cornisa para todo el collider; un techo bajo hará que se superpongan.

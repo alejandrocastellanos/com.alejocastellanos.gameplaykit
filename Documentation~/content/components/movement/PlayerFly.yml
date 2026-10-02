@@ -1,0 +1,113 @@
+name: PlayerFly
+clip: true
+related: [PlayerJetpack, PlayerTopDownMovement, PlayerWalkRun, PlayerClimbLadder]
+en:
+  summary: Toggle free flight with a button and move in any direction, ignoring gravity, until you toggle it off.
+  clip_caption: Pressing F to take off, flying up, sideways and diagonally, hovering, then pressing F again to drop.
+  description: |
+    Pressing the **Toggle Action** (the `Fly` action by default: F on the keyboard, Y/Triangle on a gamepad
+    with `KeyboardInputReader`) switches flight on or off. While flying, gravity is overridden to 0 and the
+    character's velocity is the movement input times **Fly Speed**, in all four directions (and diagonals).
+    With no input it hovers in place.
+
+    Turning flight off gives gravity back and the character falls normally. Flight is also turned off when
+    the character is reset (respawn), so it never comes back mid-air with gravity disabled.
+
+    Because flying writes the whole velocity, put `PlayerFly` after `PlayerWalkRun` in the component list so
+    the flight speed is the one that counts while airborne.
+  setup:
+    - Build a character with `CharacterController2D` and `PlayerWalkRun`.
+    - Add `PlayerFly` after `PlayerWalkRun` and before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Press **F** (or the key bound to the **Fly** action in your input reader) to take off, steer with the movement input and press it again to land.
+  fields:
+    flySpeed: Flying speed at full input, in units per second.
+    toggleAction: Input action that switches flight on and off. The key or button is assigned in the input reader.
+  api:
+    IsFlying: True while flight is on.
+    SetFlying: Turns flight on or off from code (power-ups, cutscenes, debug cheats).
+  example: |
+    A pickup that grants flight for a few seconds:
+
+    ```csharp
+    using System.Collections;
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class FlightPowerUp : MonoBehaviour
+    {
+        [SerializeField] private float duration = 5f;
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            var fly = other.GetComponent<PlayerFly>();
+            if (fly == null) return;
+            fly.StartCoroutine(Fly(fly));
+            gameObject.SetActive(false);
+        }
+
+        private IEnumerator Fly(PlayerFly fly)
+        {
+            fly.SetFlying(true);
+            yield return new WaitForSeconds(duration);
+            fly.SetFlying(false);
+        }
+    }
+    ```
+  tips:
+    - Gravity is shared through `CharacterController2D.OverrideGravity`, so flight keeps working alongside `CharacterGravityController`, ladders or water.
+    - For a flying-only game (shmup, top-down) `PlayerTopDownMovement` may fit better; `PlayerFly` is meant as a mode you switch into from platforming.
+es:
+  summary: Activa el vuelo libre con un botón y muévete en cualquier dirección sin gravedad hasta desactivarlo.
+  clip_caption: Pulsa F para despegar, vuela hacia arriba, de lado y en diagonal, flota quieto y pulsa F otra vez para caer.
+  description: |
+    Pulsar la **Toggle Action** (por defecto la acción `Fly`: F en el teclado, Y/Triángulo en el gamepad con
+    `KeyboardInputReader`) activa o desactiva el vuelo. Mientras vuela, la gravedad se fija en 0 y la
+    velocidad del personaje es el input de movimiento multiplicado por **Fly Speed**, en las cuatro
+    direcciones (y diagonales). Sin input se queda flotando en el sitio.
+
+    Al desactivar el vuelo vuelve la gravedad y el personaje cae normalmente. El vuelo también se apaga al
+    reiniciar el personaje (respawn), así que nunca reaparece en el aire con la gravedad desactivada.
+
+    Como el vuelo escribe la velocidad completa, pon `PlayerFly` después de `PlayerWalkRun` en la lista de
+    componentes para que cuente la velocidad de vuelo mientras está en el aire.
+  setup:
+    - Arma un personaje con `CharacterController2D` y `PlayerWalkRun`.
+    - Agrega `PlayerFly` después de `PlayerWalkRun` y antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Pulsa **F** (o la tecla asignada a la acción **Fly** en tu lector de input) para despegar, dirige con el input de movimiento y vuelve a pulsarla para aterrizar.
+  fields:
+    flySpeed: Velocidad de vuelo con el input al máximo, en unidades por segundo.
+    toggleAction: Acción de input que activa y desactiva el vuelo. La tecla o botón se asigna en el lector de input.
+  api:
+    IsFlying: Verdadero mientras el vuelo está activo.
+    SetFlying: Activa o desactiva el vuelo desde código (power-ups, cinemáticas, trucos de depuración).
+  example: |
+    Un objeto que da vuelo durante unos segundos:
+
+    ```csharp
+    using System.Collections;
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class FlightPowerUp : MonoBehaviour
+    {
+        [SerializeField] private float duration = 5f;
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            var fly = other.GetComponent<PlayerFly>();
+            if (fly == null) return;
+            fly.StartCoroutine(Fly(fly));
+            gameObject.SetActive(false);
+        }
+
+        private IEnumerator Fly(PlayerFly fly)
+        {
+            fly.SetFlying(true);
+            yield return new WaitForSeconds(duration);
+            fly.SetFlying(false);
+        }
+    }
+    ```
+  tips:
+    - La gravedad se comparte mediante `CharacterController2D.OverrideGravity`, así que el vuelo sigue funcionando junto a `CharacterGravityController`, escaleras o agua.
+    - Para un juego donde siempre se vuela (shmup, vista cenital) quizá encaje mejor `PlayerTopDownMovement`; `PlayerFly` está pensado como un modo al que se entra desde el plataformeo.

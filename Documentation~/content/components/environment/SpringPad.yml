@@ -1,0 +1,50 @@
+name: SpringPad
+clip: true
+related: [PlayerJump, CharacterGravityController, WindZone2D, FallingPlatform]
+en:
+  summary: A bouncy pad that launches anything that touches it upwards or in any direction you choose.
+  clip_caption: Walking onto the spring launches the player high enough to land on a far ledge.
+  description: |
+    When a `Rigidbody2D` touches the pad, `SpringPad` cancels its vertical velocity and applies an impulse
+    of **Launch Force** along **Launch Direction**. Horizontal velocity is kept, so a player running onto
+    it flies forward in an arc. There is no tag filter: boxes, enemies and projectiles bounce too.
+
+    With **Use Trigger** on, the pad reacts when something enters its trigger collider; with it off, it
+    reacts to solid collisions instead, so the collider must match the setting. The impulse is divided by
+    the body's mass: with the defaults a character of mass 1 leaves at 15 u/s, which with normal gravity is
+    roughly 11 units high.
+  setup:
+    - Create a flat GameObject with a `BoxCollider2D` marked **Is Trigger** and add `SpringPad`.
+    - Adjust **Launch Force** to the height you need (start low; the default is a big jump).
+    - For a sideways bumper, set **Launch Direction** to something like `(1, 1)` and place it on a wall.
+  fields:
+    launchDirection: Direction of the impulse. It is normalized, so only the angle matters. Note that only vertical velocity is reset before launching.
+    launchForce: Strength of the impulse (`ForceMode2D.Impulse`). The resulting speed is this divided by the body's mass.
+    useTrigger: When on, launches on entering the trigger collider; when off, on solid collision. Mark the collider **Is Trigger** accordingly.
+  tips:
+    - A `CharacterGravityController` on the player changes how high it flies; tune **Launch Force** with your final gravity settings.
+    - Each touch launches once; a pad that should keep bouncing an object needs it to leave and land again.
+es:
+  summary: Una plataforma elástica que lanza hacia arriba, o en la dirección que elijas, todo lo que la toca.
+  clip_caption: Al pisar el resorte, el jugador sale disparado lo bastante alto para caer en una cornisa lejana.
+  description: |
+    Cuando un `Rigidbody2D` toca el resorte, `SpringPad` anula su velocidad vertical y le aplica un impulso
+    de **Launch Force** en **Launch Direction**. La velocidad horizontal se conserva, así que un jugador que
+    llega corriendo vuela hacia adelante en arco. No hay filtro de tag: cajas, enemigos y proyectiles
+    también rebotan.
+
+    Con **Use Trigger** activo, reacciona cuando algo entra a su collider trigger; desactivado, reacciona a
+    choques sólidos, así que el collider debe coincidir con la opción. El impulso se divide por la masa del
+    cuerpo: con los valores por defecto, un personaje de masa 1 sale a 15 u/s, que con gravedad normal son
+    unas 11 unidades de altura.
+  setup:
+    - Crea un GameObject plano con un `BoxCollider2D` marcado como **Is Trigger** y agrégale `SpringPad`.
+    - Ajusta **Launch Force** a la altura que necesites (empieza bajo; el valor por defecto es un salto enorme).
+    - Para un rebotador lateral, pon **Launch Direction** en algo como `(1, 1)` y colócalo en una pared.
+  fields:
+    launchDirection: Dirección del impulso. Se normaliza, así que solo importa el ángulo. Ten en cuenta que antes de lanzar solo se anula la velocidad vertical.
+    launchForce: Fuerza del impulso (`ForceMode2D.Impulse`). La velocidad resultante es este valor dividido por la masa del cuerpo.
+    useTrigger: Activo, lanza al entrar al collider trigger; desactivado, al chocar de forma sólida. Marca el collider como **Is Trigger** según corresponda.
+  tips:
+    - Un `CharacterGravityController` en el jugador cambia qué tan alto vuela; ajusta **Launch Force** con la gravedad definitiva.
+    - Cada toque lanza una vez; para que siga rebotando, el objeto tiene que salir y volver a caer sobre él.

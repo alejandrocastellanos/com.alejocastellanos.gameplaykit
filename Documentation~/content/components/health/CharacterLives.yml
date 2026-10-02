@@ -1,0 +1,114 @@
+name: CharacterLives
+clip: true
+related: [CharacterRespawn, CharacterHealth, CharacterDeath, GameManager]
+en:
+  summary: Gives the player a number of lives; each death spends one and running out triggers game over.
+  clip_caption: The character keeps walking into spikes; each death costs a life and respawns it, until GAME OVER at zero lives.
+  description: |
+    `CharacterLives` counts lives and listens to `CharacterHealth.OnDeath`. Every death consumes one
+    life. While lives remain, `CharacterRespawn` brings the character back as usual; when the last life
+    is spent, the character stays dead, `IsGameOver` becomes true, `OnGameOver` fires and, if a
+    `GameManager` exists, its state is set to `GameOver`.
+
+    When `CharacterRespawn` is present with **Auto Respawn On Death** on, it is the respawn component
+    that spends the life when deciding whether to bring the character back; otherwise the life is
+    spent here. The decision is made at the moment of death, so component order doesn't matter.
+    Lives start at **Starting Lives** and can never exceed **Max Lives**.
+  setup:
+    - Add `CharacterLives` to the player, next to `CharacterHealth` (required), `CharacterDeath` and `CharacterRespawn`.
+    - Set **Starting Lives** and **Max Lives**.
+    - Listen to `OnLivesChanged` to update your HUD and to `OnGameOver` (or the `GameManager` state) to show the game over screen.
+  fields:
+    startingLives: Lives at the start and after `ResetLives`. The last death happens when this count reaches 0.
+    maxLives: Upper limit for `AddLife` (extra-life pickups).
+  events:
+    OnLivesChanged: C# event with the new number of lives, fired when a life is spent, added or reset.
+    OnGameOver: C# event fired once when the last life is spent.
+  api:
+    Lives: Current number of lives.
+    IsGameOver: True after the last life is spent, until `ResetLives`.
+    ConsumeLife: Spends a life and returns true if the character can still respawn. Does nothing after game over.
+    AddLife: Adds lives (1 by default) up to **Max Lives**. Ignored after game over.
+    ResetLives: Clears the game over and restores **Starting Lives**.
+  example: |
+    A lives counter for the HUD:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+    using UnityEngine.UI;
+
+    public class LivesHud : MonoBehaviour
+    {
+        [SerializeField] private CharacterLives lives;
+        [SerializeField] private Text label;
+
+        private void OnEnable()
+        {
+            lives.OnLivesChanged += Refresh;
+            Refresh(lives.Lives);
+        }
+
+        private void OnDisable() => lives.OnLivesChanged -= Refresh;
+
+        private void Refresh(int count) => label.text = "x" + count;
+    }
+    ```
+  tips:
+    - "Remember that `Lives` reaching 0 means game over: with **Starting Lives** = 3 the player can die twice and respawn, the third death ends the game."
+    - "Call `AddLife()` from your own pickup script (for example from a `Collectible` event) to award extra lives."
+es:
+  summary: Le da al jugador una cantidad de vidas; cada muerte gasta una y al quedarse sin ellas llega el game over.
+  clip_caption: El personaje camina una y otra vez hacia los pinchos; cada muerte cuesta una vida y reaparece, hasta el GAME OVER sin vidas.
+  description: |
+    `CharacterLives` cuenta las vidas y escucha `CharacterHealth.OnDeath`. Cada muerte gasta una vida.
+    Mientras queden vidas, `CharacterRespawn` trae al personaje de vuelta como siempre; al gastar la
+    última, el personaje se queda muerto, `IsGameOver` pasa a verdadero, se dispara `OnGameOver` y, si
+    existe un `GameManager`, su estado pasa a `GameOver`.
+
+    Si hay un `CharacterRespawn` con **Auto Respawn On Death** activado, es él quien gasta la vida al
+    decidir si reaparece; si no, la vida se gasta aquí. La decisión se toma al morir, así que no importa
+    el orden de los componentes. Las vidas empiezan en **Starting Lives** y nunca superan **Max Lives**.
+  setup:
+    - Agrega `CharacterLives` al jugador, junto a `CharacterHealth` (obligatorio), `CharacterDeath` y `CharacterRespawn`.
+    - Ajusta **Starting Lives** y **Max Lives**.
+    - Escucha `OnLivesChanged` para actualizar tu HUD y `OnGameOver` (o el estado del `GameManager`) para mostrar la pantalla de game over.
+  fields:
+    startingLives: Vidas al empezar y tras `ResetLives`. La última muerte llega cuando este contador baja a 0.
+    maxLives: Tope para `AddLife` (pickups de vida extra).
+  events:
+    OnLivesChanged: Evento C# con la nueva cantidad de vidas, cuando se gasta, se suma o se reinicia.
+    OnGameOver: Evento C# que se dispara una vez al gastar la última vida.
+  api:
+    Lives: Cantidad actual de vidas.
+    IsGameOver: Verdadero tras gastar la última vida, hasta `ResetLives`.
+    ConsumeLife: Gasta una vida y devuelve true si el personaje todavía puede reaparecer. No hace nada tras el game over.
+    AddLife: Suma vidas (1 por defecto) hasta **Max Lives**. Se ignora tras el game over.
+    ResetLives: Quita el game over y restaura **Starting Lives**.
+  example: |
+    Un contador de vidas para el HUD:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+    using UnityEngine.UI;
+
+    public class LivesHud : MonoBehaviour
+    {
+        [SerializeField] private CharacterLives lives;
+        [SerializeField] private Text label;
+
+        private void OnEnable()
+        {
+            lives.OnLivesChanged += Refresh;
+            Refresh(lives.Lives);
+        }
+
+        private void OnDisable() => lives.OnLivesChanged -= Refresh;
+
+        private void Refresh(int count) => label.text = "x" + count;
+    }
+    ```
+  tips:
+    - "Ten en cuenta que llegar a 0 en `Lives` es game over: con **Starting Lives** = 3 el jugador puede morir dos veces y reaparecer; la tercera muerte termina la partida."
+    - "Llama a `AddLife()` desde tu propio script de pickup (por ejemplo desde un evento de `Collectible`) para dar vidas extra."

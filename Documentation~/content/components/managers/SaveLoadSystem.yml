@@ -1,0 +1,115 @@
+name: SaveLoadSystem
+clip: false
+related: [CharacterPersistence, GameManager, ScoreManager, InventoryManager]
+en:
+  summary: Saves and loads your game's progress as JSON in PlayerPrefs, from a single place.
+  description: |
+    `SaveLoadSystem` is a persistent singleton (`SaveLoadSystem.Instance`, `DontDestroyOnLoad`) that
+    stores one save slot under **Save Key**. You decide what to save: define a `[Serializable]` class with
+    the data you need, pass it to `Save`, and get it back with `TryLoad`. It's turned into JSON with
+    `JsonUtility` and written to `PlayerPrefs`, which is flushed to disk right away. It can live under a
+    parent "Managers" object; on `Awake` it detaches to the scene root so `DontDestroyOnLoad` works.
+
+    `TryLoad` returns false when there's no save yet, and also when the stored text can't be parsed (a
+    corrupt save or one from an incompatible version) — in that case it logs a warning and treats it as
+    missing instead of crashing. Because it uses `JsonUtility`, the usual rules apply: public fields or
+    `[SerializeField]` fields of serializable types; no dictionaries or properties.
+  setup:
+    - Add `SaveLoadSystem` to a manager object in your first scene.
+    - Create a `[System.Serializable]` class with the fields you want to keep (level, score, unlocked items...).
+    - Call `Save(data)` at checkpoints or on quit, and `TryLoad(out data)` when the game starts.
+  fields:
+    saveKey: PlayerPrefs key the save is stored under. Use a different key per slot or per game to keep saves apart.
+  api:
+    Instance: The persistent SaveLoadSystem (null if none).
+    Save: Serializes any object with `JsonUtility` and writes it to PlayerPrefs.
+    TryLoad: Reads and deserializes the save; returns false if there's none or it can't be read.
+    HasSave: True if something is stored under **Save Key**.
+    ClearSave: Deletes the save (for a "New Game" button).
+  example: |
+    Save the level and score, and restore them on start:
+
+    ```csharp
+    using GameplayKit.Managers;
+    using UnityEngine;
+
+    [System.Serializable]
+    public class ProgressData
+    {
+        public int level;
+        public int score;
+    }
+
+    public class Progress : MonoBehaviour
+    {
+        public void SaveNow(int level)
+        {
+            SaveLoadSystem.Instance.Save(new ProgressData { level = level, score = ScoreManager.Instance.CurrentScore });
+        }
+
+        private void Start()
+        {
+            if (SaveLoadSystem.Instance.TryLoad(out ProgressData data))
+                ScoreManager.Instance.AddScore(data.score);
+        }
+    }
+    ```
+  tips:
+    - Each `Save` overwrites the whole slot; keep all persistent data in one class, or use one SaveLoadSystem key per data type.
+    - PlayerPrefs lives on the player's machine (registry on Windows, browser storage on WebGL); don't store anything secret there.
+es:
+  summary: Guarda y carga el progreso de tu juego como JSON en PlayerPrefs, desde un único lugar.
+  description: |
+    `SaveLoadSystem` es un singleton persistente (`SaveLoadSystem.Instance`, `DontDestroyOnLoad`) que guarda
+    un espacio de guardado bajo **Save Key**. Tú decides qué guardar: define una clase `[Serializable]` con
+    los datos que necesites, pásala a `Save` y recupérala con `TryLoad`. Se convierte a JSON con
+    `JsonUtility` y se escribe en `PlayerPrefs`, que se vuelca a disco de inmediato. Puede estar dentro de un
+    objeto padre "Managers"; en `Awake` se suelta a la raíz de la escena para que `DontDestroyOnLoad` funcione.
+
+    `TryLoad` devuelve false cuando todavía no hay guardado, y también cuando el texto guardado no se puede
+    leer (un guardado corrupto o de una versión incompatible) — en ese caso registra una advertencia y lo
+    trata como inexistente en vez de romperse. Como usa `JsonUtility`, aplican sus reglas de siempre: campos
+    públicos o `[SerializeField]` de tipos serializables; nada de diccionarios ni propiedades.
+  setup:
+    - Agrega `SaveLoadSystem` a un objeto de managers en tu primera escena.
+    - Crea una clase `[System.Serializable]` con los campos que quieras conservar (nivel, puntaje, ítems desbloqueados...).
+    - Llama `Save(data)` en los checkpoints o al salir, y `TryLoad(out data)` al empezar el juego.
+  fields:
+    saveKey: Clave de PlayerPrefs bajo la que se guarda. Usa una distinta por espacio de guardado o por juego para mantenerlos separados.
+  api:
+    Instance: El SaveLoadSystem persistente (null si no hay).
+    Save: Serializa cualquier objeto con `JsonUtility` y lo escribe en PlayerPrefs.
+    TryLoad: Lee y deserializa el guardado; devuelve false si no hay o no se puede leer.
+    HasSave: Verdadero si hay algo guardado bajo **Save Key**.
+    ClearSave: Borra el guardado (para un botón de "Nueva partida").
+  example: |
+    Guarda el nivel y el puntaje, y restáuralos al empezar:
+
+    ```csharp
+    using GameplayKit.Managers;
+    using UnityEngine;
+
+    [System.Serializable]
+    public class ProgressData
+    {
+        public int level;
+        public int score;
+    }
+
+    public class Progress : MonoBehaviour
+    {
+        public void SaveNow(int level)
+        {
+            SaveLoadSystem.Instance.Save(new ProgressData { level = level, score = ScoreManager.Instance.CurrentScore });
+        }
+
+        private void Start()
+        {
+            if (SaveLoadSystem.Instance.TryLoad(out ProgressData data))
+                ScoreManager.Instance.AddScore(data.score);
+        }
+    }
+    ```
+  tips:
+    - Cada `Save` sobrescribe todo el espacio; guarda todos los datos persistentes en una sola clase, o usa una clave de SaveLoadSystem por tipo de dato.
+    - PlayerPrefs vive en la máquina del jugador (registro en Windows, almacenamiento del navegador en WebGL); no guardes nada secreto ahí.

@@ -1,0 +1,139 @@
+name: EnemySpawner
+clip: true
+related: [AIBrain, DamageableObject, EnemyPathfindingAgent, AIActionMoveToTarget]
+en:
+  summary: Spawns enemies (or any prefab) on a timer, keeping at most a set number alive and pointing them at the player.
+  clip_caption: Enemies drop in from two alternating spawn points and chase the player; killing one frees a slot and the counter never goes above 3 alive.
+  description: |
+    Every **Interval** seconds the spawner checks how many of its spawned objects are still alive and,
+    if there are fewer than **Max Alive**, instantiates **Prefab** at the next of the **Spawn Points**
+    (they are used in turn) or at its own position when the list is empty. An object counts as alive
+    while it exists and is active, so enemies that are destroyed or disabled when they die free their
+    slot automatically. With **Total To Spawn** above 0 it stops after that many spawns.
+
+    If the new object has an `AIBrain`, `EnemyChase`, `EnemyFlee` or `EnemyShootOnSight` without a target,
+    the spawner assigns **Target** to each of them, or the GameObject tagged `Player` when **Target** is
+    empty, so prefabs work without scene references.
+    **Spawn On Start** spawns the first enemy right away instead of after one interval. Each spawn
+    raises the `OnSpawned` C# event with the new instance.
+  setup:
+    - Make an enemy prefab with an `AIBrain` (or `EnemyChase`, `EnemyFlee`, `EnemyShootOnSight`) so it gets the player as target automatically, and something that removes it on death (`DamageableObject` destroys it by default).
+    - Create an empty GameObject, add `EnemySpawner` and drag the prefab into **Prefab**.
+    - Optional — add empty child objects as **Spawn Points**, and tag your player `Player` (or fill **Target**).
+    - Tune **Interval**, **Max Alive** and **Total To Spawn**.
+  fields:
+    prefab: The object to spawn. Usually an enemy prefab.
+    spawnPoints: Positions used in turn for each spawn. Empty means the spawner's own position.
+    interval: Seconds between spawn attempts. When the limit is reached the attempt is skipped and the timer restarts.
+    maxAlive: Maximum number of spawned objects alive at the same time.
+    totalToSpawn: Total number of spawns for the whole game; 0 means unlimited.
+    spawnOnStart: On, the first spawn happens immediately; off, after the first **Interval**.
+    target: Target given to spawned `AIBrain`, `EnemyChase`, `EnemyFlee` and `EnemyShootOnSight` components that have none. Empty means the object tagged `Player`.
+  events:
+    OnSpawned: "C# event (`Action<GameObject>`) raised after each spawn with the new instance, once its targets have been set."
+  api:
+    AliveCount: How many spawned objects are currently alive (existing and active).
+    SpawnedCount: How many objects this spawner has created so far.
+    Spawn: Spawns one object right now and returns it (null without a prefab). It ignores **Max Alive** and **Total To Spawn**, but the spawn still counts.
+  example: |
+    Open the arena door once a wave of 10 enemies has been spawned and defeated, and give a target to
+    components the spawner doesn't handle, like `EnemyPathfindingAgent`:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class ArenaWave : MonoBehaviour
+    {
+        [SerializeField] private EnemySpawner spawner; // Total To Spawn = 10
+        [SerializeField] private Transform player;
+        [SerializeField] private GameObject door;
+
+        private void OnEnable() => spawner.OnSpawned += HandleSpawned;
+        private void OnDisable() => spawner.OnSpawned -= HandleSpawned;
+
+        private void HandleSpawned(GameObject enemy)
+        {
+            var agent = enemy.GetComponent<EnemyPathfindingAgent>();
+            if (agent != null) agent.SetTarget(player);
+        }
+
+        private void Update()
+        {
+            if (door.activeSelf && spawner.SpawnedCount >= 10 && spawner.AliveCount == 0)
+                door.SetActive(false);
+        }
+    }
+    ```
+  tips:
+    - Targets are assigned automatically only to `AIBrain`, `EnemyChase`, `EnemyFlee` and `EnemyShootOnSight`; for anything else (such as `EnemyPathfindingAgent`) set it in `OnSpawned`, as in the example.
+    - Enemies that only "die" through `CharacterHealth` stay active, so they keep counting as alive; add `CharacterDeath` with a **Disable Delay** or use `DamageableObject`.
+    - Spawned objects are not parented to the spawner; destroying the spawner leaves them in the scene.
+es:
+  summary: Genera enemigos (o cualquier prefab) cada cierto tiempo, con un máximo vivos a la vez, y los apunta al jugador.
+  clip_caption: Los enemigos caen desde dos puntos que se alternan y persiguen al jugador; eliminar uno libera un lugar y el contador nunca pasa de 3 vivos.
+  description: |
+    Cada **Interval** segundos el spawner cuenta cuántos de sus objetos generados siguen vivos y, si hay
+    menos de **Max Alive**, instancia **Prefab** en el siguiente de los **Spawn Points** (se usan por
+    turnos) o en su propia posición si la lista está vacía. Un objeto cuenta como vivo mientras exista y
+    esté activo, así que los enemigos que se destruyen o desactivan al morir liberan su lugar solos. Con
+    **Total To Spawn** mayor que 0 se detiene después de esa cantidad.
+
+    Si el objeto nuevo tiene un `AIBrain`, `EnemyChase`, `EnemyFlee` o `EnemyShootOnSight` sin objetivo, el
+    spawner le asigna **Target** a cada uno, o el GameObject con tag `Player` si **Target** está vacío, así
+    los prefabs funcionan sin referencias a la escena.
+    **Spawn On Start** genera el primer enemigo de inmediato en vez de esperar un intervalo. Cada
+    aparición dispara el evento de C# `OnSpawned` con la instancia nueva.
+  setup:
+    - Arma un prefab de enemigo con un `AIBrain` (o `EnemyChase`, `EnemyFlee`, `EnemyShootOnSight`) para que reciba al jugador como objetivo solo, y algo que lo quite al morir (`DamageableObject` lo destruye por defecto).
+    - Crea un GameObject vacío, agrega `EnemySpawner` y arrastra el prefab a **Prefab**.
+    - Opcional — agrega objetos hijos vacíos como **Spawn Points** y ponle el tag `Player` a tu jugador (o completa **Target**).
+    - Ajusta **Interval**, **Max Alive** y **Total To Spawn**.
+  fields:
+    prefab: El objeto a generar. Normalmente un prefab de enemigo.
+    spawnPoints: Posiciones que se usan por turnos en cada aparición. Vacío significa la posición del propio spawner.
+    interval: Segundos entre intentos de generar. Si se alcanzó el límite, el intento se salta y el temporizador vuelve a empezar.
+    maxAlive: Cantidad máxima de objetos generados vivos al mismo tiempo.
+    totalToSpawn: Total de apariciones en toda la partida; 0 significa sin límite.
+    spawnOnStart: Activado, la primera aparición es inmediata; desactivado, después del primer **Interval**.
+    target: Objetivo que reciben los `AIBrain`, `EnemyChase`, `EnemyFlee` y `EnemyShootOnSight` generados que no tienen uno. Vacío significa el objeto con tag `Player`.
+  events:
+    OnSpawned: "Evento de C# (`Action<GameObject>`) que se dispara después de cada aparición con la instancia nueva, ya con sus objetivos asignados."
+  api:
+    AliveCount: Cuántos objetos generados están vivos ahora (existen y están activos).
+    SpawnedCount: Cuántos objetos ha creado este spawner hasta ahora.
+    Spawn: Genera un objeto en este momento y lo devuelve (null si no hay prefab). Ignora **Max Alive** y **Total To Spawn**, pero la aparición igual cuenta.
+  example: |
+    Abre la puerta de la arena cuando una oleada de 10 enemigos fue generada y derrotada, y dale su
+    objetivo a los componentes que el spawner no maneja, como `EnemyPathfindingAgent`:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class ArenaWave : MonoBehaviour
+    {
+        [SerializeField] private EnemySpawner spawner; // Total To Spawn = 10
+        [SerializeField] private Transform player;
+        [SerializeField] private GameObject door;
+
+        private void OnEnable() => spawner.OnSpawned += HandleSpawned;
+        private void OnDisable() => spawner.OnSpawned -= HandleSpawned;
+
+        private void HandleSpawned(GameObject enemy)
+        {
+            var agent = enemy.GetComponent<EnemyPathfindingAgent>();
+            if (agent != null) agent.SetTarget(player);
+        }
+
+        private void Update()
+        {
+            if (door.activeSelf && spawner.SpawnedCount >= 10 && spawner.AliveCount == 0)
+                door.SetActive(false);
+        }
+    }
+    ```
+  tips:
+    - El objetivo se asigna automáticamente solo a `AIBrain`, `EnemyChase`, `EnemyFlee` y `EnemyShootOnSight`; para cualquier otro (como `EnemyPathfindingAgent`) asígnalo en `OnSpawned`, como en el ejemplo.
+    - Los enemigos que solo "mueren" con `CharacterHealth` siguen activos, así que siguen contando como vivos; agrega `CharacterDeath` con un **Disable Delay** o usa `DamageableObject`.
+    - Los objetos generados no quedan como hijos del spawner; destruir el spawner los deja en la escena.

@@ -1,0 +1,103 @@
+name: PlayerZipline
+clip: true
+related: [ZiplinePath, PlayerRopeGrab, PlayerWalkRun]
+en:
+  summary: Touch a zipline and the character slides along it at constant speed from its start to its end.
+  clip_caption: Walking off a high platform into the zipline and riding the cable down to the lower ground.
+  description: |
+    As soon as the character's collider enters a trigger that has a `ZiplinePath` component, the ride starts
+    automatically, no button needed. Gravity is overridden to 0 and every frame the character is placed on
+    the straight line between the path's **Start** and **End**, advancing at **Ride Speed** units per second.
+    The ride always begins at **Start**, so put the trigger there.
+
+    The ride ends when the character reaches **End** or when the player presses **Jump**; either way gravity
+    comes back and the character drops from wherever it is with no leftover speed. Because the position is
+    set directly, the speed is the same uphill and downhill.
+
+    **Zipline Tag** is an optional filter: leave it empty to use every `ZiplinePath`, or set a tag so this
+    character only rides ziplines tagged that way.
+  setup:
+    - Build a character with `CharacterController2D` and `PlayerWalkRun`.
+    - Add `PlayerZipline` after `PlayerWalkRun` and before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Create a trigger at the start of the cable, add `ZiplinePath` to it and assign two Transforms as **Start** and **End**.
+    - Walk or jump into the trigger to ride; press **Jump** to drop off mid-way.
+  fields:
+    ziplineTag: Optional tag filter. Empty means any `ZiplinePath` works; otherwise only ziplines with this tag start a ride.
+    rideSpeed: Speed along the cable, in units per second.
+  api:
+    IsRiding: True while the character is sliding along a zipline.
+  example: |
+    Play a looping sound while riding:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class ZiplineSound : MonoBehaviour
+    {
+        [SerializeField] private AudioSource loop;
+        private PlayerZipline _zipline;
+
+        private void Awake() => _zipline = GetComponent<PlayerZipline>();
+
+        private void Update()
+        {
+            if (_zipline.IsRiding && !loop.isPlaying) loop.Play();
+            else if (!_zipline.IsRiding && loop.isPlaying) loop.Stop();
+        }
+    }
+    ```
+  tips:
+    - Place **Start** and **End** where the character's pivot should hang (about half its height below the cable), and keep **End** a little above the landing spot.
+    - Keep the entry trigger small and near **Start**; touching it anywhere snaps the character to **Start**.
+    - Leave the line between **Start** and **End** free of walls; the character's collider still bumps into anything in the way during the ride.
+es:
+  summary: Toca una tirolesa y el personaje se desliza por ella a velocidad constante desde su inicio hasta su final.
+  clip_caption: Camina desde una plataforma alta hasta la tirolesa y baja por el cable hasta el suelo.
+  description: |
+    En cuanto el collider del personaje entra en un trigger con un componente `ZiplinePath`, el viaje empieza
+    solo, sin botones. La gravedad se fija en 0 y en cada frame el personaje se coloca sobre la recta entre
+    **Start** y **End**, avanzando a **Ride Speed** unidades por segundo. El viaje siempre arranca en
+    **Start**, así que pon el trigger ahí.
+
+    El viaje termina cuando llega a **End** o cuando el jugador pulsa **Salto**; en ambos casos vuelve la
+    gravedad y el personaje cae desde donde esté, sin velocidad sobrante. Como la posición se fija
+    directamente, la velocidad es la misma de subida y de bajada.
+
+    **Zipline Tag** es un filtro opcional: déjalo vacío para usar cualquier `ZiplinePath`, o pon un tag para
+    que este personaje solo use tirolesas con ese tag.
+  setup:
+    - Arma un personaje con `CharacterController2D` y `PlayerWalkRun`.
+    - Agrega `PlayerZipline` después de `PlayerWalkRun` y antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Crea un trigger al inicio del cable, agrégale `ZiplinePath` y asigna dos Transforms como **Start** y **End**.
+    - Camina o salta hacia el trigger para deslizarte; pulsa **Salto** para soltarte a mitad de camino.
+  fields:
+    ziplineTag: Filtro de tag opcional. Vacío significa que sirve cualquier `ZiplinePath`; si no, solo las tirolesas con este tag inician el viaje.
+    rideSpeed: Velocidad a lo largo del cable, en unidades por segundo.
+  api:
+    IsRiding: Verdadero mientras el personaje se desliza por una tirolesa.
+  example: |
+    Reproduce un sonido en bucle mientras viaja:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class ZiplineSound : MonoBehaviour
+    {
+        [SerializeField] private AudioSource loop;
+        private PlayerZipline _zipline;
+
+        private void Awake() => _zipline = GetComponent<PlayerZipline>();
+
+        private void Update()
+        {
+            if (_zipline.IsRiding && !loop.isPlaying) loop.Play();
+            else if (!_zipline.IsRiding && loop.isPlaying) loop.Stop();
+        }
+    }
+    ```
+  tips:
+    - Coloca **Start** y **End** donde debe quedar el pivote del personaje (más o menos media altura por debajo del cable), y deja **End** un poco por encima del punto de aterrizaje.
+    - Mantén el trigger de entrada pequeño y cerca de **Start**; tocarlo en cualquier parte lleva al personaje a **Start** de golpe.
+    - Deja la recta entre **Start** y **End** libre de paredes para que el collider no choque con ellas durante el viaje.

@@ -1,0 +1,95 @@
+name: PlayerEdgeDangle
+clip: true
+related: [PlayerWalkRun, CharacterAnimatorBridge, PlayerLedgeGrab]
+en:
+  summary: Detects when the character stands right at the edge of a drop so you can play a wobbling animation.
+  clip_caption: Walking to the end of a platform turns IsAtEdge on; turning around turns it off again.
+  description: |
+    Every frame the character is grounded, this ability casts a ray straight down from the front edge of its
+    collider (the side it is facing, from the sign of the X scale that `PlayerWalkRun` flips), starting just
+    above the feet. If that ray finds no ground within **Ray Length**, `IsAtEdge` becomes true: the next
+    step would be a fall.
+
+    It is purely informational. It doesn't stop, slow or push the character; it only exposes `IsAtEdge` so an
+    Animator, a sound or your own script can react (the classic "arms flailing at the cliff" pose). While
+    airborne it always reports false.
+
+    Because the check looks at the facing side only, turning away from the drop clears the flag even if the
+    character hasn't moved. The ray ignores the character's own colliders, so **Ground Layers** can stay on
+    *Everything*.
+  setup:
+    - Build a character with `CharacterController2D` and `PlayerWalkRun`.
+    - Add `PlayerEdgeDangle` before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Read `IsAtEdge` from your animation script (for example to set an Animator bool) and walk to the end of a platform to test it.
+  fields:
+    edgeCheck: Optional point the downward ray starts from. When empty, it starts at the front bottom corner of the character's collider.
+    rayLength: How far down the ray looks for ground, in units. Drops shorter than this (like a small step) don't count as an edge.
+    groundLayers: Layers that count as ground. *Everything* works because the character ignores its own colliders.
+  api:
+    IsAtEdge: True while the character is grounded and there's no ground below its front edge.
+  example: |
+    Drive an Animator bool so the character flails its arms at the edge:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class EdgeWobble : MonoBehaviour
+    {
+        [SerializeField] private Animator animator;
+        private PlayerEdgeDangle _edge;
+
+        private void Awake() => _edge = GetComponent<PlayerEdgeDangle>();
+
+        private void Update() => animator.SetBool("AtEdge", _edge.IsAtEdge);
+    }
+    ```
+  tips:
+    - Only play the wobble when the character is also idle; otherwise it flickers on for a frame every time the player runs off a platform.
+    - Raise **Ray Length** if stairs or small steps trigger the edge pose; lower it if even short drops should count as an edge.
+es:
+  summary: Detecta cuando el personaje está justo al borde de una caída para que reproduzcas una animación de tambaleo.
+  clip_caption: Al caminar hasta el final de una plataforma IsAtEdge se activa; al darse la vuelta se apaga otra vez.
+  description: |
+    En cada frame que el personaje está en el suelo, esta habilidad lanza un rayo hacia abajo desde el borde
+    delantero de su collider (el lado hacia donde mira, según el signo de la escala X que voltea
+    `PlayerWalkRun`), empezando justo encima de los pies. Si ese rayo no encuentra suelo dentro de **Ray
+    Length**, `IsAtEdge` pasa a verdadero: el siguiente paso sería una caída.
+
+    Es solo informativo. No frena, no desacelera ni empuja al personaje; solo expone `IsAtEdge` para que un
+    Animator, un sonido o tu propio script reaccionen (la clásica pose de "bracear al borde del precipicio").
+    En el aire siempre vale falso.
+
+    Como el chequeo mira solo hacia el frente, darse la vuelta apaga la bandera aunque el personaje no se
+    mueva. El rayo ignora los colliders del propio personaje, por eso **Ground Layers** puede quedarse en
+    *Everything*.
+  setup:
+    - Arma un personaje con `CharacterController2D` y `PlayerWalkRun`.
+    - Agrega `PlayerEdgeDangle` antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Lee `IsAtEdge` desde tu script de animación (por ejemplo para un bool del Animator) y camina hasta el final de una plataforma para probarlo.
+  fields:
+    edgeCheck: Punto opcional desde donde sale el rayo hacia abajo. Si está vacío, sale de la esquina inferior delantera del collider del personaje.
+    rayLength: Cuánto busca suelo hacia abajo el rayo, en unidades. Las caídas más cortas que esto (como un escalón) no cuentan como borde.
+    groundLayers: Capas que cuentan como suelo. *Everything* funciona porque el personaje ignora sus propios colliders.
+  api:
+    IsAtEdge: Verdadero mientras el personaje está en el suelo y no hay suelo bajo su borde delantero.
+  example: |
+    Controla un bool del Animator para que el personaje bracee al borde:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class EdgeWobble : MonoBehaviour
+    {
+        [SerializeField] private Animator animator;
+        private PlayerEdgeDangle _edge;
+
+        private void Awake() => _edge = GetComponent<PlayerEdgeDangle>();
+
+        private void Update() => animator.SetBool("AtEdge", _edge.IsAtEdge);
+    }
+    ```
+  tips:
+    - Reproduce el tambaleo solo cuando el personaje además está quieto; si no, se enciende un frame cada vez que el jugador sale corriendo de una plataforma.
+    - Sube **Ray Length** si las escaleras o escalones pequeños activan la pose de borde; bájalo si quieres que hasta las caídas cortas cuenten como borde.

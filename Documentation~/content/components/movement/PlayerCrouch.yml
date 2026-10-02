@@ -1,0 +1,110 @@
+name: PlayerCrouch
+clip: true
+related: [PlayerCrawl, PlayerWalkRun, PlayerDropThrough, PlayerSlopeWalk]
+en:
+  summary: Crouch while holding Ctrl on the ground, shrinking the collider to fit under low gaps and moving slower.
+  clip_caption: Walking up to a low overhang, crouching to pass under it at half speed, then standing up again.
+  description: |
+    While **Crouch** (Ctrl) is held and the character is grounded, `PlayerCrouch` shrinks the body collider
+    to **Crouch Height Ratio** of its standing height and multiplies the horizontal velocity by **Speed
+    Multiplier**. The collider shrinks from the top, so the feet stay exactly where they were and ground
+    detection keeps working. Releasing the button, or leaving the ground, restores the standing shape.
+
+    It works with a `CapsuleCollider2D` or a `BoxCollider2D` (the character's own collider unless you assign
+    **Body Collider**). The standing size and offset are read once when the character starts, so the
+    collider is never deformed by crouching repeatedly.
+
+    The speed multiplier is applied on top of the velocity other abilities computed earlier in the same
+    frame, so place `PlayerCrouch` **below** `PlayerWalkRun` in the component list. It doesn't check for a
+    ceiling before standing up: if the player lets go in a tunnel, the collider grows back into the
+    ceiling. While crouching it sets the movement state to `Crouching`.
+  setup:
+    - Build a character with `CharacterController2D`, a Capsule or Box collider and `PlayerWalkRun`.
+    - Add `PlayerCrouch` below `PlayerWalkRun`, before `CharacterCore` (or anywhere if `CharacterCore` is added last).
+    - Build a gap lower than the standing height but taller than the crouched height, and hold **Ctrl** to go under it.
+  fields:
+    bodyCollider: Collider that shrinks. Leave empty to use the character's own `Collider2D` (Box or Capsule only).
+    crouchHeightRatio: Crouched height as a fraction of the standing height (0.5 = half). Range 0.2–1.
+    speedMultiplier: Factor applied to the horizontal speed while crouched (0.5 = half speed, 0 = can't move while crouched).
+  api:
+    IsCrouching: True while the character is crouched this frame (button held and grounded).
+  example: |
+    Swap to a crouching sprite while `IsCrouching` is true:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class CrouchSprite : MonoBehaviour
+    {
+        [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private Sprite standing;
+        [SerializeField] private Sprite crouching;
+        private PlayerCrouch _crouch;
+
+        private void Awake() => _crouch = GetComponent<PlayerCrouch>();
+
+        private void LateUpdate()
+        {
+            spriteRenderer.sprite = _crouch.IsCrouching ? crouching : standing;
+        }
+    }
+    ```
+  tips:
+    - Add `PlayerCrawl` if you want a fixed crawl speed that ignores running.
+    - Make tunnels long enough that players won't release **Ctrl** halfway, or end them with an opening, since standing up doesn't check the ceiling.
+    - Crouch uses Ctrl, while `PlayerDropThrough` uses down + jump, so both coexist on the same character.
+es:
+  summary: Agáchate manteniendo Ctrl en el suelo; el collider se encoge para pasar por huecos bajos y te mueves más lento.
+  clip_caption: Caminando hasta un techo bajo, agachándose para pasar por debajo a mitad de velocidad y levantándose otra vez.
+  description: |
+    Mientras mantienes **Agacharse** (Ctrl) y el personaje está en el suelo, `PlayerCrouch` encoge el
+    collider del cuerpo a **Crouch Height Ratio** de su altura de pie y multiplica la velocidad horizontal
+    por **Speed Multiplier**. El collider se encoge desde arriba, así que los pies se quedan exactamente
+    donde estaban y la detección de suelo sigue funcionando. Al soltar el botón, o al dejar el suelo, vuelve
+    la forma de pie.
+
+    Funciona con un `CapsuleCollider2D` o un `BoxCollider2D` (el collider del propio personaje, salvo que
+    asignes **Body Collider**). El tamaño y el offset de pie se leen una sola vez al iniciar, así que el
+    collider nunca se deforma por agacharse muchas veces.
+
+    El multiplicador se aplica sobre la velocidad que otras habilidades ya calcularon en ese frame, por eso
+    debes poner `PlayerCrouch` **debajo** de `PlayerWalkRun` en la lista de componentes. No revisa si hay
+    techo antes de levantarse: si el jugador suelta el botón dentro de un túnel, el collider vuelve a crecer
+    contra el techo. Mientras está agachado cambia el estado de movimiento a `Crouching`.
+  setup:
+    - Arma un personaje con `CharacterController2D`, un collider Capsule o Box y `PlayerWalkRun`.
+    - Agrega `PlayerCrouch` debajo de `PlayerWalkRun`, antes de `CharacterCore` (o en cualquier orden si `CharacterCore` va al final).
+    - Arma un hueco más bajo que la altura de pie pero más alto que la altura agachado, y mantén **Ctrl** para pasar por debajo.
+  fields:
+    bodyCollider: Collider que se encoge. Déjalo vacío para usar el `Collider2D` del personaje (solo Box o Capsule).
+    crouchHeightRatio: Altura agachado como fracción de la altura de pie (0.5 = la mitad). Rango 0.2–1.
+    speedMultiplier: Factor aplicado a la velocidad horizontal mientras estás agachado (0.5 = mitad de velocidad, 0 = no se mueve agachado).
+  api:
+    IsCrouching: Verdadero mientras el personaje está agachado en este frame (botón mantenido y en el suelo).
+  example: |
+    Cambia a un sprite agachado mientras `IsCrouching` sea verdadero:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class CrouchSprite : MonoBehaviour
+    {
+        [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private Sprite standing;
+        [SerializeField] private Sprite crouching;
+        private PlayerCrouch _crouch;
+
+        private void Awake() => _crouch = GetComponent<PlayerCrouch>();
+
+        private void LateUpdate()
+        {
+            spriteRenderer.sprite = _crouch.IsCrouching ? crouching : standing;
+        }
+    }
+    ```
+  tips:
+    - Agrega `PlayerCrawl` si quieres una velocidad de gateo fija que ignore el correr.
+    - Haz los túneles lo bastante largos para que el jugador no suelte **Ctrl** a la mitad, o termínalos con una salida, porque al levantarse no se revisa el techo.
+    - Agacharse usa Ctrl y `PlayerDropThrough` usa abajo + salto, así que ambos conviven en el mismo personaje.

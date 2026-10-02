@@ -1,0 +1,94 @@
+name: CharacterDeath
+clip: true
+related: [CharacterHealth, CharacterRespawn, CharacterLives, CharacterAnimatorBridge]
+en:
+  summary: Handles what happens when health reaches zero — freezes abilities, sets the Dead state and plays a death animation.
+  clip_caption: The character dies after three spike hits, stops responding to input and disappears a moment later.
+  description: |
+    `CharacterDeath` listens to `CharacterHealth.OnDeath`. When the character dies it changes the
+    condition state of `CharacterCore` to `Dead` and suspends every ability, so input no longer moves,
+    jumps or attacks. If there is an `Animator` on the object or its children it sets the
+    **Death Animator Trigger** (`Die` by default), and then it fires `OnCharacterDeath`.
+
+    By default the body stays in the scene. Set **Disable Delay** to a value of 0 or more to deactivate
+    the GameObject that many seconds after dying — handy for enemies. `Revive` undoes everything: it
+    cancels the pending deactivation, reactivates the object, resumes the abilities and puts the
+    condition back to `Normal`. It does not restore health; `CharacterRespawn` calls both `ResetHealth`
+    and `Revive` for you.
+  setup:
+    - Add `CharacterDeath` to a character with `CharacterHealth` (it is required and added automatically).
+    - If you have an Animator, create a trigger parameter named like **Death Animator Trigger**, or clear the field.
+    - For enemies, set **Disable Delay** to make the body disappear; for the player, add `CharacterRespawn` instead.
+  fields:
+    deathAnimatorTrigger: Animator trigger set when the character dies. Leave it empty to skip the animation call.
+    disableDelay: Seconds until the GameObject is deactivated after dying. -1 (default) never deactivates it.
+  events:
+    OnCharacterDeath: C# event fired right after the death has been applied (state, suspension and animation).
+  api:
+    Revive: Resumes abilities, returns the condition to `Normal` and reactivates the GameObject. Does not touch health.
+  example: |
+    Show a "You died" panel when the player dies:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class DeathScreen : MonoBehaviour
+    {
+        [SerializeField] private CharacterDeath playerDeath;
+        [SerializeField] private GameObject panel;
+
+        private void OnEnable() => playerDeath.OnCharacterDeath += Show;
+        private void OnDisable() => playerDeath.OnCharacterDeath -= Show;
+
+        private void Show() => panel.SetActive(true);
+    }
+    ```
+  tips:
+    - With `CharacterRespawn`, keep **Disable Delay** at -1 so the player isn't switched off while waiting to reappear.
+    - "`CharacterAnimatorBridge` also sets a `Dead` bool from the condition state, so you can drive the death animation with either one."
+es:
+  summary: Se encarga de lo que pasa cuando la vida llega a cero — congela las habilidades, marca el estado Dead y anima la muerte.
+  clip_caption: El personaje muere tras tres golpes de los pinchos, deja de responder al input y desaparece un momento después.
+  description: |
+    `CharacterDeath` escucha `CharacterHealth.OnDeath`. Cuando el personaje muere, cambia el estado de
+    condición de `CharacterCore` a `Dead` y suspende todas las habilidades, así que el input ya no lo
+    mueve, ni salta, ni ataca. Si hay un `Animator` en el objeto o sus hijos activa el
+    **Death Animator Trigger** (`Die` por defecto) y después dispara `OnCharacterDeath`.
+
+    Por defecto el cuerpo se queda en la escena. Pon **Disable Delay** en 0 o más para desactivar el
+    GameObject esos segundos después de morir — útil para enemigos. `Revive` deshace todo: cancela la
+    desactivación pendiente, reactiva el objeto, reanuda las habilidades y vuelve la condición a
+    `Normal`. No restaura la vida; `CharacterRespawn` llama a `ResetHealth` y a `Revive` por ti.
+  setup:
+    - Agrega `CharacterDeath` a un personaje con `CharacterHealth` (es obligatorio y se agrega solo).
+    - Si usas Animator, crea un parámetro trigger con el nombre de **Death Animator Trigger**, o deja el campo vacío.
+    - En enemigos, ajusta **Disable Delay** para que el cuerpo desaparezca; en el jugador, agrega `CharacterRespawn`.
+  fields:
+    deathAnimatorTrigger: Trigger del Animator que se activa al morir. Déjalo vacío para no llamar al Animator.
+    disableDelay: Segundos hasta desactivar el GameObject después de morir. -1 (por defecto) nunca lo desactiva.
+  events:
+    OnCharacterDeath: Evento C# que se dispara justo después de aplicar la muerte (estado, suspensión y animación).
+  api:
+    Revive: Reanuda las habilidades, vuelve la condición a `Normal` y reactiva el GameObject. No toca la vida.
+  example: |
+    Muestra un panel de "Has muerto" cuando el jugador muere:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class DeathScreen : MonoBehaviour
+    {
+        [SerializeField] private CharacterDeath playerDeath;
+        [SerializeField] private GameObject panel;
+
+        private void OnEnable() => playerDeath.OnCharacterDeath += Show;
+        private void OnDisable() => playerDeath.OnCharacterDeath -= Show;
+
+        private void Show() => panel.SetActive(true);
+    }
+    ```
+  tips:
+    - Con `CharacterRespawn`, deja **Disable Delay** en -1 para que el jugador no se apague mientras espera reaparecer.
+    - "`CharacterAnimatorBridge` también pone un bool `Dead` según el estado de condición, así que puedes animar la muerte con cualquiera de los dos."

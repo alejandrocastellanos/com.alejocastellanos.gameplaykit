@@ -1,0 +1,55 @@
+name: CameraZoomBySpeed
+clip: true
+related: [CameraFollow, CameraBounds, PlayerDash, PlayerWalkRun]
+en:
+  summary: Zooms the camera out as the player speeds up and back in when it slows down.
+  clip_caption: Standing, walking, running and dashing — the camera zooms out with speed and back in when the player stops.
+  description: |
+    Every `LateUpdate`, `CameraZoomBySpeed` reads the speed of its target `Rigidbody2D` and moves the
+    camera's orthographic size between **Min Zoom** (standing still) and **Max Zoom** (at **Speed For Max
+    Zoom** or faster), interpolating linearly in between. The change is smoothed with **Zoom Smooth Time**,
+    so short bursts like a dash produce a gentle breath instead of a jump.
+
+    The speed is the full velocity magnitude, so falling fast zooms out too. **Target** is optional: when
+    empty it looks for the object tagged **Player** and uses its `Rigidbody2D`. It only affects orthographic
+    cameras, and it overrides any orthographic size you set by hand on that camera.
+  setup:
+    - Add `CameraZoomBySpeed` to your camera (usually next to `CameraFollow`).
+    - Tag your player **Player** or drag its `Rigidbody2D` into **Target**.
+    - Set **Min Zoom** to the size you like when standing and **Max Zoom** to the widest view you allow.
+    - Set **Speed For Max Zoom** close to your fastest regular speed (run or dash speed).
+  fields:
+    target: Rigidbody2D whose speed drives the zoom. Empty uses the object tagged Player.
+    minZoom: Orthographic size when the target is still (half the visible height, in units).
+    maxZoom: Orthographic size at **Speed For Max Zoom** or faster. Higher shows more of the level.
+    speedForMaxZoom: Speed, in units per second, at which the camera reaches **Max Zoom**. With the default walk (4) and run (7) speeds, 10 leaves room for dashes.
+    zoomSmoothTime: Approximate seconds the zoom takes to settle. Raise it for slower, more cinematic zoom changes.
+  tips:
+    - Keep **Max Zoom** moderate (about 1.5× **Min Zoom**); bigger jumps make sprites look tiny at full speed.
+    - With `CameraBounds`, make sure the level is large enough for the widest zoom, or the camera will be centered on that axis.
+es:
+  summary: Aleja el zoom de la cámara cuando el jugador acelera y lo acerca de nuevo cuando frena.
+  clip_caption: Quieto, caminando, corriendo y con dash — la cámara se aleja con la velocidad y se acerca cuando el jugador se detiene.
+  description: |
+    En cada `LateUpdate`, `CameraZoomBySpeed` lee la velocidad de su `Rigidbody2D` objetivo y lleva el tamaño
+    ortográfico de la cámara entre **Min Zoom** (quieto) y **Max Zoom** (a **Speed For Max Zoom** o más),
+    interpolando en línea recta entre ambos. El cambio se suaviza con **Zoom Smooth Time**, así ráfagas
+    cortas como un dash producen una respiración suave en vez de un salto.
+
+    La velocidad es la magnitud completa, así que caer rápido también aleja el zoom. **Target** es opcional:
+    si está vacío busca el objeto con tag **Player** y usa su `Rigidbody2D`. Solo afecta a cámaras
+    ortográficas y reemplaza cualquier tamaño ortográfico que pongas a mano en esa cámara.
+  setup:
+    - Agrega `CameraZoomBySpeed` a tu cámara (normalmente junto a `CameraFollow`).
+    - Ponle el tag **Player** a tu jugador o arrastra su `Rigidbody2D` a **Target**.
+    - Pon en **Min Zoom** el tamaño que te gusta estando quieto y en **Max Zoom** la vista más amplia que permitas.
+    - Pon **Speed For Max Zoom** cerca de tu velocidad normal más alta (correr o dash).
+  fields:
+    target: Rigidbody2D cuya velocidad controla el zoom. Vacío usa el objeto con tag Player.
+    minZoom: Tamaño ortográfico con el objetivo quieto (la mitad de la altura visible, en unidades).
+    maxZoom: Tamaño ortográfico a **Speed For Max Zoom** o más. Más alto muestra más del nivel.
+    speedForMaxZoom: Velocidad, en unidades por segundo, a la que la cámara llega a **Max Zoom**. Con las velocidades por defecto de caminar (4) y correr (7), 10 deja margen para los dashes.
+    zoomSmoothTime: Segundos aproximados que tarda el zoom en acomodarse. Súbelo para cambios más lentos y cinematográficos.
+  tips:
+    - Mantén **Max Zoom** moderado (cerca de 1.5× **Min Zoom**); saltos mayores hacen que los sprites se vean diminutos a toda velocidad.
+    - Con `CameraBounds`, asegúrate de que el nivel sea lo bastante grande para el zoom más amplio, o la cámara se centrará en ese eje.

@@ -1,0 +1,104 @@
+name: PlayerDash8Directions
+clip: true
+related: [PlayerDash, PlayerTopDownMovement, PlayerTeleportBlink, PlayerRollDodge]
+en:
+  summary: Dash in the direction you are holding, including diagonals and straight up or down, with a cooldown.
+  clip_caption: In a top-down room, the character dashes diagonally, sideways, up and down following the held direction.
+  description: |
+    Like `PlayerDash`, but the burst follows the movement input instead of only the facing. Pressing **Dash**
+    (Q, or the right trigger on a gamepad) takes the normalized input direction, so diagonals are as fast as
+    straight lines, and moves the character at **Dash Speed** along it for **Dash Duration** seconds. With no
+    input held it dashes horizontally towards the facing direction (the sign of `transform.localScale.x`).
+
+    The velocity is overwritten every frame during the dash. When it ends, the character keeps whatever
+    velocity the dash left: in a side-scroller, `PlayerWalkRun` immediately takes back the horizontal speed
+    but the vertical speed remains, so an upward dash carries on rising like a jump. In a top-down game,
+    `PlayerTopDownMovement` smoothly brings the speed back to walking.
+
+    The **Cooldown** starts counting when the dash begins. It works in the air and on the ground, and it's
+    the dash the **GameplayKit > Create Top-Down Player** menu uses.
+  setup:
+    - Build a character with `CharacterController2D` and a movement ability (`PlayerWalkRun` or `PlayerTopDownMovement`).
+    - Add `PlayerDash8Directions` before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Hold a direction (WASD, arrows or left stick) and press **Q**.
+  fields:
+    dashSpeed: Speed during the dash, in units per second, along the chosen direction.
+    dashDuration: How long the dash lasts, in seconds. Distance ≈ **Dash Speed** × **Dash Duration**.
+    cooldown: Seconds from the start of one dash until the next one is allowed.
+  example: |
+    Shake the camera a little on every dash by listening to the `Dashing` movement state:
+
+    ```csharp
+    using GameplayKit.CameraSystem;
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class DashShake : MonoBehaviour
+    {
+        [SerializeField] private CameraShake cameraShake;
+        private CharacterCore _core;
+
+        private void Start()
+        {
+            _core = GetComponent<CharacterCore>();
+            _core.Movement.OnStateChanged += (previous, current) =>
+            {
+                if (current == MovementState.Dashing) cameraShake.Shake(0.1f, 0.05f);
+            };
+        }
+    }
+    ```
+  tips:
+    - In platformers, an upward dash plus gravity can reach high ledges; lower **Dash Speed** or **Dash Duration** if it outclimbs your jump.
+    - Use `PlayerDash` instead if you only want horizontal dashes and don't want diagonals to depend on stick precision.
+es:
+  summary: Haz dash en la dirección que mantienes, incluidas diagonales y recto hacia arriba o abajo, con recarga.
+  clip_caption: En una habitación cenital, el personaje hace dash en diagonal, de lado, hacia arriba y hacia abajo según la dirección mantenida.
+  description: |
+    Como `PlayerDash`, pero el impulso sigue el input de movimiento en vez de solo la orientación. Al pulsar
+    **Dash** (Q, o el gatillo derecho del gamepad) toma la dirección del input normalizada, así que las
+    diagonales son tan rápidas como las rectas, y mueve al personaje a **Dash Speed** en esa dirección durante
+    **Dash Duration** segundos. Si no mantienes ninguna dirección, hace el dash en horizontal hacia donde mira
+    (el signo de `transform.localScale.x`).
+
+    La velocidad se sobrescribe en cada frame durante el dash. Al terminar, el personaje conserva la
+    velocidad que dejó el dash: en un juego de plataformas, `PlayerWalkRun` retoma enseguida la velocidad
+    horizontal pero la vertical se mantiene, así que un dash hacia arriba sigue subiendo como un salto. En
+    un juego cenital, `PlayerTopDownMovement` devuelve la velocidad a la de caminar de forma suave.
+
+    **Cooldown** empieza a contar cuando comienza el dash. Funciona en el aire y en el suelo, y es el dash
+    que usa el menú **GameplayKit > Create Top-Down Player**.
+  setup:
+    - Arma un personaje con `CharacterController2D` y una habilidad de movimiento (`PlayerWalkRun` o `PlayerTopDownMovement`).
+    - Agrega `PlayerDash8Directions` antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Mantén una dirección (WASD, flechas o stick izquierdo) y pulsa **Q**.
+  fields:
+    dashSpeed: Velocidad durante el dash, en unidades por segundo, en la dirección elegida.
+    dashDuration: Cuánto dura el dash, en segundos. Distancia ≈ **Dash Speed** × **Dash Duration**.
+    cooldown: Segundos desde el inicio de un dash hasta que se permite el siguiente.
+  example: |
+    Sacude un poco la cámara en cada dash escuchando el estado de movimiento `Dashing`:
+
+    ```csharp
+    using GameplayKit.CameraSystem;
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class DashShake : MonoBehaviour
+    {
+        [SerializeField] private CameraShake cameraShake;
+        private CharacterCore _core;
+
+        private void Start()
+        {
+            _core = GetComponent<CharacterCore>();
+            _core.Movement.OnStateChanged += (previous, current) =>
+            {
+                if (current == MovementState.Dashing) cameraShake.Shake(0.1f, 0.05f);
+            };
+        }
+    }
+    ```
+  tips:
+    - En plataformas, un dash hacia arriba más la gravedad puede alcanzar cornisas altas; baja **Dash Speed** o **Dash Duration** si supera a tu salto.
+    - Usa `PlayerDash` si solo quieres dashes horizontales y no quieres que las diagonales dependan de la precisión del stick.

@@ -1,0 +1,75 @@
+name: AIDecisionHealthThreshold
+clip: true
+related: [AIBrain, AIActionFlee, CharacterHealth, DamageableObject]
+en:
+  summary: AIBrain decision that becomes true when the enemy's own health drops to a percentage of its maximum.
+  clip_caption: The enemy approaches until two shots bring it to 50% health, then switches to Flee and runs to the wall.
+  description: |
+    Looks for any health component (`IHealthSource`, such as `CharacterHealth` or `DamageableObject`) on
+    this GameObject or its parents and returns true when `CurrentHealth / MaxHealth` is at or below
+    **Threshold Ratio 01**. With the default 0.5 an enemy with 60 HP switches at 30 HP or less. If no
+    health component is found (or its maximum is 0) it returns false, and it keeps looking each time
+    it's asked, so a health component added later is picked up.
+
+    Health never goes back up by itself in most setups, so this is usually a one-way transition into
+    a "wounded" behaviour: flee, call for help, enrage.
+  setup:
+    - Give the enemy `CharacterHealth` or `DamageableObject` so it can take damage.
+    - Add `AIDecisionHealthThreshold` and set **Threshold Ratio 01**.
+    - In the combat state, add a transition with it and **True Target State** set to e.g. `Flee`.
+  fields:
+    thresholdRatio01: Health fraction (0 to 1) at or below which the decision is true. 0.25 means "a quarter of the maximum or less".
+  example: |
+    Play a "wounded" sound once when the enemy enters the state this decision leads to:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class WoundedCry : AIActionBase
+    {
+        [SerializeField] private AudioSource cry;
+
+        public override void OnEnterState(AIBrain brain) => cry.Play();
+        public override void PerformAction(AIBrain brain) { }
+    }
+    ```
+  tips:
+    - Put the transition first in the list so it wins over range checks on the same frame.
+    - Stack two copies (0.5 and 0.2) on different states for multi-phase bosses.
+es:
+  summary: Decisión de AIBrain que se vuelve verdadera cuando la vida del propio enemigo baja a un porcentaje de su máximo.
+  clip_caption: El enemigo se acerca hasta que dos disparos lo dejan al 50 % de vida; entonces pasa a Flee y corre hasta la pared.
+  description: |
+    Busca cualquier componente de vida (`IHealthSource`, como `CharacterHealth` o `DamageableObject`) en
+    este GameObject o sus padres y devuelve verdadero cuando `CurrentHealth / MaxHealth` es menor o igual
+    a **Threshold Ratio 01**. Con el valor por defecto 0.5, un enemigo de 60 de vida cambia con 30 o
+    menos. Si no encuentra componente de vida (o su máximo es 0) devuelve falso, y lo sigue buscando cada
+    vez que se le pregunta, así que detecta uno agregado más tarde.
+
+    En la mayoría de los casos la vida no vuelve a subir sola, así que suele ser una transición de ida
+    hacia un comportamiento de "herido": huir, pedir ayuda, enfurecerse.
+  setup:
+    - Dale al enemigo `CharacterHealth` o `DamageableObject` para que pueda recibir daño.
+    - Agrega `AIDecisionHealthThreshold` y ajusta **Threshold Ratio 01**.
+    - En el estado de combate, agrega una transición con ella y **True Target State** en, por ejemplo, `Flee`.
+  fields:
+    thresholdRatio01: Fracción de vida (0 a 1) a partir de la cual, hacia abajo, la decisión es verdadera. 0.25 significa "un cuarto del máximo o menos".
+  example: |
+    Reproduce un sonido de "herido" una vez cuando el enemigo entra al estado al que lleva esta decisión:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class WoundedCry : AIActionBase
+    {
+        [SerializeField] private AudioSource cry;
+
+        public override void OnEnterState(AIBrain brain) => cry.Play();
+        public override void PerformAction(AIBrain brain) { }
+    }
+    ```
+  tips:
+    - Pon la transición primera en la lista para que gane sobre los chequeos de rango en el mismo frame.
+    - Usa dos copias (0.5 y 0.2) en estados distintos para jefes con varias fases.

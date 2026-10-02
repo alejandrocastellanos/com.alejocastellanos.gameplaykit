@@ -1,0 +1,99 @@
+name: PressurePlate
+clip: true
+related: [PushableBox, Lever, Elevator, DoorWithKey]
+en:
+  summary: A floor plate that stays pressed while something stands on it and fires events to open doors or start machines.
+  clip_caption: The plate opens the gate while the player stands on it, closes it when they step off, and a falling crate keeps it open.
+  description: |
+    `PressurePlate` works with a trigger collider. Every collider that enters it and passes the
+    **Required Tag** filter (empty means anything with a physics body: players, enemies, boxes) is counted.
+    The plate becomes pressed when the first one enters, firing **On Pressed** and `OnPressed`, and is
+    released only when the last one leaves, firing **On Released** and `OnReleased`.
+
+    Because it counts, stepping off while a box is still on the plate keeps it pressed, which makes it the
+    natural partner of `PushableBox` puzzles. A character with several colliders counts each one, but it
+    still releases correctly when it leaves completely.
+  setup:
+    - Create a flat GameObject with a `BoxCollider2D` marked **Is Trigger**, slightly overlapping the floor, and add `PressurePlate`.
+    - In **On Pressed** and **On Released**, click **+**, drag the target (a door, a gate, an `Elevator`) and pick the method to call.
+    - Optionally set **Required Tag** so only the player, or only boxes, can press it.
+  fields:
+    requiredTag: Only colliders with this tag (on the collider or its Rigidbody2D) press the plate. Empty means any collider.
+  events:
+    onPressed: UnityEvent fired when the plate goes from free to pressed.
+    onReleased: UnityEvent fired when the last object leaves the plate.
+    OnPressed: C# event fired together with **On Pressed**.
+    OnReleased: C# event fired together with **On Released**.
+  api:
+    IsPressed: True while at least one valid collider is on the plate.
+  example: |
+    Lower a platform sprite a little while the plate is pressed:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    [RequireComponent(typeof(PressurePlate))]
+    public class PlateVisual : MonoBehaviour
+    {
+        [SerializeField] private Transform top;
+
+        private void Awake()
+        {
+            var plate = GetComponent<PressurePlate>();
+            plate.OnPressed += () => top.localPosition = new Vector3(0f, -0.08f, 0f);
+            plate.OnReleased += () => top.localPosition = Vector3.zero;
+        }
+    }
+    ```
+  tips:
+    - Make the trigger overlap the floor surface a little so objects resting on the floor are inside it.
+    - For a one-time trigger, connect **On Pressed** to `DoorWithKey.Open` and ignore **On Released**.
+es:
+  summary: Una placa en el suelo que se mantiene pulsada mientras algo la pisa y dispara eventos para abrir puertas o activar mecanismos.
+  clip_caption: La placa abre la reja mientras el jugador la pisa, la cierra cuando se baja, y una caja que cae la mantiene abierta.
+  description: |
+    `PressurePlate` funciona con un collider trigger. Cuenta cada collider que entra y pasa el filtro de
+    **Required Tag** (vacío significa cualquier cosa con cuerpo físico: jugadores, enemigos, cajas). La
+    placa se pulsa cuando entra el primero, disparando **On Pressed** y `OnPressed`, y solo se suelta cuando
+    sale el último, disparando **On Released** y `OnReleased`.
+
+    Como cuenta, bajarse mientras una caja sigue encima la mantiene pulsada, lo que la hace la pareja
+    natural de los puzles con `PushableBox`. Un personaje con varios colliders cuenta cada uno, pero igual
+    la suelta correctamente cuando sale del todo.
+  setup:
+    - Crea un GameObject plano con un `BoxCollider2D` marcado como **Is Trigger**, que se meta un poco en el suelo, y agrégale `PressurePlate`.
+    - En **On Pressed** y **On Released**, pulsa **+**, arrastra el destino (una puerta, una reja, un `Elevator`) y elige el método a llamar.
+    - Si quieres, pon un **Required Tag** para que solo el jugador, o solo las cajas, puedan pulsarla.
+  fields:
+    requiredTag: Solo los colliders con este tag (en el collider o en su Rigidbody2D) pulsan la placa. Vacío significa cualquier collider.
+  events:
+    onPressed: UnityEvent que se dispara cuando la placa pasa de libre a pulsada.
+    onReleased: UnityEvent que se dispara cuando el último objeto sale de la placa.
+    OnPressed: Evento C# que se dispara junto con **On Pressed**.
+    OnReleased: Evento C# que se dispara junto con **On Released**.
+  api:
+    IsPressed: Verdadero mientras haya al menos un collider válido sobre la placa.
+  example: |
+    Hunde un poco el sprite de la placa mientras está pulsada:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    [RequireComponent(typeof(PressurePlate))]
+    public class PlateVisual : MonoBehaviour
+    {
+        [SerializeField] private Transform top;
+
+        private void Awake()
+        {
+            var plate = GetComponent<PressurePlate>();
+            plate.OnPressed += () => top.localPosition = new Vector3(0f, -0.08f, 0f);
+            plate.OnReleased += () => top.localPosition = Vector3.zero;
+        }
+    }
+    ```
+  tips:
+    - Haz que el trigger se meta un poco en la superficie del suelo para que los objetos apoyados queden dentro.
+    - Para un disparo de una sola vez, conecta **On Pressed** a `DoorWithKey.Open` e ignora **On Released**.

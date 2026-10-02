@@ -4,6 +4,30 @@ Todos los cambios relevantes de este paquete se documentan aquí.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado,
 [Semantic Versioning](https://semver.org/lang/es/).
 
+## [1.1.0] - 2026-10-02
+
+### Agregado
+
+- Sitio de documentación (MkDocs Material, inglés y español) en `Documentation~/`, publicado en GitHub
+  Pages por `.github/workflows/docs.yml`, con un clip animado de cada componente y referencia completa
+  del Inspector.
+- Helper `PlayerLocator` y propiedades públicas `Target` en `EnemyChase`, `EnemyFlee` y `EnemyShootOnSight`.
+- Campos `force` y `upwardLift` en `CharacterKnockback` y `swingDamping` en `PlayerRopeGrab`.
+
+### Corregido
+
+- `CharacterCore` se salta las habilidades desmarcadas en el Inspector (y `AIBrain` las acciones y
+  decisiones desactivadas).
+- `PlayerRopeGrab` es un péndulo real: la gravedad lo hace oscilar, el input empuja hacia la dirección
+  pulsada (antes era al revés) y conserva el impulso al soltarse.
+- `PlayerWallCling` ya no anula la altura del wall jump cuando se sigue empujando hacia la pared.
+- `EnemyChase`, `EnemyFlee` y `EnemyShootOnSight` buscan al objeto con tag Player si no tienen objetivo;
+  `EnemySpawner` también les asigna el suyo.
+- `PauseManager` pone a `GameManager` en `Paused` y lo devuelve a `Playing` (sin pisar un `GameOver`);
+  `GameManager`, `AudioManager` y `SaveLoadSystem` se sueltan de su padre antes de `DontDestroyOnLoad`.
+- `CharacterKnockback` empuja con una velocidad configurable en lugar de usar el daño como fuerza.
+- `CharacterGravityController` respeta el Gravity Scale del `Rigidbody2D` (Base Gravity Scale = 0).
+
 ## [1.0.0] - 2026-10-02
 
 Primera versión publicada.
@@ -45,4 +69,5 @@ Primera versión publicada.
 - `EnemyPathfindingAgent` requiere un NavMesh 2D externo (por ejemplo NavMeshPlus); sin NavMesh
   no hace nada.
 
+[1.1.0]: https://github.com/<usuario>/<repo>/releases/tag/v1.1.0
 [1.0.0]: https://github.com/<usuario>/<repo>/releases/tag/v1.0.0

@@ -1,0 +1,57 @@
+name: DamageFlash
+clip: true
+related: [CharacterHealth, DamageableObject, DamagePopupSpawner, CameraShake]
+en:
+  summary: Tints the sprites for an instant when hit and makes them blink while the character is invulnerable.
+  clip_caption: Sword hits make an enemy flash red and blink during its invulnerability, while a crate only flashes.
+  description: |
+    `DamageFlash` finds the health source on its object or a parent — `CharacterHealth`,
+    `DamageableObject` or anything implementing `IHealthSource` — and reacts every time a hit lands. All
+    `SpriteRenderer`s on the object and its children are tinted with **Flash Color** for
+    **Flash Duration** seconds and then restored to their original colors.
+
+    With a `CharacterHealth`, the sprites then blink (alternating full and 25 % opacity every
+    **Blink Interval** seconds) for as long as the character stays invulnerable, so players can see the
+    immunity window. Blinking stops on death. `DamageableObject` has no invulnerability, so it only
+    flashes. Disabling the component restores the original colors.
+  setup:
+    - Add `DamageFlash` to an object with `CharacterHealth` or `DamageableObject` (on the same object or a parent).
+    - Make sure the visuals are `SpriteRenderer`s on that object or its children.
+    - Pick a **Flash Color** that contrasts with your art.
+  fields:
+    flashColor: Color applied to every sprite during the flash. The original alpha of each sprite is kept.
+    flashDuration: Seconds the tint lasts.
+    blinkWhileInvulnerable: When on, the sprites blink while the `CharacterHealth` is invulnerable after the flash.
+    blinkInterval: Seconds between each blink toggle. Smaller values blink faster.
+  api:
+    IsFlashing: True while the flash or the blinking is running.
+  tips:
+    - The sprite colors are recorded when the component wakes up; if you change a sprite's color by code later, the flash restores the old color.
+    - Combine it with `CameraShake` and `DamagePopupSpawner` for punchy hit feedback.
+es:
+  summary: Tiñe los sprites un instante al recibir un golpe y los hace parpadear mientras el personaje es invulnerable.
+  clip_caption: Los espadazos hacen que un enemigo destelle en rojo y parpadee durante su invulnerabilidad, mientras que la caja solo destella.
+  description: |
+    `DamageFlash` busca la fuente de vida en su objeto o en un padre — `CharacterHealth`,
+    `DamageableObject` o cualquier cosa que implemente `IHealthSource` — y reacciona cada vez que entra
+    un golpe. Todos los `SpriteRenderer` del objeto y sus hijos se tiñen con **Flash Color** durante
+    **Flash Duration** segundos y luego vuelven a sus colores originales.
+
+    Con un `CharacterHealth`, después los sprites parpadean (alternando opacidad completa y 25 % cada
+    **Blink Interval** segundos) mientras el personaje siga invulnerable, para que el jugador vea la
+    ventana de inmunidad. El parpadeo se corta al morir. `DamageableObject` no tiene invulnerabilidad,
+    así que solo destella. Desactivar el componente restaura los colores originales.
+  setup:
+    - Agrega `DamageFlash` a un objeto con `CharacterHealth` o `DamageableObject` (en el mismo objeto o en un padre).
+    - Asegúrate de que lo visual sean `SpriteRenderer` en ese objeto o sus hijos.
+    - Elige un **Flash Color** que contraste con tu arte.
+  fields:
+    flashColor: Color que se aplica a cada sprite durante el destello. Se conserva el alfa original de cada sprite.
+    flashDuration: Segundos que dura el tinte.
+    blinkWhileInvulnerable: Activado, los sprites parpadean mientras el `CharacterHealth` es invulnerable tras el destello.
+    blinkInterval: Segundos entre cada cambio del parpadeo. Valores más chicos parpadean más rápido.
+  api:
+    IsFlashing: Verdadero mientras dura el destello o el parpadeo.
+  tips:
+    - Los colores de los sprites se guardan cuando el componente despierta; si después cambias el color de un sprite por código, el destello restaura el color viejo.
+    - Combínalo con `CameraShake` y `DamagePopupSpawner` para que los golpes se sientan con fuerza.

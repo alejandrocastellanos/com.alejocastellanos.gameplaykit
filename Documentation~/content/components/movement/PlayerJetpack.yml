@@ -1,0 +1,96 @@
+name: PlayerJetpack
+clip: true
+related: [PlayerFly, PlayerGlide, PlayerJump, PlayerWalkRun]
+en:
+  summary: Hold jump to fly upwards on a jetpack that burns fuel in the air and refills on the ground.
+  clip_caption: A full tank lifts the character high until the fuel runs out; after a short refill on the ground the next boost is much smaller.
+  description: |
+    While **Jump** is held and there's fuel left, the character's vertical velocity is set to **Thrust**
+    every frame and fuel drains at **Fuel Drain Per Second**. It works from the ground and in mid-air, and
+    sets the movement state to `Jumping`. Horizontal movement is untouched, so `PlayerWalkRun` still steers.
+
+    When the tank is empty, holding the button does nothing and the character falls normally. Fuel only
+    refills while the character is grounded and not thrusting, at **Fuel Regen Per Second**, so players
+    have to land to recover. The tank starts full.
+
+    Because **Thrust** is a velocity, not a force, letting go while rising carries the character further up
+    before gravity takes over. With the defaults (14 units per second) even a short burst goes high; lower
+    **Thrust** for gentle hovering.
+  setup:
+    - Build a character with `CharacterController2D` and `PlayerWalkRun`.
+    - Add `PlayerJetpack` before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Hold **Jump** to boost; land to refill the fuel.
+  fields:
+    thrust: Upward speed while boosting, in units per second. Lower it for a slower, more controllable jetpack.
+    maxFuel: Fuel capacity; the tank starts full. With the default of 100 you can read `CurrentFuel` as a percentage.
+    fuelDrainPerSecond: Fuel used per second of boosting. Max Fuel divided by this value is the total boost time.
+    fuelRegenPerSecond: Fuel recovered per second while standing on the ground and not boosting.
+  api:
+    CurrentFuel: Fuel left right now, between 0 and **Max Fuel**. Use it to fill a fuel bar.
+  example: |
+    Fill a UI bar with the remaining fuel:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+    using UnityEngine.UI;
+
+    public class FuelBar : MonoBehaviour
+    {
+        [SerializeField] private PlayerJetpack jetpack;
+        [SerializeField] private Image fill;
+        [SerializeField] private float maxFuel = 100f; // same value as the jetpack's Max Fuel
+
+        private void Update() => fill.fillAmount = jetpack.CurrentFuel / maxFuel;
+    }
+    ```
+  tips:
+    - It uses the same button as `PlayerJump`, so pressing jump on the ground both jumps and starts boosting; use one or the other, or accept that the jump is just the first frame of the boost.
+    - Pair it with `PlayerGlide` only if you want the remaining button hold to slow the fall once the tank is empty.
+es:
+  summary: Mantén salto para elevarte con un jetpack que gasta combustible en el aire y se recarga en el suelo.
+  clip_caption: Con el tanque lleno el personaje sube alto hasta quedarse sin combustible; tras recargar un poco en el suelo, el siguiente impulso es mucho menor.
+  description: |
+    Mientras **Salto** está apretado y queda combustible, la velocidad vertical del personaje se fija en
+    **Thrust** en cada frame y el combustible baja a razón de **Fuel Drain Per Second**. Funciona desde el
+    suelo y en el aire, y cambia el estado de movimiento a `Jumping`. El movimiento horizontal no se toca,
+    así que `PlayerWalkRun` sigue dirigiendo.
+
+    Con el tanque vacío, mantener el botón no hace nada y el personaje cae normalmente. El combustible solo
+    se recarga mientras el personaje está en el suelo y sin impulsar, a **Fuel Regen Per Second**, así que el
+    jugador tiene que aterrizar para recuperarlo. El tanque empieza lleno.
+
+    Como **Thrust** es una velocidad y no una fuerza, soltar mientras sube lleva al personaje todavía más
+    arriba antes de que la gravedad mande. Con el valor por defecto (14 unidades por segundo) incluso un
+    impulso corto sube mucho; baja **Thrust** para flotar con suavidad.
+  setup:
+    - Arma un personaje con `CharacterController2D` y `PlayerWalkRun`.
+    - Agrega `PlayerJetpack` antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Mantén **Salto** para impulsarte; aterriza para recargar el combustible.
+  fields:
+    thrust: Velocidad hacia arriba al impulsarse, en unidades por segundo. Bájala para un jetpack más lento y controlable.
+    maxFuel: Capacidad de combustible; el tanque empieza lleno. Con el valor por defecto de 100 puedes leer `CurrentFuel` como porcentaje.
+    fuelDrainPerSecond: Combustible gastado por segundo de impulso. Max Fuel dividido por este valor es el tiempo total de impulso.
+    fuelRegenPerSecond: Combustible recuperado por segundo estando en el suelo y sin impulsar.
+  api:
+    CurrentFuel: Combustible restante en este momento, entre 0 y **Max Fuel**. Úsalo para llenar una barra de combustible.
+  example: |
+    Llena una barra de UI con el combustible restante:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+    using UnityEngine.UI;
+
+    public class FuelBar : MonoBehaviour
+    {
+        [SerializeField] private PlayerJetpack jetpack;
+        [SerializeField] private Image fill;
+        [SerializeField] private float maxFuel = 100f; // el mismo valor que Max Fuel del jetpack
+
+        private void Update() => fill.fillAmount = jetpack.CurrentFuel / maxFuel;
+    }
+    ```
+  tips:
+    - Usa el mismo botón que `PlayerJump`, así que pulsar salto en el suelo salta e impulsa a la vez; usa uno u otro, o acepta que el salto sea solo el primer frame del impulso.
+    - Combínalo con `PlayerGlide` solo si quieres que, con el tanque vacío, seguir apretando el botón frene la caída.

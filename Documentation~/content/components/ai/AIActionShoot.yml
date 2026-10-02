@@ -1,0 +1,83 @@
+name: AIActionShoot
+clip: true
+related: [AIBrain, WeaponHitscan, WeaponProjectile, AIDecisionLineOfSight, AIDecisionTargetInRange]
+en:
+  summary: AIBrain action that fires the enemy's weapon at its target at a regular interval.
+  clip_caption: A turret idles until the player walks into its range, then shoots every 0.6 seconds and stops when the player leaves.
+  description: |
+    While its state is active, the action aims at `AIBrain.Target` (full 2D direction, so it also
+    shoots up or down) and calls `TryFire` on a `WeaponHitscan` on the same GameObject, or on a
+    `WeaponProjectile` if there is no hitscan or it couldn't fire. Damage, range and projectile come from
+    the weapon; the action only decides *when* to pull the trigger.
+
+    Entering the state resets the timer, so the first shot goes off immediately. After a successful shot
+    it waits **Fire Interval** seconds. If the weapon is still on its own cooldown the action simply
+    tries again next frame. It doesn't check walls: pair it with `AIDecisionLineOfSight` if the enemy
+    shouldn't shoot through cover.
+  setup:
+    - Add a `WeaponHitscan` or a `WeaponProjectile` (with its projectile prefab) to the enemy.
+    - Add `AIActionShoot` to the same GameObject and an `AIBrain` with the player as **Target**.
+    - List the action in a state such as `Shoot`, entered with `AIDecisionTargetInRange` or `AIDecisionLineOfSight`.
+  fields:
+    fireInterval: Seconds between shots while the state is active. The weapon's own cooldown still applies, so the real rate is the slower of the two.
+  example: |
+    React to each shot (muzzle flash, sound) through the weapon's event:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class MuzzleFlash : MonoBehaviour
+    {
+        [SerializeField] private WeaponHitscan gun;
+        [SerializeField] private ParticleSystem flash;
+
+        private void OnEnable() => gun.OnShotFired += HandleShot;
+        private void OnDisable() => gun.OnShotFired -= HandleShot;
+
+        private void HandleShot(Vector2 origin, Vector2 end) => flash.Play();
+    }
+    ```
+  tips:
+    - Set the weapon's **Fire Point** to the barrel so shots don't start at the enemy's center.
+    - Combine with `AIDecisionTimeInState` and `AIActionWait` for burst-then-reload patterns.
+es:
+  summary: Acción de AIBrain que dispara el arma del enemigo hacia su objetivo a intervalos regulares.
+  clip_caption: Una torreta espera hasta que el jugador entra en su rango, dispara cada 0.6 segundos y se detiene cuando el jugador sale.
+  description: |
+    Mientras su estado está activo, la acción apunta a `AIBrain.Target` (dirección 2D completa, así
+    también dispara hacia arriba o abajo) y llama a `TryFire` de un `WeaponHitscan` en el mismo
+    GameObject, o de un `WeaponProjectile` si no hay hitscan o no pudo disparar. El daño, el alcance y el
+    proyectil vienen del arma; la acción solo decide *cuándo* apretar el gatillo.
+
+    Al entrar al estado se reinicia el temporizador, así que el primer disparo sale de inmediato. Después
+    de un disparo exitoso espera **Fire Interval** segundos. Si el arma todavía está en su propio
+    cooldown, la acción simplemente lo intenta de nuevo en el siguiente frame. No revisa paredes:
+    combínala con `AIDecisionLineOfSight` si el enemigo no debe disparar a través de coberturas.
+  setup:
+    - Agrega un `WeaponHitscan` o un `WeaponProjectile` (con su prefab de proyectil) al enemigo.
+    - Agrega `AIActionShoot` al mismo GameObject y un `AIBrain` con el jugador como **Target**.
+    - Pon la acción en un estado como `Shoot`, al que se entra con `AIDecisionTargetInRange` o `AIDecisionLineOfSight`.
+  fields:
+    fireInterval: Segundos entre disparos mientras el estado está activo. El cooldown propio del arma sigue aplicando, así que el ritmo real es el más lento de los dos.
+  example: |
+    Reacciona a cada disparo (destello, sonido) con el evento del arma:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class MuzzleFlash : MonoBehaviour
+    {
+        [SerializeField] private WeaponHitscan gun;
+        [SerializeField] private ParticleSystem flash;
+
+        private void OnEnable() => gun.OnShotFired += HandleShot;
+        private void OnDisable() => gun.OnShotFired -= HandleShot;
+
+        private void HandleShot(Vector2 origin, Vector2 end) => flash.Play();
+    }
+    ```
+  tips:
+    - Asigna el **Fire Point** del arma al cañón para que los disparos no salgan del centro del enemigo.
+    - Combínala con `AIDecisionTimeInState` y `AIActionWait` para patrones de ráfaga y recarga.

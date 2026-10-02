@@ -1,0 +1,102 @@
+name: CharacterAimAndOrient
+clip: true
+related: [PlayerAttack, WeaponHitscan, WeaponProjectile, PlayerWalkRun]
+en:
+  summary: Works out where the character aims — mouse, right stick or nearest target — and rotates the weapon arm.
+  clip_caption: In Closest Target mode the arm points at the nearest target and the shots follow; after walking right, the aim switches to the other target.
+  description: |
+    `CharacterAimAndOrient` calculates `AimDirection` every frame. In **Mouse** mode it points from the
+    character to the mouse cursor (using **Aim Camera**, or the main camera). In **Stick** mode it follows
+    the gamepad right stick when it moves past **Stick Dead Zone** and keeps the last direction
+    otherwise. In **Closest Target** mode it points at the nearest damageable object within
+    **Target Search Radius**, ignoring the character itself, and keeps the last direction when there is
+    none.
+
+    If **Part To Rotate** is assigned (a gun or an arm), that part is rotated towards the aim; the body
+    itself is never rotated. The angle is computed in the character's local space, so when the character
+    flips with a negative X scale the weapon doesn't end up upside down. `PlayerAttack` fires
+    `WeaponHitscan` and `WeaponProjectile` along `AimDirection`; melee weapons ignore it.
+  setup:
+    - Add `CharacterAimAndOrient` to a character with `PlayerAttack` and a ranged weapon.
+    - Create a child for the arm or gun (with its sprite pointing right) and assign it to **Part To Rotate**.
+    - Choose **Aim Mode**; for **Mouse**, check that **Aim Camera** points to your gameplay camera.
+  fields:
+    aimMode: "How the aim is chosen: **Mouse** (cursor), **Stick** (gamepad right stick) or **Closest Target** (nearest damageable object, auto-aim)."
+    partToRotate: Optional transform rotated towards the aim, like the weapon or arm. Empty = only `AimDirection` is calculated.
+    stickDeadZone: In **Stick** mode, stick movement below this magnitude is ignored and the last direction is kept.
+    aimCamera: Camera used to convert the mouse position to world space. Empty = `Camera.main`.
+    targetSearchRadius: In **Closest Target** mode, how far targets are searched for, in units.
+    targetLayers: Layers searched in **Closest Target** mode. Only objects with an `IDamageable` count.
+  api:
+    AimDirection: Normalized aim direction in world space (right by default).
+    SetAimDirection: Forces the aim direction (ignored for near-zero vectors). Useful for custom input or AI; the active mode may overwrite it on the next frame.
+  example: |
+    Aim with a virtual joystick on mobile by forcing the direction (leave **Aim Mode** on **Stick** so nothing overrides it without a gamepad):
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class VirtualStickAim : MonoBehaviour
+    {
+        [SerializeField] private CharacterAimAndOrient aim;
+
+        // Call this from your on-screen joystick with its current value.
+        public void OnStick(Vector2 value)
+        {
+            if (value.magnitude > 0.2f) aim.SetAimDirection(value);
+        }
+    }
+    ```
+  tips:
+    - "**Stick** mode reads the right stick only with the new Input System; with the legacy Input Manager it never changes the aim, so feed it with `SetAimDirection`."
+    - "**Closest Target** works great as auto-aim for twin-stick or mobile games; reduce **Target Search Radius** so it doesn't lock on to off-screen enemies."
+es:
+  summary: Calcula hacia dónde apunta el personaje — mouse, stick derecho u objetivo más cercano — y gira el brazo del arma.
+  clip_caption: En modo Closest Target el brazo apunta al objetivo más cercano y los disparos lo siguen; tras caminar a la derecha, la mira pasa al otro objetivo.
+  description: |
+    `CharacterAimAndOrient` calcula `AimDirection` en cada frame. En modo **Mouse** apunta del personaje
+    al cursor (usando **Aim Camera**, o la cámara principal). En modo **Stick** sigue el stick derecho
+    del gamepad cuando supera **Stick Dead Zone** y, si no, conserva la última dirección. En modo
+    **Closest Target** apunta al objeto dañable más cercano dentro de **Target Search Radius**,
+    ignorando al propio personaje, y conserva la última dirección si no hay ninguno.
+
+    Si asignas **Part To Rotate** (una pistola o un brazo), esa parte gira hacia la mira; el cuerpo nunca
+    se rota. El ángulo se calcula en el espacio local del personaje, así que cuando se voltea con escala
+    X negativa el arma no queda boca abajo. `PlayerAttack` dispara `WeaponHitscan` y `WeaponProjectile`
+    en la dirección de `AimDirection`; las armas cuerpo a cuerpo lo ignoran.
+  setup:
+    - Agrega `CharacterAimAndOrient` a un personaje con `PlayerAttack` y un arma a distancia.
+    - Crea un hijo para el brazo o la pistola (con su sprite mirando a la derecha) y asígnalo a **Part To Rotate**.
+    - Elige **Aim Mode**; en **Mouse**, revisa que **Aim Camera** apunte a tu cámara de juego.
+  fields:
+    aimMode: "Cómo se elige la mira: **Mouse** (cursor), **Stick** (stick derecho del gamepad) o **Closest Target** (objeto dañable más cercano, auto-apuntado)."
+    partToRotate: Transform opcional que gira hacia la mira, como el arma o el brazo. Vacío = solo se calcula `AimDirection`.
+    stickDeadZone: En modo **Stick**, los movimientos del stick por debajo de esta magnitud se ignoran y se conserva la última dirección.
+    aimCamera: Cámara para convertir la posición del mouse a coordenadas de mundo. Vacío = `Camera.main`.
+    targetSearchRadius: En modo **Closest Target**, hasta qué distancia se buscan objetivos, en unidades.
+    targetLayers: Capas donde se busca en modo **Closest Target**. Solo cuentan objetos con `IDamageable`.
+  api:
+    AimDirection: Dirección de apuntado normalizada, en coordenadas de mundo (derecha por defecto).
+    SetAimDirection: Fuerza la dirección de apuntado (se ignora con vectores casi nulos). Útil para input propio o IA; el modo activo puede pisarla en el frame siguiente.
+  example: |
+    Apunta con un joystick virtual en móvil forzando la dirección (deja **Aim Mode** en **Stick** para que nada la pise sin gamepad):
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class VirtualStickAim : MonoBehaviour
+    {
+        [SerializeField] private CharacterAimAndOrient aim;
+
+        // Llámalo desde tu joystick en pantalla con su valor actual.
+        public void OnStick(Vector2 value)
+        {
+            if (value.magnitude > 0.2f) aim.SetAimDirection(value);
+        }
+    }
+    ```
+  tips:
+    - "El modo **Stick** solo lee el stick derecho con el nuevo Input System; con el Input Manager clásico nunca cambia la mira, así que aliméntalo con `SetAimDirection`."
+    - "**Closest Target** funciona muy bien como auto-apuntado en juegos twin-stick o de móvil; baja **Target Search Radius** para que no fije enemigos fuera de pantalla."

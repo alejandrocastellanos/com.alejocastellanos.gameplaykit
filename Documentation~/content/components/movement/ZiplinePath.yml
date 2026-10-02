@@ -1,0 +1,50 @@
+name: ZiplinePath
+clip: true
+related: [PlayerZipline, PlayerWalkRun]
+en:
+  summary: Defines the two ends of a zipline and turns its trigger into the entry point riders grab.
+  clip_caption: The path's Start and End set the direction, so this zipline carries the character uphill onto a high platform.
+  description: |
+    `ZiplinePath` goes on the same GameObject as the trigger collider that starts the ride. It only holds two
+    Transforms: **Start** and **End**. When a character with `PlayerZipline` touches the trigger, it jumps to
+    **Start** and slides in a straight line to **End** at its **Ride Speed**.
+
+    The order of the two points sets the direction, and the ride doesn't care about slope: a zipline can go
+    downhill, flat or even uphill at the same speed. The points are read every frame during the ride, so
+    moving them (for example on a moving platform) moves the cable too.
+
+    No tag is required. Only if a character's **Zipline Tag** is set does this GameObject also need that tag.
+  setup:
+    - Create a GameObject at the start of the cable and add a small `BoxCollider2D` with **Is Trigger** enabled.
+    - Add `ZiplinePath` and create two empty child or scene objects for the ends; drag them into **Start** and **End**.
+    - Give the character `PlayerZipline` and walk into the trigger.
+  fields:
+    Start: Where the ride begins; the rider's pivot is placed here first. Put the entry trigger around this point.
+    End: Where the ride ends and gravity comes back. Keep it slightly above the landing spot.
+  tips:
+    - The component draws nothing; add a sprite or `LineRenderer` between **Start** and **End** so players can see the cable.
+    - For a two-way zipline, use two `ZiplinePath` triggers, one at each end, with **Start** and **End** swapped.
+es:
+  summary: Define los dos extremos de una tirolesa y convierte su trigger en el punto de entrada para los viajeros.
+  clip_caption: Start y End definen la dirección, así que esta tirolesa lleva al personaje cuesta arriba hasta una plataforma alta.
+  description: |
+    `ZiplinePath` va en el mismo GameObject que el collider trigger que inicia el viaje. Solo guarda dos
+    Transforms: **Start** y **End**. Cuando un personaje con `PlayerZipline` toca el trigger, salta a **Start**
+    y se desliza en línea recta hasta **End** a su **Ride Speed**.
+
+    El orden de los dos puntos define la dirección, y al viaje no le importa la pendiente: una tirolesa puede
+    bajar, ir plana o incluso subir a la misma velocidad. Los puntos se leen en cada frame durante el viaje,
+    así que si los mueves (por ejemplo sobre una plataforma móvil) el cable se mueve con ellos.
+
+    No hace falta ningún tag. Solo si el **Zipline Tag** de un personaje tiene valor, este GameObject también
+    necesita ese tag.
+  setup:
+    - Crea un GameObject al inicio del cable y agrégale un `BoxCollider2D` pequeño con **Is Trigger** activado.
+    - Agrega `ZiplinePath` y crea dos objetos vacíos (hijos o de la escena) para los extremos; arrástralos a **Start** y **End**.
+    - Dale `PlayerZipline` al personaje y camina hacia el trigger.
+  fields:
+    Start: Donde empieza el viaje; el pivote del viajero se coloca aquí primero. Pon el trigger de entrada alrededor de este punto.
+    End: Donde termina el viaje y vuelve la gravedad. Déjalo un poco por encima del punto de aterrizaje.
+  tips:
+    - El componente no dibuja nada; agrega un sprite o un `LineRenderer` entre **Start** y **End** para que se vea el cable.
+    - Para una tirolesa de ida y vuelta usa dos triggers con `ZiplinePath`, uno en cada extremo, con **Start** y **End** invertidos.

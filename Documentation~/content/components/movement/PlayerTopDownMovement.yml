@@ -1,0 +1,123 @@
+name: PlayerTopDownMovement
+clip: true
+related: [PlayerDash8Directions, PlayerWalkRun, PlayerInteract]
+en:
+  summary: Top-down movement in any direction with no gravity, smooth acceleration and Shift to run.
+  clip_caption: A character walking and running around a top-down room in eight directions and stopping against the walls.
+  description: |
+    For games seen from above. `PlayerTopDownMovement` turns gravity off for the character as soon as it
+    starts (through the controller's shared gravity override) and moves it on both axes with the same input
+    as the rest of the kit: WASD, arrows or the left stick, plus **Run** (Shift) to switch from **Walk
+    Speed** to **Run Speed**. The input is clamped to a length of 1, so diagonals aren't faster than straight
+    lines and analog sticks give proportional speed.
+
+    The velocity eases towards the target with a smoothing time of **Acceleration** seconds, both when
+    starting and when stopping; set it to 0 for instant, grid-like response. Walls and obstacles are just
+    solid colliders: the `Rigidbody2D` collides with them normally.
+
+    It remembers the last direction moved in `LastMoveDirection` (it starts as down), which is useful for
+    choosing an idle sprite or the direction of an attack. With **Flip With Direction** on it flips
+    `transform.localScale.x` when moving left or right. It stops responding while the character is stunned
+    or dead, and writes the `Idle`, `Walking` and `Running` movement states.
+  setup:
+    - Use **GameplayKit > Create Top-Down Player**, or build a character with a `Collider2D` (a 0.4-radius `CircleCollider2D` works well) and `CharacterController2D`.
+    - Add `PlayerTopDownMovement` instead of `PlayerWalkRun` and `PlayerJump`, then `CharacterCore` last.
+    - Surround the play area with solid colliders and press Play.
+  fields:
+    walkSpeed: Movement speed without **Run**, in units per second.
+    runSpeed: Movement speed while **Run** is held, in units per second.
+    acceleration: Smoothing time, in seconds, to reach the target speed (and to stop). 0 = instant.
+    flipWithDirection: Flips `localScale.x` to face left or right while moving horizontally.
+  api:
+    LastMoveDirection: Normalized direction of the last movement input (starts as `Vector2.down`). Stays the same while idle.
+  example: |
+    Feed the last movement direction to a four-direction Animator blend tree:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class TopDownAnimator : MonoBehaviour
+    {
+        [SerializeField] private Animator animator;
+        private PlayerTopDownMovement _movement;
+        private Rigidbody2D _body;
+
+        private void Awake()
+        {
+            _movement = GetComponent<PlayerTopDownMovement>();
+            _body = GetComponent<Rigidbody2D>();
+        }
+
+        private void LateUpdate()
+        {
+            animator.SetFloat("DirX", _movement.LastMoveDirection.x);
+            animator.SetFloat("DirY", _movement.LastMoveDirection.y);
+            animator.SetFloat("Speed", _body.linearVelocity.magnitude);
+        }
+    }
+    ```
+  tips:
+    - Don't combine it with `PlayerWalkRun`, `PlayerJump` or other platformer abilities; pair it with `PlayerDash8Directions` for a dodge.
+    - Turn **Flip With Direction** off if you use separate up/down/left/right sprites driven by `LastMoveDirection`.
+    - Raise **Acceleration** (0.15–0.25) for slippery surfaces like ice.
+es:
+  summary: Movimiento cenital en cualquier dirección, sin gravedad, con aceleración suave y Shift para correr.
+  clip_caption: Un personaje caminando y corriendo por una habitación vista desde arriba en ocho direcciones y deteniéndose contra las paredes.
+  description: |
+    Para juegos vistos desde arriba. `PlayerTopDownMovement` le quita la gravedad al personaje apenas
+    arranca (con la anulación de gravedad compartida del controlador) y lo mueve en ambos ejes con el mismo
+    input que el resto del kit: WASD, flechas o stick izquierdo, más **Correr** (Shift) para pasar de **Walk
+    Speed** a **Run Speed**. El input se limita a una longitud de 1, así que las diagonales no son más rápidas
+    que las rectas y los sticks analógicos dan velocidad proporcional.
+
+    La velocidad se acerca a la deseada con un tiempo de suavizado de **Acceleration** segundos, tanto al
+    arrancar como al frenar; ponlo en 0 para una respuesta inmediata, tipo cuadrícula. Las paredes y
+    obstáculos son simplemente colliders sólidos: el `Rigidbody2D` choca con ellos normalmente.
+
+    Recuerda la última dirección de movimiento en `LastMoveDirection` (empieza hacia abajo), útil para elegir
+    el sprite en reposo o la dirección de un ataque. Con **Flip With Direction** activo voltea
+    `transform.localScale.x` al moverte a izquierda o derecha. Deja de responder mientras el personaje está
+    aturdido o muerto, y escribe los estados de movimiento `Idle`, `Walking` y `Running`.
+  setup:
+    - Usa **GameplayKit > Create Top-Down Player**, o arma un personaje con un `Collider2D` (un `CircleCollider2D` de radio 0.4 funciona bien) y `CharacterController2D`.
+    - Agrega `PlayerTopDownMovement` en lugar de `PlayerWalkRun` y `PlayerJump`, y luego `CharacterCore` al final.
+    - Rodea la zona de juego con colliders sólidos y dale Play.
+  fields:
+    walkSpeed: Velocidad de movimiento sin **Correr**, en unidades por segundo.
+    runSpeed: Velocidad de movimiento mientras mantienes **Correr**, en unidades por segundo.
+    acceleration: Tiempo de suavizado, en segundos, para llegar a la velocidad deseada (y para frenar). 0 = inmediato.
+    flipWithDirection: Voltea `localScale.x` para mirar a izquierda o derecha al moverte en horizontal.
+  api:
+    LastMoveDirection: Dirección normalizada del último input de movimiento (empieza en `Vector2.down`). No cambia mientras estás quieto.
+  example: |
+    Pasa la última dirección de movimiento a un blend tree de cuatro direcciones del Animator:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class TopDownAnimator : MonoBehaviour
+    {
+        [SerializeField] private Animator animator;
+        private PlayerTopDownMovement _movement;
+        private Rigidbody2D _body;
+
+        private void Awake()
+        {
+            _movement = GetComponent<PlayerTopDownMovement>();
+            _body = GetComponent<Rigidbody2D>();
+        }
+
+        private void LateUpdate()
+        {
+            animator.SetFloat("DirX", _movement.LastMoveDirection.x);
+            animator.SetFloat("DirY", _movement.LastMoveDirection.y);
+            animator.SetFloat("Speed", _body.linearVelocity.magnitude);
+        }
+    }
+    ```
+  tips:
+    - No lo combines con `PlayerWalkRun`, `PlayerJump` ni otras habilidades de plataformas; acompáñalo con `PlayerDash8Directions` para esquivar.
+    - Desactiva **Flip With Direction** si usas sprites separados de arriba/abajo/izquierda/derecha según `LastMoveDirection`.
+    - Sube **Acceleration** (0.15–0.25) para superficies resbalosas como hielo.

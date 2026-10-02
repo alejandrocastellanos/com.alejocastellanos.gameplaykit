@@ -1,0 +1,102 @@
+name: EnemyPathfindingAgent
+clip: false
+experimental: true
+related: [EnemyChase, AIBrain, EnemySpawner]
+en:
+  summary: Experimental — moves an enemy around obstacles to its target using Unity's NavMeshAgent on a 2D NavMesh.
+  description: |
+    A thin wrapper over Unity's `NavMeshAgent` for enemies that must find their way around complex
+    obstacles. Every **Repath Interval** seconds it calls `SetDestination` with the target's position;
+    the agent does the actual path finding and movement, so speed, acceleration, stopping distance and
+    avoidance are configured on the `NavMeshAgent` (added automatically). In `Awake` it turns off the
+    agent's `updateRotation` and `updateUpAxis`, which keeps the object flat on the XY plane instead of
+    rotating it as a 3D agent would.
+
+    **Experimental:** Unity bakes NavMeshes in 3D, on the XZ plane. A 2D game needs a NavMesh built on
+    the XY plane, for example with the community package **NavMeshPlus**. Without a NavMesh under the
+    enemy (or without a target) the component simply does nothing and reports no error. It is found
+    under **Add Component › GameplayKit › Experimental › Enemy Pathfinding Agent (NavMesh)**.
+  setup:
+    - Install NavMeshPlus (or another way to bake a NavMesh on the XY plane) and bake a NavMesh for your level following its instructions.
+    - Add `EnemyPathfindingAgent` to the enemy; a `NavMeshAgent` is added with it. Set speed and stopping distance on the `NavMeshAgent`.
+    - Assign **Target** in the Inspector, or call `SetTarget` from code (for example from `EnemySpawner.OnSpawned`).
+  fields:
+    target: Object to walk to, usually the player.
+    repathInterval: Seconds between path updates towards the target's current position. Lower follows a moving target more closely at a higher CPU cost.
+  api:
+    HasTarget: True when a target is assigned.
+    SetTarget: Changes the target at runtime; pass null to stop updating the destination.
+  example: |
+    Give spawned pathfinding enemies their target as they appear:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class AssignPathTarget : MonoBehaviour
+    {
+        [SerializeField] private EnemySpawner spawner;
+        [SerializeField] private Transform player;
+
+        private void OnEnable() => spawner.OnSpawned += Assign;
+        private void OnDisable() => spawner.OnSpawned -= Assign;
+
+        private void Assign(GameObject enemy)
+        {
+            var agent = enemy.GetComponent<EnemyPathfindingAgent>();
+            if (agent != null) agent.SetTarget(player);
+        }
+    }
+    ```
+  tips:
+    - The `NavMeshAgent` moves the Transform itself; don't combine it with velocity-based components such as `EnemyChase` or `EnemyPatrol`, and make any `Rigidbody2D` on the enemy Kinematic so gravity doesn't fight the agent.
+    - NavMesh pathfinding suits top-down levels; for side-view platformers `EnemyChase` or an `AIBrain` is usually enough.
+es:
+  summary: Experimental — lleva a un enemigo hasta su objetivo esquivando obstáculos con el NavMeshAgent de Unity sobre un NavMesh 2D.
+  description: |
+    Un envoltorio simple sobre el `NavMeshAgent` de Unity para enemigos que deben encontrar el camino
+    entre obstáculos complejos. Cada **Repath Interval** segundos llama a `SetDestination` con la posición
+    del objetivo; el agente se encarga de calcular la ruta y mover al enemigo, así que la velocidad, la
+    aceleración, la distancia de frenado y la evasión se configuran en el `NavMeshAgent` (que se agrega
+    solo). En `Awake` desactiva `updateRotation` y `updateUpAxis` del agente, lo que mantiene el objeto
+    plano sobre el plano XY en vez de rotarlo como haría un agente 3D.
+
+    **Experimental:** Unity hornea los NavMesh en 3D, sobre el plano XZ. Un juego 2D necesita un NavMesh
+    construido sobre el plano XY, por ejemplo con el paquete comunitario **NavMeshPlus**. Sin un NavMesh
+    bajo el enemigo (o sin objetivo) el componente simplemente no hace nada y no muestra errores. Está en
+    **Add Component › GameplayKit › Experimental › Enemy Pathfinding Agent (NavMesh)**.
+  setup:
+    - Instala NavMeshPlus (u otra forma de hornear un NavMesh sobre el plano XY) y hornea un NavMesh para tu nivel siguiendo sus instrucciones.
+    - Agrega `EnemyPathfindingAgent` al enemigo; con él se agrega un `NavMeshAgent`. Ajusta la velocidad y la distancia de frenado en el `NavMeshAgent`.
+    - Asigna **Target** en el Inspector o llama a `SetTarget` por código (por ejemplo desde `EnemySpawner.OnSpawned`).
+  fields:
+    target: Objeto hacia el que caminar, normalmente el jugador.
+    repathInterval: Segundos entre actualizaciones de la ruta hacia la posición actual del objetivo. Un valor más bajo sigue mejor a un objetivo en movimiento, con más costo de CPU.
+  api:
+    HasTarget: Verdadero cuando hay un objetivo asignado.
+    SetTarget: Cambia el objetivo en runtime; pasa null para dejar de actualizar el destino.
+  example: |
+    Dale su objetivo a los enemigos con pathfinding a medida que aparecen:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class AssignPathTarget : MonoBehaviour
+    {
+        [SerializeField] private EnemySpawner spawner;
+        [SerializeField] private Transform player;
+
+        private void OnEnable() => spawner.OnSpawned += Assign;
+        private void OnDisable() => spawner.OnSpawned -= Assign;
+
+        private void Assign(GameObject enemy)
+        {
+            var agent = enemy.GetComponent<EnemyPathfindingAgent>();
+            if (agent != null) agent.SetTarget(player);
+        }
+    }
+    ```
+  tips:
+    - El `NavMeshAgent` mueve el Transform directamente; no lo combines con componentes que usan velocidad como `EnemyChase` o `EnemyPatrol`, y pon en Kinematic cualquier `Rigidbody2D` del enemigo para que la gravedad no pelee con el agente.
+    - El pathfinding con NavMesh encaja en niveles top-down; para plataformeros de vista lateral normalmente alcanza con `EnemyChase` o un `AIBrain`.

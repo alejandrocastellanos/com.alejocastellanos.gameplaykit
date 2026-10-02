@@ -1,0 +1,91 @@
+name: WaterZone
+clip: true
+related: [PlayerSwim, WindZone2D, CharacterGravityController, PushableBox]
+en:
+  summary: A body of water that slows down and buoys up any physics object inside it.
+  clip_caption: A normal crate sinks slowly, a light crate floats at the surface, and a crate outside the water falls at full speed.
+  description: |
+    `WaterZone` works with a trigger collider and affects every `Rigidbody2D` that enters it. On entering,
+    the body's linear damping is replaced with **Linear Drag In Water** (the original value is restored when
+    it leaves), and every physics step it gets a constant upward force of **Buoyancy Force**, even if it
+    is resting on the bottom.
+
+    The force doesn't depend on depth, so what floats is decided by weight: with normal gravity, a body of
+    mass 1 weighs about 9.8, more than the default buoyancy of 8, so it sinks slowly; a body under about
+    0.8 of mass rises until it pops out of the surface, falls back in and bobs there. Characters with
+    `PlayerSwim` detect any `WaterZone` on their own and switch to swimming, which controls their velocity
+    directly.
+  setup:
+    - Create a GameObject with a `BoxCollider2D` marked **Is Trigger** covering the water and add `WaterZone`.
+    - Give the player `PlayerSwim` if it should swim inside.
+    - Tune **Buoyancy Force** against the mass of the objects that should float, and **Linear Drag In Water** for how thick the water feels.
+  fields:
+    linearDragInWater: Linear damping applied to bodies while inside (replaces their own and is restored on exit). Higher feels like thicker liquid.
+    buoyancyForce: Constant upward force applied to each body inside, in newtons. Floats bodies lighter than this divided by gravity (about 0.8 of mass by default).
+  events:
+    OnEnterWater: C# event fired when a collider enters the water, with that collider's GameObject. Good for splash effects.
+    OnExitWater: C# event fired when a collider leaves the water, with that collider's GameObject.
+  example: |
+    Spawn a splash wherever something enters the water:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    [RequireComponent(typeof(WaterZone))]
+    public class Splashes : MonoBehaviour
+    {
+        [SerializeField] private GameObject splashPrefab;
+
+        private void Awake() =>
+            GetComponent<WaterZone>().OnEnterWater += go =>
+                Instantiate(splashPrefab, go.transform.position, Quaternion.identity);
+    }
+    ```
+  tips:
+    - Events fire per collider, so an object with two colliders produces two splashes.
+    - Make floating platforms out of light crates: set their **Mass** under the floating threshold and freeze their rotation.
+es:
+  summary: Un volumen de agua que frena y hace flotar a cualquier objeto con física que entre.
+  clip_caption: Una caja normal se hunde despacio, una caja liviana flota en la superficie y una caja fuera del agua cae a toda velocidad.
+  description: |
+    `WaterZone` funciona con un collider trigger y afecta a cada `Rigidbody2D` que entra. Al entrar, la
+    amortiguación lineal del cuerpo se reemplaza por **Linear Drag In Water** (al salir se restaura la
+    original), y en cada paso de física recibe una fuerza constante hacia arriba de **Buoyancy Force**,
+    aunque esté apoyado en el fondo.
+
+    La fuerza no depende de la profundidad, así que lo que flota lo decide el peso: con gravedad normal,
+    un cuerpo de masa 1 pesa unos 9.8, más que la flotación por defecto de 8, así que se hunde despacio; un
+    cuerpo de menos de unos 0.8 de masa sube hasta asomarse, vuelve a caer y se queda meciéndose en la
+    superficie. Los personajes con `PlayerSwim` detectan cualquier `WaterZone` por su cuenta y pasan a
+    nadar, lo que controla su velocidad directamente.
+  setup:
+    - Crea un GameObject con un `BoxCollider2D` marcado como **Is Trigger** que cubra el agua y agrégale `WaterZone`.
+    - Dale al jugador `PlayerSwim` si debe nadar dentro.
+    - Ajusta **Buoyancy Force** según la masa de lo que debe flotar, y **Linear Drag In Water** según qué tan espesa se sienta el agua.
+  fields:
+    linearDragInWater: Amortiguación lineal que se aplica a los cuerpos dentro (reemplaza la suya y se restaura al salir). Más alto se siente como un líquido más espeso.
+    buoyancyForce: Fuerza constante hacia arriba sobre cada cuerpo dentro, en newtons. Flotan los cuerpos más livianos que este valor dividido por la gravedad (unos 0.8 de masa por defecto).
+  events:
+    OnEnterWater: Evento C# que se dispara cuando un collider entra al agua, con el GameObject de ese collider. Ideal para salpicaduras.
+    OnExitWater: Evento C# que se dispara cuando un collider sale del agua, con el GameObject de ese collider.
+  example: |
+    Crea una salpicadura donde algo entra al agua:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    [RequireComponent(typeof(WaterZone))]
+    public class Splashes : MonoBehaviour
+    {
+        [SerializeField] private GameObject splashPrefab;
+
+        private void Awake() =>
+            GetComponent<WaterZone>().OnEnterWater += go =>
+                Instantiate(splashPrefab, go.transform.position, Quaternion.identity);
+    }
+    ```
+  tips:
+    - Los eventos se disparan por collider, así que un objeto con dos colliders produce dos salpicaduras.
+    - Haz plataformas flotantes con cajas livianas: pon su **Mass** por debajo del umbral de flotación y congela su rotación.

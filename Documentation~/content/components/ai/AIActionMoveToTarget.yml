@@ -1,0 +1,81 @@
+name: AIActionMoveToTarget
+clip: true
+related: [AIBrain, AIDecisionTargetInRange, AIActionFlee, EnemyChase]
+en:
+  summary: AIBrain action that walks the enemy towards its target and stops at a set distance.
+  clip_caption: The enemy walks up to the player, stops at the stopping distance and follows again when the player moves away.
+  description: |
+    While its state is active, the enemy moves horizontally towards `AIBrain.Target` at **Speed** by
+    setting the `Rigidbody2D`'s X velocity; the Y velocity is left alone, so it walks on the ground and
+    falls with gravity. When the straight-line distance to the target is at most **Stopping Distance**,
+    it stops.
+
+    Leaving the state zeroes the horizontal velocity, so the enemy doesn't keep sliding into the next
+    state. With no target the action does nothing. It doesn't flip the sprite; add a small custom action
+    (see `AIActionBase`) if your enemy must face the player.
+  setup:
+    - Give the enemy a `Collider2D` and a `Rigidbody2D` (Freeze Rotation Z).
+    - Add `AIActionMoveToTarget` and an `AIBrain`, and assign the player to the brain's **Target**.
+    - List the action in a state such as `Chase`, usually entered with `AIDecisionTargetInRange`.
+  fields:
+    speed: Horizontal speed in units per second.
+    stoppingDistance: Distance to the target at which the enemy stops. The default (0.3) is smaller than most colliders, so the enemy pushes against the player; raise it for enemies that should keep some room.
+  example: |
+    Make the enemy faster when it's angry by keeping two configured copies and switching states from
+    code:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class EnrageOnHit : MonoBehaviour
+    {
+        [SerializeField] private AIBrain brain;
+
+        // Hook this to a damage event; "ChaseFast" is a state with a faster AIActionMoveToTarget.
+        public void Enrage() => brain.TransitionTo("ChaseFast");
+    }
+    ```
+  tips:
+    - Combine it with `AIDecisionTargetInRange` in two directions (true enters `Chase`, false leaves it) for a classic aggro behaviour.
+    - The distance includes height, so a target on a platform above may never get within **Stopping Distance**.
+    - Motion is horizontal only; for flying or top-down enemies write a custom action that sets both axes.
+es:
+  summary: Acción de AIBrain que lleva al enemigo hacia su objetivo y lo detiene a cierta distancia.
+  clip_caption: El enemigo camina hasta el jugador, se detiene a la distancia de frenado y lo vuelve a seguir cuando se aleja.
+  description: |
+    Mientras su estado está activo, el enemigo se mueve en horizontal hacia `AIBrain.Target` a **Speed**
+    fijando la velocidad X del `Rigidbody2D`; la velocidad Y no se toca, así camina por el suelo y cae con
+    la gravedad. Cuando la distancia en línea recta al objetivo es como mucho **Stopping Distance**, se
+    detiene.
+
+    Al salir del estado la velocidad horizontal vuelve a cero, para que el enemigo no siga deslizándose
+    en el siguiente estado. Sin objetivo la acción no hace nada. No voltea el sprite; agrega una pequeña
+    acción propia (mira `AIActionBase`) si tu enemigo debe mirar al jugador.
+  setup:
+    - Dale al enemigo un `Collider2D` y un `Rigidbody2D` (Freeze Rotation Z).
+    - Agrega `AIActionMoveToTarget` y un `AIBrain`, y asigna al jugador en el **Target** del cerebro.
+    - Pon la acción en un estado como `Chase`, al que normalmente se entra con `AIDecisionTargetInRange`.
+  fields:
+    speed: Velocidad horizontal en unidades por segundo.
+    stoppingDistance: Distancia al objetivo a la que el enemigo se detiene. El valor por defecto (0.3) es menor que la mayoría de los colliders, así que el enemigo empuja al jugador; súbelo para enemigos que deban guardar espacio.
+  example: |
+    Haz que el enemigo sea más rápido cuando se enoja, teniendo dos copias configuradas y cambiando de
+    estado por código:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class EnrageOnHit : MonoBehaviour
+    {
+        [SerializeField] private AIBrain brain;
+
+        // Conéctalo a un evento de daño; "ChaseFast" es un estado con un AIActionMoveToTarget más rápido.
+        public void Enrage() => brain.TransitionTo("ChaseFast");
+    }
+    ```
+  tips:
+    - Combínala con `AIDecisionTargetInRange` en ambos sentidos (true entra a `Chase`, false sale) para el clásico comportamiento de "aggro".
+    - La distancia incluye la altura, así que un objetivo sobre una plataforma más alta puede no quedar nunca dentro de **Stopping Distance**.
+    - El movimiento es solo horizontal; para enemigos voladores o top-down escribe una acción propia que mueva ambos ejes.

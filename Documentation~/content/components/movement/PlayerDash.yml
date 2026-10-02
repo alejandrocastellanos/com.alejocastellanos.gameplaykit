@@ -1,0 +1,117 @@
+name: PlayerDash
+clip: true
+related: [PlayerDash8Directions, PlayerRollDodge, PlayerGroundSlam, PlayerTeleportBlink]
+en:
+  summary: Quick horizontal burst of speed in the facing direction, on the ground or in the air, with a cooldown.
+  clip_caption: A dash to the right on the ground, then a short hop and a flat air dash to the left.
+  description: |
+    Pressing **Dash** (Q, or the right trigger on a gamepad) moves the character at **Dash Speed** in the
+    direction it is facing for **Dash Duration** seconds. The facing comes from the sign of
+    `transform.localScale.x`, which `PlayerWalkRun` flips. With the defaults the dash covers about 2.4 units
+    (16 × 0.15).
+
+    During the dash the velocity is overwritten every frame with a purely horizontal value, so vertical
+    speed is held at zero: an air dash travels in a flat line and the fall only resumes when it ends. It
+    works on the ground and in the air, as often as the **Cooldown** allows. The cooldown starts counting
+    when the dash begins, so it includes the dash itself.
+
+    It doesn't make the character invulnerable and doesn't change its collider; for a dodge with
+    invulnerability use `PlayerRollDodge`, and for dashing along the input direction use
+    `PlayerDash8Directions`.
+  setup:
+    - Build a character with `CharacterController2D` and `PlayerWalkRun` (so it can turn around).
+    - Add `PlayerDash` before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Press **Q** while facing the way you want to go.
+  fields:
+    dashSpeed: Horizontal speed during the dash, in units per second.
+    dashDuration: How long the dash lasts, in seconds. Distance ≈ **Dash Speed** × **Dash Duration**.
+    cooldown: Seconds from the start of one dash until the next one is allowed.
+  example: |
+    `PlayerDash` has no events; detect dashes from the `Dashing` movement state it sets on start, for
+    example to emit an afterimage effect:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class DashAfterimage : MonoBehaviour
+    {
+        [SerializeField] private ParticleSystem afterimage;
+        private CharacterCore _core;
+
+        private void Start()
+        {
+            _core = GetComponent<CharacterCore>();
+            _core.Movement.OnStateChanged += HandleState;
+        }
+
+        private void OnDestroy()
+        {
+            if (_core != null) _core.Movement.OnStateChanged -= HandleState;
+        }
+
+        private void HandleState(MovementState previous, MovementState current)
+        {
+            if (current == MovementState.Dashing) afterimage.Play();
+        }
+    }
+    ```
+  tips:
+    - The dash shares the **Dash** button with `PlayerGroundSlam`; on the same character, down + Dash in the air triggers both, so pick one or remap one of them.
+    - Air dashes are unlimited apart from the cooldown; raise **Cooldown** if players can cross gaps you meant to be impassable.
+es:
+  summary: Impulso horizontal rápido hacia donde miras, en el suelo o en el aire, con tiempo de recarga.
+  clip_caption: Un dash a la derecha en el suelo y luego un saltito con un dash aéreo recto hacia la izquierda.
+  description: |
+    Pulsar **Dash** (Q, o el gatillo derecho del gamepad) mueve al personaje a **Dash Speed** hacia donde
+    mira durante **Dash Duration** segundos. La orientación sale del signo de `transform.localScale.x`, que
+    voltea `PlayerWalkRun`. Con los valores por defecto el dash recorre unas 2.4 unidades (16 × 0.15).
+
+    Durante el dash la velocidad se sobrescribe en cada frame con un valor puramente horizontal, así que la
+    velocidad vertical se mantiene en cero: un dash en el aire avanza en línea recta y la caída solo sigue
+    cuando termina. Funciona en el suelo y en el aire, tantas veces como lo permita **Cooldown**. La recarga
+    empieza a contar cuando el dash comienza, así que incluye la duración del propio dash.
+
+    No vuelve invulnerable al personaje ni cambia su collider; para un esquive con invulnerabilidad usa
+    `PlayerRollDodge`, y para hacer dash en la dirección del input usa `PlayerDash8Directions`.
+  setup:
+    - Arma un personaje con `CharacterController2D` y `PlayerWalkRun` (para que pueda darse vuelta).
+    - Agrega `PlayerDash` antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Pulsa **Q** mirando hacia donde quieres ir.
+  fields:
+    dashSpeed: Velocidad horizontal durante el dash, en unidades por segundo.
+    dashDuration: Cuánto dura el dash, en segundos. Distancia ≈ **Dash Speed** × **Dash Duration**.
+    cooldown: Segundos desde el inicio de un dash hasta que se permite el siguiente.
+  example: |
+    `PlayerDash` no tiene eventos; detecta los dashes con el estado de movimiento `Dashing` que activa al
+    empezar, por ejemplo para soltar una estela:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class DashAfterimage : MonoBehaviour
+    {
+        [SerializeField] private ParticleSystem afterimage;
+        private CharacterCore _core;
+
+        private void Start()
+        {
+            _core = GetComponent<CharacterCore>();
+            _core.Movement.OnStateChanged += HandleState;
+        }
+
+        private void OnDestroy()
+        {
+            if (_core != null) _core.Movement.OnStateChanged -= HandleState;
+        }
+
+        private void HandleState(MovementState previous, MovementState current)
+        {
+            if (current == MovementState.Dashing) afterimage.Play();
+        }
+    }
+    ```
+  tips:
+    - El dash comparte el botón **Dash** con `PlayerGroundSlam`; en el mismo personaje, abajo + Dash en el aire activa los dos, así que elige uno o cambia la asignación de alguno.
+    - Los dashes aéreos son ilimitados salvo por la recarga; sube **Cooldown** si los jugadores cruzan huecos que querías imposibles.

@@ -1,0 +1,43 @@
+name: RopeAnchor
+clip: true
+related: [PlayerRopeGrab, PlayerJump]
+en:
+  summary: Marks a trigger collider as a rope anchor the player can grab and swing from, with no tags to set up.
+  clip_caption: Pressing interact out of the anchor's range does nothing; jumping into the range and pressing it grabs the rope.
+  description: |
+    `RopeAnchor` is an empty marker component. Put it on a GameObject with a trigger `Collider2D` and any
+    character with `PlayerRopeGrab` can grab it. It exists so you don't need a "RopeAnchor" tag in the Tag
+    Manager; the tag still works as an alternative through **Rope Tag** on `PlayerRopeGrab`.
+
+    The GameObject's position is the pivot of the rope, and the trigger's shape is the grab range: a
+    character can only grab while its collider overlaps the trigger. The rope length is the distance from
+    the pivot to the character at the moment it grabs, so a `CircleCollider2D` centred on the pivot caps
+    the rope length at its radius. While hanging, the character swings around the pivot like a pendulum.
+  setup:
+    - Create a GameObject at the point the rope hangs from.
+    - Add a `CircleCollider2D` with **Is Trigger** enabled; its radius is how close the player must get to grab it.
+    - Add `RopeAnchor` to the same GameObject and give the player `PlayerRopeGrab`.
+  tips:
+    - Place the anchor high enough that the rope length plus the character's height stays above the ground, otherwise the swing collides with the floor.
+    - Draw the rope yourself (a `LineRenderer` from the anchor to the player while `PlayerRopeGrab.IsSwinging` is true); the component has no visuals.
+es:
+  summary: Marca un collider trigger como ancla de cuerda de la que el jugador puede agarrarse y balancearse, sin configurar tags.
+  clip_caption: Pulsar interactuar fuera del alcance del ancla no hace nada; saltar dentro del alcance y pulsarlo agarra la cuerda.
+  description: |
+    `RopeAnchor` es un componente marcador vacío. Ponlo en un GameObject con un `Collider2D` trigger y
+    cualquier personaje con `PlayerRopeGrab` podrá agarrarse. Existe para que no necesites un tag
+    "RopeAnchor" en el Tag Manager; el tag sigue funcionando como alternativa mediante **Rope Tag** en
+    `PlayerRopeGrab`.
+
+    La posición del GameObject es el punto de giro de la cuerda y la forma del trigger es el alcance: el
+    personaje solo puede agarrarse mientras su collider se superpone con el trigger. El largo de la cuerda es
+    la distancia del punto de giro al personaje en el momento en que se agarra, así que un `CircleCollider2D`
+    centrado en el punto de giro limita el largo a su radio. Colgado, el personaje oscila alrededor del punto
+    de giro como un péndulo.
+  setup:
+    - Crea un GameObject en el punto del que cuelga la cuerda.
+    - Agrégale un `CircleCollider2D` con **Is Trigger** activado; su radio es qué tan cerca debe llegar el jugador para agarrarse.
+    - Agrega `RopeAnchor` al mismo GameObject y dale `PlayerRopeGrab` al jugador.
+  tips:
+    - Pon el ancla lo bastante alta para que el largo de la cuerda más la altura del personaje quede sobre el suelo; si no, el balanceo choca con el piso.
+    - Dibuja la cuerda tú mismo (un `LineRenderer` del ancla al jugador mientras `PlayerRopeGrab.IsSwinging` sea verdadero); el componente no tiene visuales.

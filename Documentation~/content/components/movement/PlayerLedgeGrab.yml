@@ -1,0 +1,129 @@
+name: PlayerLedgeGrab
+clip: true
+related: [PlayerLedgeClimb, PlayerJump, PlayerWalkRun, PlayerWallJump]
+en:
+  summary: Catches the edge of a platform while falling and hangs there until the player lets go or climbs up.
+  clip_caption: Jumping at a tall platform, catching its edge on the way down, hanging, then letting go with down plus away.
+  description: |
+    While the character is airborne and moving down, this ability fires two short rays in the direction it
+    is facing (the sign of the X scale, which `PlayerWalkRun` flips): one at chest height and one at head
+    height. A ledge is found when the chest ray hits a wall but the head ray finds nothing. A third ray then
+    looks down just inside the wall to locate its top face, and that corner is stored in `LedgePoint`.
+
+    Once it grabs, the character is frozen in place every frame: velocity is set to zero and gravity is
+    overridden to 0 through `CharacterController2D.OverrideGravity`, so it stays put no matter what other
+    abilities do earlier in the frame. Pushing down (vertical input below -0.5) lets go and gives gravity back.
+    Nothing happens while grounded or while rising, so jumping up along a wall never snags on the way up.
+
+    With the default offsets (chest +0.2, head +0.8 from the pivot) the character catches ledges whose top
+    sits between its chest and head, which suits the default 1.8-unit capsule. Rays ignore the character's
+    own colliders, so **Ledge Layers** can stay on *Everything*. Add `PlayerLedgeClimb` to climb onto the
+    ledge with **Jump**.
+  setup:
+    - Build a character with `CharacterController2D`, `PlayerWalkRun` and `PlayerJump` (or `PlayerMultiJump`).
+    - Add `PlayerLedgeGrab` after `PlayerWalkRun` and before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Place a platform taller than the character's chest, jump at its side while holding towards it and the character hangs from the edge on the way down.
+    - Press down (**S** / down arrow) to let go, or add `PlayerLedgeClimb` to climb up.
+  fields:
+    chestCheck: Optional Transform used as the origin of the chest ray. When empty, the character's position plus **Chest Offset** is used.
+    headCheck: Optional Transform used as the origin of the head ray. When empty, the character's position plus **Head Offset** is used.
+    chestOffset: Offset from the pivot for the chest ray when **Chest Check** is empty. The ray must hit the wall for a ledge to count.
+    headOffset: Offset from the pivot for the head ray when **Head Check** is empty. The ray must be clear, so the ledge top has to be below this height.
+    checkDistance: How far past the collider's edge both rays reach, in units. Raise it if the character must be closer to the wall than you'd like.
+    ledgeLayers: Layers that count as ledges. *Everything* works because the character ignores its own colliders.
+  api:
+    IsGrabbingLedge: True while the character is hanging from a ledge. Read it to drive a hang animation.
+    LedgePoint: World position of the top corner of the grabbed ledge (where the feet would end up after climbing).
+    LedgeDirection: Side of the grabbed ledge, 1 for right and -1 for left.
+    Release: Lets go of the ledge and restores gravity. Does nothing if not hanging.
+  example: |
+    Play a hang animation from your own script and let a "drop" button release the ledge:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class LedgeHangAnimation : MonoBehaviour
+    {
+        [SerializeField] private Animator animator;
+        private PlayerLedgeGrab _ledgeGrab;
+
+        private void Awake() => _ledgeGrab = GetComponent<PlayerLedgeGrab>();
+
+        private void Update()
+        {
+            animator.SetBool("Hanging", _ledgeGrab.IsGrabbingLedge);
+        }
+
+        // Hook this to a UI button or another input.
+        public void Drop() => _ledgeGrab.Release();
+    }
+    ```
+  tips:
+    - Place it after `PlayerWalkRun` in the component list so the freeze is the last word on velocity while hanging.
+    - Letting go with only down while still facing the wall can catch the same edge again on the next frame, so the character inches down slowly. Press down together with the direction away from the wall (with `PlayerWalkRun` the character turns and the rays stop seeing the wall).
+    - If your sprite is taller or shorter than 1.8 units, move **Chest Offset** and **Head Offset** (or assign **Chest Check** / **Head Check**) so the head ray sits just above the hands.
+es:
+  summary: Se agarra del borde de una plataforma mientras cae y se queda colgado hasta soltarse o trepar.
+  clip_caption: Salta hacia una plataforma alta, se agarra del borde al bajar, se queda colgado y se suelta con abajo más la dirección contraria.
+  description: |
+    Mientras el personaje está en el aire y bajando, esta habilidad lanza dos rayos cortos hacia donde mira
+    (el signo de la escala X, que es lo que voltea `PlayerWalkRun`): uno a la altura del pecho y otro a la
+    altura de la cabeza. Hay borde cuando el rayo del pecho choca con una pared y el de la cabeza no encuentra
+    nada. Luego un tercer rayo mira hacia abajo justo dentro de la pared para ubicar su cara superior, y esa
+    esquina se guarda en `LedgePoint`.
+
+    Al agarrarse, el personaje queda congelado en cada frame: la velocidad se pone en cero y la gravedad se
+    fija en 0 con `CharacterController2D.OverrideGravity`, así no se mueve aunque otras habilidades actúen
+    antes en el frame. Empujar hacia abajo (input vertical menor que -0.5) lo suelta y le devuelve la
+    gravedad. En el suelo o subiendo no hace nada, así que saltar pegado a una pared nunca se engancha de
+    subida.
+
+    Con los offsets por defecto (pecho +0.2, cabeza +0.8 desde el pivote) agarra bordes cuya parte superior
+    queda entre el pecho y la cabeza, lo que encaja con la cápsula de 1.8 unidades por defecto. Los rayos
+    ignoran los colliders del propio personaje, por eso **Ledge Layers** puede quedarse en *Everything*.
+    Agrega `PlayerLedgeClimb` para trepar a la cornisa con **Salto**.
+  setup:
+    - Arma un personaje con `CharacterController2D`, `PlayerWalkRun` y `PlayerJump` (o `PlayerMultiJump`).
+    - Agrega `PlayerLedgeGrab` después de `PlayerWalkRun` y antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Pon una plataforma más alta que el pecho del personaje, salta hacia su costado manteniendo la dirección y al bajar quedará colgado del borde.
+    - Pulsa abajo (**S** / flecha abajo) para soltarte, o agrega `PlayerLedgeClimb` para trepar.
+  fields:
+    chestCheck: Transform opcional que sirve de origen al rayo del pecho. Si está vacío se usa la posición del personaje más **Chest Offset**.
+    headCheck: Transform opcional que sirve de origen al rayo de la cabeza. Si está vacío se usa la posición del personaje más **Head Offset**.
+    chestOffset: Desplazamiento desde el pivote para el rayo del pecho cuando **Chest Check** está vacío. Este rayo debe chocar con la pared para que cuente como borde.
+    headOffset: Desplazamiento desde el pivote para el rayo de la cabeza cuando **Head Check** está vacío. Este rayo debe salir libre, así que la cima del borde tiene que quedar por debajo.
+    checkDistance: Cuánto más allá del borde del collider llegan ambos rayos, en unidades. Súbelo si el personaje tiene que acercarse demasiado a la pared.
+    ledgeLayers: Capas que cuentan como borde. *Everything* funciona porque el personaje ignora sus propios colliders.
+  api:
+    IsGrabbingLedge: Verdadero mientras el personaje cuelga de un borde. Úsalo para la animación de colgarse.
+    LedgePoint: Posición en el mundo de la esquina superior del borde agarrado (donde quedarían los pies al trepar).
+    LedgeDirection: Lado del borde agarrado, 1 a la derecha y -1 a la izquierda.
+    Release: Suelta el borde y devuelve la gravedad. No hace nada si no está colgado.
+  example: |
+    Reproduce una animación de colgarse desde tu propio script y deja que un botón de "soltar" libere el borde:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class LedgeHangAnimation : MonoBehaviour
+    {
+        [SerializeField] private Animator animator;
+        private PlayerLedgeGrab _ledgeGrab;
+
+        private void Awake() => _ledgeGrab = GetComponent<PlayerLedgeGrab>();
+
+        private void Update()
+        {
+            animator.SetBool("Hanging", _ledgeGrab.IsGrabbingLedge);
+        }
+
+        // Conéctalo a un botón de UI u otro input.
+        public void Drop() => _ledgeGrab.Release();
+    }
+    ```
+  tips:
+    - Ponlo después de `PlayerWalkRun` en la lista de componentes para que el congelado tenga la última palabra sobre la velocidad mientras cuelga.
+    - Soltarse solo con abajo mirando todavía a la pared puede volver a agarrar el mismo borde en el frame siguiente, y el personaje baja muy despacio. Pulsa abajo junto con la dirección contraria a la pared (con `PlayerWalkRun` el personaje se voltea y los rayos dejan de ver la pared).
+    - Si tu sprite mide más o menos de 1.8 unidades, mueve **Chest Offset** y **Head Offset** (o asigna **Chest Check** / **Head Check**) para que el rayo de la cabeza quede justo encima de las manos.

@@ -1,0 +1,200 @@
+name: AbilityBase
+clip: false
+related: [CharacterCore, CharacterController2D, KeyboardInputReader, PlayerWalkRun]
+en:
+  summary: Base class for every character ability; inherit from it to write your own movement or combat mechanic.
+  description: |
+    `AbilityBase` is the abstract `MonoBehaviour` that every kit ability (`PlayerWalkRun`, `PlayerJump`,
+    `PlayerDash`, `PlayerAttack`...) derives from. You never add it directly: you inherit from it, and
+    `CharacterCore` does the rest. In its `Awake`, `CharacterCore` collects every `AbilityBase` on its
+    GameObject and its children (inactive children included) and calls `Initialize` on each one, which
+    fills the protected `Character` (the `CharacterCore`) and `CharacterInput` (the `ICharacterInput` on the
+    same object, for example `KeyboardInputReader`).
+
+    Every frame `CharacterCore` runs four phases, and each phase runs for **all** abilities before the next
+    one starts: `HandleInput` → `EarlyProcessAbility` → `ProcessAbility` → `LateProcessAbility`. That lets an
+    ability react early (for example, block a jump in the Early phase) before any other one processes,
+    without touching Unity's script execution order. Abilities with `AbilityEnabled = false` or whose
+    component is unticked in the Inspector (`enabled = false`) are skipped, and nothing runs while the character's `Condition` is `Paused` or while some system has called
+    `CharacterCore.Suspend` (death, stun...).
+
+    If an ability throws an exception, `CharacterCore` logs the error once, sets that ability's
+    `AbilityEnabled` to false and keeps running the others. `ResetAbility` is called from
+    `CharacterCore.ResetCharacter`, which `CharacterRespawn` uses when the character reappears: clean up any
+    temporary state there.
+  setup:
+    - Create a script that inherits from `AbilityBase` (namespace `GameplayKit.Core`) and override the phases you need.
+    - Read input through `CharacterInput` and move the body through `Character.Controller` (never the `Rigidbody2D` directly).
+    - Add the script to a character that has `CharacterController2D` and `CharacterCore`, on the same GameObject or a child.
+    - If you add it at runtime with `AddComponent`, do it before `CharacterCore` wakes up; abilities are only discovered in its `Awake`.
+  api:
+    AbilityEnabled: Turns the ability on or off from code without disabling the component (unticking the component also stops it). `CharacterCore` sets it to false if the ability throws.
+    Initialize: Called once by `CharacterCore.Awake`. If you override it, call `base.Initialize(character)` first so `Character` and `CharacterInput` are set.
+    HandleInput: First phase of the frame, meant for reading raw input into fields.
+    EarlyProcessAbility: Second phase, for checks other abilities depend on (grounded timers, blocking a jump...).
+    ProcessAbility: Main logic of the ability.
+    LateProcessAbility: Last phase of the frame, for things like animation parameters.
+    ResetAbility: Called when the character respawns or is reset; restore the ability's initial state here.
+  example: |
+    A complete custom ability: hold **Jump** while falling to hover for a limited time. It uses the
+    shared gravity override of `CharacterController2D`, so it doesn't fight swimming, ladders or gliding:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class PlayerHover : AbilityBase
+    {
+        [SerializeField] private float hoverGravity = 0.2f;
+        [SerializeField] private float maxFallSpeed = 2f;
+        [SerializeField] private float maxHoverTime = 1.5f;
+
+        private bool _wantsHover;
+        private bool _hovering;
+        private float _hoverLeft;
+
+        public override void Initialize(CharacterCore character)
+        {
+            base.Initialize(character); // sets Character and CharacterInput
+            _hoverLeft = maxHoverTime;
+        }
+
+        public override void HandleInput() => _wantsHover = CharacterInput.JumpHeld;
+
+        public override void EarlyProcessAbility()
+        {
+            if (Character.Controller.IsGrounded) _hoverLeft = maxHoverTime;
+        }
+
+        public override void ProcessAbility()
+        {
+            var controller = Character.Controller;
+            bool canHover = !controller.IsGrounded && controller.Velocity.y <= 0f && _hoverLeft > 0f
+                && Character.Condition.CurrentState == ConditionState.Normal;
+
+            if (_wantsHover && canHover)
+            {
+                if (!_hovering) controller.OverrideGravity(this, hoverGravity);
+                _hovering = true;
+                _hoverLeft -= Time.deltaTime;
+                if (controller.Velocity.y < -maxFallSpeed) controller.SetVerticalVelocity(-maxFallSpeed);
+            }
+            else StopHover();
+        }
+
+        public override void ResetAbility() => StopHover();
+
+        private void OnDisable() => StopHover();
+
+        private void StopHover()
+        {
+            if (!_hovering) return;
+            _hovering = false;
+            Character.Controller.ReleaseGravity(this);
+        }
+    }
+    ```
+  tips:
+    - Always release what you take (gravity overrides, `LockHorizontalControl`, suspensions) in `ResetAbility` and `OnDisable`, or a respawn can leave the character stuck.
+    - Respect `Character.Condition` (`Stunned`, `Dead`) like the kit abilities do, so stuns and death work with your ability too.
+    - Use `Character.Movement.ChangeState(...)` if your ability should be visible to animation (`CharacterAnimatorBridge`) or to other abilities.
+    - Because `CharacterInput` is an interface, the same ability works with keyboard, AI or replays without changes.
+es:
+  summary: Clase base de toda habilidad del personaje; hereda de ella para escribir tu propia mecánica de movimiento o combate.
+  description: |
+    `AbilityBase` es el `MonoBehaviour` abstracto del que derivan todas las habilidades del kit
+    (`PlayerWalkRun`, `PlayerJump`, `PlayerDash`, `PlayerAttack`...). Nunca lo agregas directamente: heredas
+    de él y `CharacterCore` hace el resto. En su `Awake`, `CharacterCore` reúne todas las `AbilityBase` de su
+    GameObject y de sus hijos (incluso los inactivos) y llama `Initialize` en cada una, que llena las
+    propiedades protegidas `Character` (el `CharacterCore`) y `CharacterInput` (el `ICharacterInput` del
+    mismo objeto, por ejemplo `KeyboardInputReader`).
+
+    Cada frame `CharacterCore` corre cuatro fases, y cada fase corre para **todas** las habilidades antes de
+    pasar a la siguiente: `HandleInput` → `EarlyProcessAbility` → `ProcessAbility` → `LateProcessAbility`.
+    Así una habilidad puede reaccionar temprano (por ejemplo, bloquear un salto en la fase Early) antes de
+    que otra procese, sin tocar el orden de ejecución de scripts de Unity. Las habilidades con
+    `AbilityEnabled = false` o con el componente desmarcado en el Inspector (`enabled = false`) se saltan, y
+    no corre nada mientras la `Condition` del personaje sea `Paused` o
+    mientras algún sistema haya llamado `CharacterCore.Suspend` (muerte, aturdimiento...).
+
+    Si una habilidad lanza una excepción, `CharacterCore` registra el error una sola vez, pone su
+    `AbilityEnabled` en false y sigue corriendo las demás. `ResetAbility` se llama desde
+    `CharacterCore.ResetCharacter`, que usa `CharacterRespawn` al reaparecer: limpia ahí cualquier estado
+    temporal.
+  setup:
+    - Crea un script que herede de `AbilityBase` (namespace `GameplayKit.Core`) y sobrescribe las fases que necesites.
+    - Lee el input con `CharacterInput` y mueve el cuerpo con `Character.Controller` (nunca el `Rigidbody2D` directamente).
+    - Agrega el script a un personaje con `CharacterController2D` y `CharacterCore`, en el mismo GameObject o en un hijo.
+    - Si lo agregas en tiempo de ejecución con `AddComponent`, hazlo antes de que despierte `CharacterCore`; las habilidades solo se descubren en su `Awake`.
+  api:
+    AbilityEnabled: Enciende o apaga la habilidad desde código sin desactivar el componente (desmarcar el componente también la detiene). `CharacterCore` lo pone en false si la habilidad lanza una excepción.
+    Initialize: Lo llama una vez `CharacterCore.Awake`. Si lo sobrescribes, llama primero `base.Initialize(character)` para que `Character` y `CharacterInput` queden asignados.
+    HandleInput: Primera fase del frame, pensada para leer el input crudo y guardarlo en campos.
+    EarlyProcessAbility: Segunda fase, para chequeos de los que dependen otras habilidades (timers de suelo, bloquear un salto...).
+    ProcessAbility: Lógica principal de la habilidad.
+    LateProcessAbility: Última fase del frame, para cosas como parámetros de animación.
+    ResetAbility: Se llama cuando el personaje reaparece o se reinicia; restaura aquí el estado inicial de la habilidad.
+  example: |
+    Una habilidad completa: mantén **Salto** mientras caes para planear un tiempo limitado. Usa la anulación
+    de gravedad compartida de `CharacterController2D`, así no pelea con nadar, escaleras ni planeo:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class PlayerHover : AbilityBase
+    {
+        [SerializeField] private float hoverGravity = 0.2f;
+        [SerializeField] private float maxFallSpeed = 2f;
+        [SerializeField] private float maxHoverTime = 1.5f;
+
+        private bool _wantsHover;
+        private bool _hovering;
+        private float _hoverLeft;
+
+        public override void Initialize(CharacterCore character)
+        {
+            base.Initialize(character); // asigna Character y CharacterInput
+            _hoverLeft = maxHoverTime;
+        }
+
+        public override void HandleInput() => _wantsHover = CharacterInput.JumpHeld;
+
+        public override void EarlyProcessAbility()
+        {
+            if (Character.Controller.IsGrounded) _hoverLeft = maxHoverTime;
+        }
+
+        public override void ProcessAbility()
+        {
+            var controller = Character.Controller;
+            bool canHover = !controller.IsGrounded && controller.Velocity.y <= 0f && _hoverLeft > 0f
+                && Character.Condition.CurrentState == ConditionState.Normal;
+
+            if (_wantsHover && canHover)
+            {
+                if (!_hovering) controller.OverrideGravity(this, hoverGravity);
+                _hovering = true;
+                _hoverLeft -= Time.deltaTime;
+                if (controller.Velocity.y < -maxFallSpeed) controller.SetVerticalVelocity(-maxFallSpeed);
+            }
+            else StopHover();
+        }
+
+        public override void ResetAbility() => StopHover();
+
+        private void OnDisable() => StopHover();
+
+        private void StopHover()
+        {
+            if (!_hovering) return;
+            _hovering = false;
+            Character.Controller.ReleaseGravity(this);
+        }
+    }
+    ```
+  tips:
+    - Libera siempre lo que tomas (anulaciones de gravedad, `LockHorizontalControl`, suspensiones) en `ResetAbility` y `OnDisable`, o un respawn puede dejar al personaje trabado.
+    - Respeta `Character.Condition` (`Stunned`, `Dead`) como hacen las habilidades del kit, para que aturdimientos y muerte funcionen también con la tuya.
+    - Usa `Character.Movement.ChangeState(...)` si tu habilidad debe verse en la animación (`CharacterAnimatorBridge`) o en otras habilidades.
+    - Como `CharacterInput` es una interfaz, la misma habilidad funciona con teclado, IA o replays sin cambios.

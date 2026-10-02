@@ -1,0 +1,129 @@
+name: PlayerJump
+clip: true
+related: [PlayerMultiJump, PlayerWalkRun, PlayerDropThrough, PlayerWallJump]
+en:
+  summary: Variable-height jump with coyote time and a jump buffer, so short taps hop and held presses jump high.
+  clip_caption: A quick tap of jump makes a short hop; holding the button makes a full-height jump.
+  description: |
+    Pressing **Jump** (Space, or A/Cross on a gamepad) sets the character's vertical velocity to
+    **Jump Force**. Letting go of the button while still rising multiplies the upward speed by
+    **Jump Cut Multiplier**, so a quick tap gives a small hop and holding the button gives the full jump.
+    With Unity's default gravity (‑9.81) and a **Gravity Scale** of 1, the default full jump rises roughly
+    7 units.
+
+    Two forgiveness windows make it feel responsive. **Coyote Time** lets the player still jump for a moment
+    after running off a ledge. **Jump Buffer Time** remembers a press made just before landing and fires the
+    jump the moment the character touches the ground; if the button was already released by then, the jump
+    comes out already cut (a short hop). Each window is consumed by the jump, so coyote time never gives a
+    second jump.
+
+    It only jumps from the ground. It also respects `CharacterController2D.IsJumpBlocked`, which other
+    abilities set when they use the button for something else (for example `PlayerDropThrough`). It sets the
+    movement state to `Jumping` on takeoff and to `Falling` while airborne and moving down.
+  setup:
+    - Build a character with `CharacterController2D` and `PlayerWalkRun`.
+    - Add `PlayerJump` before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Make sure there's solid ground under the character, then press **Jump**; tap it for a short hop or hold it for a high jump.
+  fields:
+    jumpForce: Upward velocity applied on takeoff, in units per second. Higher values jump higher and longer.
+    jumpCutMultiplier: Fraction of the upward speed kept when the button is released early (0.5 = half). Set it to 1 to disable variable height.
+    coyoteTime: Seconds after leaving the ground during which a jump is still allowed.
+    jumpBufferTime: Seconds a press is remembered before landing; the jump fires as soon as the character is grounded.
+  example: |
+    `PlayerJump` has no events, but you can detect takeoff from the movement state, for example to play a
+    sound:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class JumpSound : MonoBehaviour
+    {
+        [SerializeField] private AudioSource source;
+        [SerializeField] private AudioClip jumpClip;
+        private CharacterCore _core;
+
+        private void Start()
+        {
+            _core = GetComponent<CharacterCore>();
+            _core.Movement.OnStateChanged += HandleState;
+        }
+
+        private void OnDestroy()
+        {
+            if (_core != null) _core.Movement.OnStateChanged -= HandleState;
+        }
+
+        private void HandleState(MovementState previous, MovementState current)
+        {
+            if (current == MovementState.Jumping) source.PlayOneShot(jumpClip);
+        }
+    }
+    ```
+  tips:
+    - Use either `PlayerJump` or `PlayerMultiJump` on a character, not both; `PlayerMultiJump` adds air jumps.
+    - If jumps feel floaty, add `CharacterGravityController` to fall faster; it has its own short-jump gravity, so consider setting **Jump Cut Multiplier** to 1 to avoid stacking both.
+    - Raise **Coyote Time** and **Jump Buffer Time** slightly (0.15 s) for casual or mobile games; lower them for precise platformers.
+es:
+  summary: Salto de altura variable con coyote time y buffer de salto; un toque corto da un saltito y mantener salta alto.
+  clip_caption: Un toque rápido de salto da un saltito corto; mantener el botón da el salto completo.
+  description: |
+    Pulsar **Salto** (Space, o A/Cross en el gamepad) fija la velocidad vertical del personaje en
+    **Jump Force**. Si sueltas el botón mientras todavía sube, la velocidad hacia arriba se multiplica por
+    **Jump Cut Multiplier**, así que un toque rápido da un saltito y mantener el botón da el salto completo.
+    Con la gravedad por defecto de Unity (‑9.81) y un **Gravity Scale** de 1, el salto completo por defecto
+    sube unas 7 unidades.
+
+    Dos ventanas de tolerancia lo hacen sentir ágil. **Coyote Time** te deja saltar un instante después de
+    salir corriendo de un borde. **Jump Buffer Time** recuerda una pulsación hecha justo antes de aterrizar y
+    lanza el salto en cuanto el personaje toca el suelo; si para entonces ya soltaste el botón, el salto sale
+    recortado (un saltito). Cada ventana se consume con el salto, así que el coyote time nunca regala un
+    segundo salto.
+
+    Solo salta desde el suelo. También respeta `CharacterController2D.IsJumpBlocked`, que otras habilidades
+    activan cuando usan el botón para otra cosa (por ejemplo `PlayerDropThrough`). Cambia el estado de
+    movimiento a `Jumping` al despegar y a `Falling` mientras está en el aire bajando.
+  setup:
+    - Arma un personaje con `CharacterController2D` y `PlayerWalkRun`.
+    - Agrega `PlayerJump` antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Asegúrate de que haya suelo sólido debajo y pulsa **Salto**; tócalo para un saltito o mantenlo para saltar alto.
+  fields:
+    jumpForce: Velocidad hacia arriba al despegar, en unidades por segundo. Valores más altos saltan más alto y más largo.
+    jumpCutMultiplier: Fracción de la velocidad de subida que se conserva al soltar el botón antes de tiempo (0.5 = la mitad). Ponlo en 1 para desactivar la altura variable.
+    coyoteTime: Segundos después de dejar el suelo durante los que todavía puedes saltar.
+    jumpBufferTime: Segundos que se recuerda una pulsación antes de aterrizar; el salto sale apenas el personaje toca el suelo.
+  example: |
+    `PlayerJump` no tiene eventos, pero puedes detectar el despegue con el estado de movimiento, por
+    ejemplo para reproducir un sonido:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class JumpSound : MonoBehaviour
+    {
+        [SerializeField] private AudioSource source;
+        [SerializeField] private AudioClip jumpClip;
+        private CharacterCore _core;
+
+        private void Start()
+        {
+            _core = GetComponent<CharacterCore>();
+            _core.Movement.OnStateChanged += HandleState;
+        }
+
+        private void OnDestroy()
+        {
+            if (_core != null) _core.Movement.OnStateChanged -= HandleState;
+        }
+
+        private void HandleState(MovementState previous, MovementState current)
+        {
+            if (current == MovementState.Jumping) source.PlayOneShot(jumpClip);
+        }
+    }
+    ```
+  tips:
+    - Usa `PlayerJump` o `PlayerMultiJump` en un personaje, no los dos; `PlayerMultiJump` agrega saltos en el aire.
+    - Si los saltos se sienten flotantes, agrega `CharacterGravityController` para caer más rápido; trae su propia gravedad de salto corto, así que considera poner **Jump Cut Multiplier** en 1 para no sumar ambos.
+    - Sube un poco **Coyote Time** y **Jump Buffer Time** (0.15 s) para juegos casuales o móviles; bájalos para plataformas de precisión.

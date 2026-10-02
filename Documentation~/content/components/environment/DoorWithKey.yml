@@ -1,0 +1,92 @@
+name: DoorWithKey
+clip: true
+related: [ItemPickup, InventoryManager, Lever, PressurePlate]
+en:
+  summary: A door that opens only when someone carrying the right key touches it.
+  clip_caption: The closed door blocks the player; after grabbing the key, touching the door opens it and uses up the key.
+  description: |
+    `DoorWithKey` listens on a trigger collider. When something enters it, the door looks for an
+    `IKeyHolder` on that object or its parents (the kit's `InventoryManager` is one) and asks whether it has
+    **Required Item Id**. If it does, the key is removed (when **Consume Item On Open** is on) and the door
+    opens; otherwise nothing happens.
+
+    Opening disables **Blocking Collider**, hides **Visual When Closed** and fires `OnOpened`. The door
+    stays open for good. Because the check happens on entering the trigger, a player who is already inside
+    the trigger when picking up the key has to step out and back in. You can also open it from code or from
+    a `Lever`/`PressurePlate` event by calling `Open()`.
+  setup:
+    - Create the door GameObject with a `BoxCollider2D` marked **Is Trigger**, a bit wider than the door, and add `DoorWithKey`.
+    - Add a child with a solid `BoxCollider2D` and the door sprite, and drag it into **Blocking Collider** (and **Visual When Closed**).
+    - Give the player an `InventoryManager` and place an `ItemPickup` with the same **Item Id** as the door's **Required Item Id**.
+  fields:
+    requiredItemId: Id the key holder must have. It must match the **Item Id** of the matching `ItemPickup` (both default to `llave_dorada`).
+    consumeItemOnOpen: Removes the key from the holder when the door opens. Turn it off for master keys that open several doors.
+    visualWhenClosed: GameObject hidden when the door opens (the closed door sprite).
+    blockingCollider: Solid collider disabled when the door opens. It must not be the trigger that detects the player.
+  events:
+    OnOpened: C# event fired when the door opens, by key or by calling `Open()`.
+  api:
+    IsOpen: True once the door has been opened.
+    Open: Opens the door immediately without checking keys, for levers, plates or cutscenes.
+  example: |
+    Play an animation when the door opens:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    [RequireComponent(typeof(DoorWithKey))]
+    public class DoorAnimation : MonoBehaviour
+    {
+        [SerializeField] private Animator animator;
+
+        private void Awake() => GetComponent<DoorWithKey>().OnOpened += () => animator.SetTrigger("Open");
+    }
+    ```
+  tips:
+    - Make the trigger wider than the blocking collider so the player reaches it while standing against the door.
+    - Item ids are just strings; keep them in one place (a constants class) to avoid typos between doors and pickups.
+es:
+  summary: Una puerta que solo se abre cuando la toca alguien que lleva la llave correcta.
+  clip_caption: La puerta cerrada bloquea al jugador; tras tomar la llave, tocarla la abre y gasta la llave.
+  description: |
+    `DoorWithKey` escucha en un collider trigger. Cuando algo entra, busca un `IKeyHolder` en ese objeto o
+    sus padres (el `InventoryManager` del kit lo es) y le pregunta si tiene **Required Item Id**. Si lo
+    tiene, le quita la llave (con **Consume Item On Open** activo) y se abre; si no, no pasa nada.
+
+    Al abrirse desactiva **Blocking Collider**, oculta **Visual When Closed** y dispara `OnOpened`. Se queda
+    abierta para siempre. Como el chequeo ocurre al entrar al trigger, un jugador que ya está dentro
+    cuando recoge la llave tiene que salir y volver a entrar. También puedes abrirla desde código o desde
+    el evento de una `Lever`/`PressurePlate` llamando a `Open()`.
+  setup:
+    - Crea la puerta con un `BoxCollider2D` marcado como **Is Trigger**, un poco más ancho que la puerta, y agrégale `DoorWithKey`.
+    - Agrega un hijo con un `BoxCollider2D` sólido y el sprite de la puerta, y arrástralo a **Blocking Collider** (y a **Visual When Closed**).
+    - Dale al jugador un `InventoryManager` y pon un `ItemPickup` con el mismo **Item Id** que el **Required Item Id** de la puerta.
+  fields:
+    requiredItemId: Id que debe tener quien lleva las llaves. Debe coincidir con el **Item Id** del `ItemPickup` correspondiente (ambos usan `llave_dorada` por defecto).
+    consumeItemOnOpen: Quita la llave al abrir. Desactívalo para llaves maestras que abren varias puertas.
+    visualWhenClosed: GameObject que se oculta al abrirse (el sprite de la puerta cerrada).
+    blockingCollider: Collider sólido que se desactiva al abrirse. No debe ser el trigger que detecta al jugador.
+  events:
+    OnOpened: Evento C# que se dispara al abrirse, con llave o llamando a `Open()`.
+  api:
+    IsOpen: Verdadero desde que la puerta se abrió.
+    Open: Abre la puerta de inmediato sin revisar llaves, para palancas, placas o cinemáticas.
+  example: |
+    Reproduce una animación al abrirse la puerta:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    [RequireComponent(typeof(DoorWithKey))]
+    public class DoorAnimation : MonoBehaviour
+    {
+        [SerializeField] private Animator animator;
+
+        private void Awake() => GetComponent<DoorWithKey>().OnOpened += () => animator.SetTrigger("Open");
+    }
+    ```
+  tips:
+    - Haz el trigger más ancho que el collider que bloquea para que el jugador lo alcance pegado a la puerta.
+    - Los ids son simples strings; guárdalos en un solo lugar (una clase de constantes) para evitar errores entre puertas y recogibles.

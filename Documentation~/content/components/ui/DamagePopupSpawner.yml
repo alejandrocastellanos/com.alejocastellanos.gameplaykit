@@ -1,0 +1,49 @@
+name: DamagePopupSpawner
+clip: true
+related: [UIDamagePopup, CharacterHealth, DamageableObject, WeaponMelee]
+en:
+  summary: Pops a floating damage number above an object every time it gets hit (and a heal number when it heals).
+  clip_caption: Each sword hit on the training dummy pops a red number with the damage dealt; the last, stronger hit shows -25.
+  description: |
+    Add `DamagePopupSpawner` to anything with health — a `CharacterHealth` or a `DamageableObject`, on the
+    same object or a parent — and it spawns a `UIDamagePopup` at the object's position plus **Offset**
+    whenever it takes damage. With **Show Heals** on, healing spawns a green `+` number too (only
+    `CharacterHealth` can heal).
+
+    Without a **Popup Prefab** it builds a simple world-space text by code, so it works the moment you add
+    it. The number shows the amount that was dealt, rounded, and the popup floats up, fades and destroys
+    itself. It finds the health component when it's enabled, so add it to an object that already has one.
+  setup:
+    - Add `DamagePopupSpawner` to an enemy, breakable prop or the player (anything with `CharacterHealth` or `DamageableObject`).
+    - Adjust **Offset** so the numbers start just above the sprite.
+    - Optionally assign your own **Popup Prefab** for custom fonts and colors.
+  fields:
+    popupPrefab: Optional custom popup — a prefab whose root has a world-space Canvas, a Text and `UIDamagePopup`. Empty creates a simple text by code.
+    offset: Where popups appear relative to the object's position, in world units. The default (0, 1.2) is just above a character of normal height.
+    showHeals: Also show green numbers when the object heals.
+  tips:
+    - Put it on a child object if you want popups to come from a specific point, such as a boss's head; it still finds the health on the parent.
+    - Pair it with `DamageFlash` for hits that read clearly even without sound.
+es:
+  summary: Muestra un número de daño flotante sobre un objeto cada vez que recibe un golpe (y uno de curación al curarse).
+  clip_caption: Cada espadazo al muñeco de práctica muestra un número rojo con el daño; el último golpe, más fuerte, muestra -25.
+  description: |
+    Agrega `DamagePopupSpawner` a cualquier cosa con vida — un `CharacterHealth` o un `DamageableObject`, en
+    el mismo objeto o en un padre — y creará un `UIDamagePopup` en la posición del objeto más **Offset** cada
+    vez que reciba daño. Con **Show Heals** activo, las curaciones también muestran un número verde con `+`
+    (solo `CharacterHealth` se puede curar).
+
+    Sin **Popup Prefab** arma por código un texto simple en el mundo, así funciona apenas lo agregas. El
+    número muestra la cantidad recibida, redondeada, y el popup sube, se desvanece y se destruye solo. Busca
+    el componente de vida al activarse, así que agrégalo a un objeto que ya tenga uno.
+  setup:
+    - Agrega `DamagePopupSpawner` a un enemigo, a un objeto rompible o al jugador (cualquier cosa con `CharacterHealth` o `DamageableObject`).
+    - Ajusta **Offset** para que los números empiecen justo encima del sprite.
+    - Opcionalmente asigna tu propio **Popup Prefab** para fuentes y colores personalizados.
+  fields:
+    popupPrefab: Popup propio opcional — un prefab cuya raíz tenga un Canvas World Space, un Text y `UIDamagePopup`. Vacío crea un texto simple por código.
+    offset: Dónde aparecen los popups respecto a la posición del objeto, en unidades del mundo. El valor por defecto (0, 1.2) queda justo encima de un personaje de altura normal.
+    showHeals: Muestra también números verdes cuando el objeto se cura.
+  tips:
+    - Ponlo en un objeto hijo si quieres que los popups salgan de un punto concreto, como la cabeza de un jefe; igual encuentra la vida en el padre.
+    - Combínalo con `DamageFlash` para que los golpes se lean claro incluso sin sonido.

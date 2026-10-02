@@ -1,0 +1,53 @@
+name: FallingPlatform
+clip: true
+related: [MovingPlatform, OneWayPlatform, CharacterController2D, Checkpoint]
+en:
+  summary: A platform that drops shortly after being stepped on, then reappears in its original spot.
+  clip_caption: Each platform falls half a second after the player steps on it and comes back a moment later.
+  description: |
+    The platform sits still as a *Kinematic* `Rigidbody2D` (added automatically). When an object with
+    **Trigger Tag** collides with it, it waits **Fall Delay** seconds and then switches to *Dynamic*, so
+    gravity takes it. Any collision counts, from above or from the side; an empty **Trigger Tag** lets
+    anything trigger it, including boxes and enemies.
+
+    **Destroy Delay** seconds after it starts falling, the GameObject is deactivated (a negative value keeps
+    it falling forever). With **Respawn After Destroy** on, it comes back **Respawn Delay** seconds later at
+    its original position, kinematic again and ready to fall once more.
+  setup:
+    - Create a GameObject with a solid `BoxCollider2D` and add `FallingPlatform` (a `Rigidbody2D` is added for you).
+    - Give the player the **Player** tag, or clear **Trigger Tag** so anything can trigger it.
+    - On the `Rigidbody2D`, tick **Freeze Rotation Z** so it falls flat and respawns straight.
+  fields:
+    fallDelay: Seconds between being touched and starting to fall. The player's window to get off.
+    destroyDelay: Seconds of falling before the platform is deactivated. Use a negative value to never deactivate it.
+    respawnAfterDestroy: Brings the platform back to its starting spot after it is deactivated.
+    respawnDelay: Seconds between being deactivated and reappearing.
+    triggerTag: Tag of the objects that make it fall. Empty means any colliding object.
+  tips:
+    - Respawn resets position and velocity but not rotation, so freeze rotation unless you want it to tumble.
+    - Line several in a row over a pit so the player has to keep moving.
+es:
+  summary: Una plataforma que se desploma poco después de pisarla y luego reaparece en su sitio.
+  clip_caption: Cada plataforma cae medio segundo después de que el jugador la pisa y vuelve un momento después.
+  description: |
+    La plataforma está quieta como un `Rigidbody2D` *Kinematic* (se agrega solo). Cuando choca con ella un
+    objeto con **Trigger Tag**, espera **Fall Delay** segundos y pasa a *Dynamic*, así la gravedad se la
+    lleva. Cuenta cualquier choque, desde arriba o de lado; con **Trigger Tag** vacío la activa cualquier
+    cosa, incluidas cajas y enemigos.
+
+    **Destroy Delay** segundos después de empezar a caer, el GameObject se desactiva (un valor negativo la
+    deja caer para siempre). Con **Respawn After Destroy** activo, vuelve **Respawn Delay** segundos después
+    en su posición original, otra vez cinemática y lista para volver a caer.
+  setup:
+    - Crea un GameObject con un `BoxCollider2D` sólido y agrégale `FallingPlatform` (el `Rigidbody2D` se agrega solo).
+    - Dale al jugador el tag **Player**, o deja **Trigger Tag** vacío para que la active cualquier cosa.
+    - En el `Rigidbody2D`, marca **Freeze Rotation Z** para que caiga plana y reaparezca derecha.
+  fields:
+    fallDelay: Segundos entre que la tocan y empieza a caer. Es el margen del jugador para bajarse.
+    destroyDelay: Segundos de caída antes de desactivarla. Usa un valor negativo para que nunca se desactive.
+    respawnAfterDestroy: Hace que vuelva a su lugar de inicio después de desactivarse.
+    respawnDelay: Segundos entre que se desactiva y reaparece.
+    triggerTag: Tag de los objetos que la hacen caer. Vacío significa cualquier objeto que choque.
+  tips:
+    - El respawn reinicia posición y velocidad pero no la rotación; congela la rotación salvo que quieras que dé vueltas.
+    - Pon varias seguidas sobre un foso para que el jugador no pueda detenerse.

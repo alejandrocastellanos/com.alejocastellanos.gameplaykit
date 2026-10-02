@@ -1,0 +1,49 @@
+name: ConveyorBelt
+clip: true
+related: [MovingPlatform, PushableBox, PlayerWalkRun, Elevator]
+en:
+  summary: A belt that keeps dragging anything standing on it in one direction, on top of its own movement.
+  clip_caption: Standing still, the player is carried right; walking against the belt is slow, walking with it is fast.
+  description: |
+    `ConveyorBelt` goes on a solid collider. Every physics step it shifts every dynamic `Rigidbody2D`
+    standing on its top face by **Speed** × **Direction**, regardless of what that body is doing. Because
+    it moves the body's position instead of changing its velocity, the drag adds to the character's own
+    walking: with the defaults (3 u/s) a player walking at 4 u/s moves at 7 u/s with the belt and 1 u/s
+    against it, and keeps sliding even while standing still.
+
+    Only bodies whose feet rest on the top surface count; touching the belt from the side or from below
+    does nothing. Boxes and enemies ride it too. The belt itself doesn't need a `Rigidbody2D` and never
+    moves.
+  setup:
+    - Create a GameObject with a solid `BoxCollider2D` (not a trigger) and add `ConveyorBelt`.
+    - Set **Direction** (it is normalized, only the angle matters) and **Speed**.
+    - Add arrows or an animated texture so players can read which way it moves.
+  fields:
+    speed: How fast riders are carried, in units per second.
+    direction: Direction riders are carried in. It is normalized, so `(1, 0)` and `(5, 0)` behave the same; use `(-1, 0)` for a leftward belt.
+  tips:
+    - Turn it on and off from a `Lever` by connecting its UnityEvents to the component's **enabled** checkbox.
+    - Put a `HazardZone` at the end of a belt for a classic factory trap.
+es:
+  summary: Una cinta que arrastra en una dirección a todo lo que esté encima, sumándose a su propio movimiento.
+  clip_caption: Quieto, el jugador es llevado a la derecha; caminar en contra es lento y a favor, rápido.
+  description: |
+    `ConveyorBelt` va en un collider sólido. En cada paso de física desplaza **Speed** × **Direction** a cada
+    `Rigidbody2D` dinámico parado sobre su cara superior, haga lo que haga ese cuerpo. Como mueve la
+    posición en vez de cambiar la velocidad, el arrastre se suma a la caminata del personaje: con los
+    valores por defecto (3 u/s), un jugador que camina a 4 u/s avanza a 7 u/s a favor y a 1 u/s en contra,
+    y sigue deslizándose aunque esté quieto.
+
+    Solo cuentan los cuerpos que apoyan los pies en la superficie superior; tocar la cinta de lado o desde
+    abajo no hace nada. Cajas y enemigos también viajan en ella. La cinta no necesita `Rigidbody2D` y
+    nunca se mueve.
+  setup:
+    - Crea un GameObject con un `BoxCollider2D` sólido (no trigger) y agrégale `ConveyorBelt`.
+    - Ajusta **Direction** (se normaliza, solo importa el ángulo) y **Speed**.
+    - Agrega flechas o una textura animada para que se entienda hacia dónde va.
+  fields:
+    speed: Qué tan rápido arrastra a los pasajeros, en unidades por segundo.
+    direction: Dirección del arrastre. Se normaliza, así que `(1, 0)` y `(5, 0)` se comportan igual; usa `(-1, 0)` para una cinta hacia la izquierda.
+  tips:
+    - Enciéndela y apágala con una `Lever` conectando sus UnityEvents a la casilla **enabled** del componente.
+    - Pon una `HazardZone` al final de la cinta para una trampa de fábrica clásica.

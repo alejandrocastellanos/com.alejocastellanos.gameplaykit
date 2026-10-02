@@ -1,0 +1,6 @@
+# Generado por tools/generate.py / mkdocs
+site/
+mkdocs.yml
+docs/en/components/
+docs/es/components/
+__pycache__/

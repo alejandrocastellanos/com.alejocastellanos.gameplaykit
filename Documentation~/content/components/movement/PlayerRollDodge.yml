@@ -1,0 +1,110 @@
+name: PlayerRollDodge
+clip: true
+related: [PlayerDash, CharacterHealth, PlayerTeleportBlink, PlayerDash8Directions]
+en:
+  summary: Dodge roll that moves the character forward quickly and makes it immune to damage for the roll's duration.
+  clip_caption: Walking over spikes costs health; rolling back across them takes no damage.
+  description: |
+    Pressing the **Roll** action (Left Alt, or B/Circle on a gamepad, with the default `KeyboardInputReader`)
+    while grounded and off cooldown rolls the character forward at **Roll Speed** for **Roll Duration**
+    seconds, in the direction it is facing (the sign of `transform.localScale.x`). Vertical speed is kept, so
+    rolling off a ledge falls naturally. With the defaults the roll covers about 3 units.
+
+    During the roll horizontal control is locked (`PlayerWalkRun` can't steer or cancel it) and, if the
+    character has a `CharacterHealth`, it gets invulnerability for the whole roll through
+    `GrantInvulnerability`, so hazards, enemies and projectiles don't hurt it. `CharacterHealth` can be added
+    after the roll ability; it's looked up again when a roll starts.
+
+    The collider isn't resized, so a roll doesn't fit through low gaps (use `PlayerCrouch` for that). The
+    **Cooldown** starts counting when the roll begins.
+  setup:
+    - Build a character with `CharacterController2D`, `PlayerWalkRun` and `CharacterHealth`.
+    - Add `PlayerRollDodge` before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Walk towards danger and press the **Roll** action (Left Alt by default) to roll through it unharmed.
+  fields:
+    rollSpeed: Horizontal speed during the roll, in units per second.
+    rollDuration: How long the roll and its invulnerability last, in seconds. Distance ≈ **Roll Speed** × **Roll Duration**.
+    cooldown: Seconds from the start of one roll until the next one is allowed.
+    rollAction: Which `CharacterAction` triggers the roll. Change it to reuse another button (for example **Special**).
+  api:
+    IsRolling: True while the roll is in progress.
+    IsInvulnerable: True during the roll, the window in which damage is ignored.
+  example: |
+    Make the character semi-transparent while it's invulnerable during a roll:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class RollGhost : MonoBehaviour
+    {
+        [SerializeField] private SpriteRenderer spriteRenderer;
+        private PlayerRollDodge _roll;
+
+        private void Awake() => _roll = GetComponent<PlayerRollDodge>();
+
+        private void LateUpdate()
+        {
+            Color c = spriteRenderer.color;
+            c.a = _roll.IsInvulnerable ? 0.5f : 1f;
+            spriteRenderer.color = c;
+        }
+    }
+    ```
+  tips:
+    - Make sure **Roll Duration** is long enough to cross your widest hazard; with damage zones that tick on entry, the character must be out before invulnerability ends.
+    - Rolls only start on the ground; use `PlayerDash` if you want an air option too.
+es:
+  summary: Rodada de esquive que mueve al personaje rápido hacia adelante y lo vuelve inmune al daño mientras dura.
+  clip_caption: Caminar sobre los picos quita vida; rodar de vuelta sobre ellos no hace daño.
+  description: |
+    Pulsar la acción **Roll** (Alt izquierdo, o B/Círculo en el gamepad, con el `KeyboardInputReader` por
+    defecto) estando en el suelo y sin recarga hace rodar al personaje hacia adelante a **Roll Speed**
+    durante **Roll Duration** segundos, hacia donde mira (el signo de `transform.localScale.x`). La velocidad
+    vertical se conserva, así que rodar fuera de un borde cae de forma natural. Con los valores por defecto
+    la rodada recorre unas 3 unidades.
+
+    Durante la rodada el control horizontal queda bloqueado (`PlayerWalkRun` no puede dirigirla ni
+    cancelarla) y, si el personaje tiene `CharacterHealth`, recibe invulnerabilidad durante toda la rodada
+    con `GrantInvulnerability`, así que peligros, enemigos y proyectiles no lo dañan. Puedes agregar
+    `CharacterHealth` después de la habilidad; se vuelve a buscar al empezar cada rodada.
+
+    El collider no cambia de tamaño, así que la rodada no pasa por huecos bajos (para eso usa
+    `PlayerCrouch`). **Cooldown** empieza a contar cuando comienza la rodada.
+  setup:
+    - Arma un personaje con `CharacterController2D`, `PlayerWalkRun` y `CharacterHealth`.
+    - Agrega `PlayerRollDodge` antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Camina hacia un peligro y pulsa la acción **Roll** (Alt izquierdo por defecto) para atravesarlo sin daño.
+  fields:
+    rollSpeed: Velocidad horizontal durante la rodada, en unidades por segundo.
+    rollDuration: Cuánto duran la rodada y su invulnerabilidad, en segundos. Distancia ≈ **Roll Speed** × **Roll Duration**.
+    cooldown: Segundos desde el inicio de una rodada hasta que se permite la siguiente.
+    rollAction: Qué `CharacterAction` activa la rodada. Cámbiala para reutilizar otro botón (por ejemplo **Special**).
+  api:
+    IsRolling: Verdadero mientras la rodada está en curso.
+    IsInvulnerable: Verdadero durante la rodada, la ventana en la que se ignora el daño.
+  example: |
+    Vuelve semitransparente al personaje mientras es invulnerable durante una rodada:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class RollGhost : MonoBehaviour
+    {
+        [SerializeField] private SpriteRenderer spriteRenderer;
+        private PlayerRollDodge _roll;
+
+        private void Awake() => _roll = GetComponent<PlayerRollDodge>();
+
+        private void LateUpdate()
+        {
+            Color c = spriteRenderer.color;
+            c.a = _roll.IsInvulnerable ? 0.5f : 1f;
+            spriteRenderer.color = c;
+        }
+    }
+    ```
+  tips:
+    - Asegúrate de que **Roll Duration** alcance para cruzar tu peligro más ancho; con zonas de daño que golpean al entrar, el personaje debe salir antes de que termine la invulnerabilidad.
+    - Las rodadas solo empiezan en el suelo; usa `PlayerDash` si también quieres una opción en el aire.

@@ -1,0 +1,99 @@
+name: WeaponInventorySlot
+clip: true
+related: [PlayerAttack, WeaponMelee, WeaponHitscan, WeaponProjectile]
+en:
+  summary: Carries several weapons and keeps only the equipped one active, switching with a button.
+  clip_caption: The sword breaks a crate, the switch button swaps to a gun that shoots a far dummy, then back to the sword.
+  description: |
+    `WeaponInventorySlot` holds a list of weapon GameObjects (usually children of the character, each
+    with its own `WeaponMelee`, `WeaponHitscan`, `WeaponProjectile`...). Equipping one activates it and
+    deactivates all the others. On `Start` it equips **Starting Weapon Index**.
+
+    With `PlayerAttack` on the same object, the **Switch Weapon Action** (K by default) calls
+    `EquipNext`, cycling through the list. Since `PlayerAttack` only looks at active children, attacks
+    always use the equipped weapon. Invalid indexes are ignored.
+  setup:
+    - Create one child GameObject per weapon under the character and add a weapon component to each.
+    - Add `WeaponInventorySlot` to the character and drag the children into **Weapons**.
+    - With `PlayerAttack` on the character, press **Special** to switch and **Attack** to use the current weapon.
+  fields:
+    weapons: The weapon GameObjects, in switching order. Only the equipped one is active.
+    startingWeaponIndex: Index of the weapon equipped at start.
+  events:
+    OnWeaponEquipped: C# event fired with the new index every time a weapon is equipped.
+  api:
+    EquippedIndex: Index of the equipped weapon, or -1 before the first equip.
+    EquipWeapon: Equips the weapon at an index; ignored if the index is out of range.
+    EquipNext: Equips the next weapon, wrapping around to the first.
+    EquipPrevious: Equips the previous weapon, wrapping around to the last.
+  example: |
+    Pick weapons directly with the number keys:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class NumberKeyWeapons : MonoBehaviour
+    {
+        private WeaponInventorySlot _slot;
+
+        private void Awake() => _slot = GetComponent<WeaponInventorySlot>();
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1)) _slot.EquipWeapon(0);
+            if (Input.GetKeyDown(KeyCode.Alpha2)) _slot.EquipWeapon(1);
+        }
+    }
+    ```
+  tips:
+    - Don't leave a weapon component on the character root as well; `PlayerAttack` would find it no matter which child is equipped.
+    - Use `OnWeaponEquipped` to update a weapon icon in your HUD.
+es:
+  summary: Lleva varias armas y deja activa solo la equipada, cambiando con un botón.
+  clip_caption: La espada rompe una caja, el botón de cambio pasa a una pistola que dispara a un muñeco lejano y luego vuelve a la espada.
+  description: |
+    `WeaponInventorySlot` guarda una lista de GameObjects de armas (normalmente hijos del personaje, cada
+    uno con su `WeaponMelee`, `WeaponHitscan`, `WeaponProjectile`...). Equipar una la activa y desactiva
+    todas las demás. En `Start` equipa **Starting Weapon Index**.
+
+    Con `PlayerAttack` en el mismo objeto, la **Switch Weapon Action** (K por defecto) llama a
+    `EquipNext` y recorre la lista en ciclo. Como `PlayerAttack` solo mira los hijos activos, los ataques
+    siempre usan el arma equipada. Los índices inválidos se ignoran.
+  setup:
+    - Crea un GameObject hijo por arma bajo el personaje y agrégale a cada uno un componente de arma.
+    - Agrega `WeaponInventorySlot` al personaje y arrastra los hijos a **Weapons**.
+    - Con `PlayerAttack` en el personaje, pulsa **Special** para cambiar y **Attack** para usar el arma actual.
+  fields:
+    weapons: Los GameObjects de las armas, en el orden de cambio. Solo el equipado queda activo.
+    startingWeaponIndex: Índice del arma equipada al empezar.
+  events:
+    OnWeaponEquipped: Evento C# con el nuevo índice, cada vez que se equipa un arma.
+  api:
+    EquippedIndex: Índice del arma equipada, o -1 antes del primer equipamiento.
+    EquipWeapon: Equipa el arma de un índice; se ignora si el índice está fuera de rango.
+    EquipNext: Equipa la siguiente arma, volviendo a la primera al final.
+    EquipPrevious: Equipa el arma anterior, volviendo a la última al principio.
+  example: |
+    Elige armas directamente con las teclas numéricas:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+
+    public class NumberKeyWeapons : MonoBehaviour
+    {
+        private WeaponInventorySlot _slot;
+
+        private void Awake() => _slot = GetComponent<WeaponInventorySlot>();
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1)) _slot.EquipWeapon(0);
+            if (Input.GetKeyDown(KeyCode.Alpha2)) _slot.EquipWeapon(1);
+        }
+    }
+    ```
+  tips:
+    - No dejes también un componente de arma en la raíz del personaje; `PlayerAttack` lo encontraría sin importar qué hijo esté equipado.
+    - Usa `OnWeaponEquipped` para actualizar el ícono del arma en tu HUD.

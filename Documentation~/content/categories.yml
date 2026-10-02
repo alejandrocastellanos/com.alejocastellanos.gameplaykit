@@ -1,0 +1,102 @@
+core:
+  en: |
+    The foundation every character is built on. `CharacterCore` discovers the abilities on a character and runs
+    them each frame, `CharacterController2D` handles ground detection, velocity and shared gravity, and
+    `KeyboardInputReader` turns keyboard and gamepad input into the `ICharacterInput` every ability reads.
+    Derive from `AbilityBase` to write your own mechanics (see [Custom abilities](../../guides/custom-abilities.md)).
+  es: |
+    La base sobre la que se arma cualquier personaje. `CharacterCore` descubre las habilidades del personaje y
+    las ejecuta cada frame, `CharacterController2D` se encarga del suelo, la velocidad y la gravedad compartida,
+    y `KeyboardInputReader` convierte el teclado y el gamepad en el `ICharacterInput` que leen todas las
+    habilidades. Hereda de `AbilityBase` para escribir tus propias mecánicas (ver
+    [Habilidades propias](../../guides/custom-abilities.md)).
+movement:
+  en: |
+    Character abilities for platformers and top-down games, from walking and jumping to wall jumps, ledges,
+    ladders, ropes, ziplines, swimming and flight. Each one is an `AbilityBase`: add it next to a
+    `CharacterController2D` and a `CharacterCore`, and it works with the default controls. A few marker
+    components (`LadderZone`, `RopeAnchor`, `ZiplinePath`) tag the level pieces those abilities use.
+  es: |
+    Habilidades de personaje para juegos de plataformas y top-down, desde caminar y saltar hasta wall jumps,
+    cornisas, escaleras, cuerdas, tirolesas, nado y vuelo. Cada una es una `AbilityBase`: agrégala junto a un
+    `CharacterController2D` y un `CharacterCore` y funciona con los controles por defecto. Algunos componentes
+    marcadores (`LadderZone`, `RopeAnchor`, `ZiplinePath`) identifican las piezas del nivel que usan esas
+    habilidades.
+health:
+  en: |
+    Everything between taking a hit and coming back: health with invulnerability frames, knockback, stun,
+    death, respawn at checkpoints, lives with game over, fall damage and visual feedback. `CharacterHealth`
+    works on any object, with or without `CharacterCore`, and anything that deals damage reaches it through
+    `IDamageable`. This category also includes gravity shaping and persistence between scenes.
+  es: |
+    Todo lo que pasa entre recibir un golpe y volver: vida con frames de invulnerabilidad, knockback,
+    aturdimiento, muerte, respawn en checkpoints, vidas con game over, daño por caída y feedback visual.
+    `CharacterHealth` funciona en cualquier objeto, con o sin `CharacterCore`, y todo lo que hace daño le llega a
+    través de `IDamageable`. Esta categoría también incluye el control de la gravedad y la persistencia entre
+    escenas.
+combat:
+  en: |
+    `PlayerAttack` connects the attack button to whatever weapon the character carries: melee hitboxes,
+    instant hitscan shots or projectiles, chained into combos or charged by holding the button. Weapons hit
+    anything that implements `IDamageable` and never the attacker, and enemies can fire the same weapons. Add
+    `WeaponInventorySlot` to switch weapons, and `CharacterAimAndOrient` to aim with the mouse or the right stick.
+  es: |
+    `PlayerAttack` conecta el botón de ataque con el arma que lleve el personaje: hitboxes melee, disparos
+    hitscan instantáneos o proyectiles, encadenados en combos o cargados manteniendo el botón. Las armas golpean
+    cualquier cosa que implemente `IDamageable` y nunca al atacante, y los enemigos pueden disparar las mismas
+    armas. Agrega `WeaponInventorySlot` para cambiar de arma y `CharacterAimAndOrient` para apuntar con el mouse
+    o el stick derecho.
+ai:
+  en: |
+    Two ways to give enemies a mind. Standalone behaviours like `EnemyPatrol`, `EnemyChase` or
+    `EnemyShootOnSight` do one job all the time. `AIBrain` is a state machine you assemble in the Inspector from
+    actions (what to do) and decisions (when to switch). `EnemySpawner` keeps them coming (see
+    [Enemies and AI](../../guides/enemies-and-ai.md)).
+  es: |
+    Dos formas de darles cabeza a los enemigos. Los comportamientos independientes como `EnemyPatrol`,
+    `EnemyChase` o `EnemyShootOnSight` hacen una sola cosa todo el tiempo. `AIBrain` es una máquina de estados que
+    armas en el Inspector con acciones (qué hacer) y decisiones (cuándo cambiar). `EnemySpawner` los sigue
+    generando (ver [Enemigos e IA](../../guides/enemies-and-ai.md)).
+environment:
+  en: |
+    The pieces a level is made of: moving, falling and one-way platforms, elevators, conveyors and springs;
+    levers and pressure plates wired with UnityEvents; keys and locked doors; hazards, water and wind; pickups,
+    checkpoints and level exits. Put each one on a GameObject with the right collider (most use a trigger) and
+    it reacts to the player with no extra setup (see [Building a level](../../guides/building-a-level.md)).
+  es: |
+    Las piezas con las que se arma un nivel: plataformas móviles, que caen y de un sentido, ascensores, cintas y
+    resortes; palancas y placas de presión conectadas con UnityEvents; llaves y puertas con cerradura; zonas de
+    daño, agua y viento; pickups, checkpoints y salidas de nivel. Pon cada una en un GameObject con el collider
+    adecuado (casi todas usan un trigger) y reacciona al jugador sin más configuración (ver
+    [Construir un nivel](../../guides/building-a-level.md)).
+camera:
+  en: |
+    Components for an orthographic 2D camera. `CameraFollow` tracks the player smoothly (it finds the
+    `Player` tag on its own), `CameraBounds` keeps the view inside the level, `CameraShake` adds impact, and
+    `CameraZoomBySpeed` pulls back when things get fast. They stack in a fixed execution order, so you can use
+    any combination.
+  es: |
+    Componentes para una cámara 2D ortográfica. `CameraFollow` sigue al jugador suavemente (encuentra solo el
+    tag `Player`), `CameraBounds` mantiene la vista dentro del nivel, `CameraShake` le da impacto a los golpes y
+    `CameraZoomBySpeed` aleja la vista cuando todo va rápido. Se apilan en un orden de ejecución fijo, así que
+    puedes usar cualquier combinación.
+managers:
+  en: |
+    Scene-wide services: game state, level bounds and the void, score, inventory, pause, music and sound
+    effects, save/load and scene transitions with a fade. Most are lightweight singletons with a static
+    `Instance` that other components find by themselves. Give the ones that persist between scenes their own
+    GameObject.
+  es: |
+    Servicios para toda la escena: estado del juego, límites del nivel y vacío, puntaje, inventario, pausa,
+    música y efectos, guardado y transiciones de escena con fundido. Casi todos son singletons livianos con un
+    `Instance` estático que los demás componentes encuentran solos. Pon los que persisten entre escenas en su
+    propio GameObject.
+ui:
+  en: |
+    uGUI components for the HUD: a health bar, score text, a pause menu and floating damage numbers. They
+    connect themselves to the player, `ScoreManager` and `PauseManager`, so a HUD works as soon as it's in the
+    scene. **GameplayKit → Create HUD** builds a complete one.
+  es: |
+    Componentes de uGUI para el HUD: barra de vida, texto de puntaje, menú de pausa y números de daño
+    flotantes. Se conectan solos con el jugador, `ScoreManager` y `PauseManager`, así que un HUD funciona apenas
+    está en la escena. **GameplayKit → Create HUD** arma uno completo.

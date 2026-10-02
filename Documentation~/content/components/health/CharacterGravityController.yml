@@ -1,0 +1,92 @@
+name: CharacterGravityController
+clip: true
+related: [PlayerJump, PlayerMultiJump, CharacterController2D, CharacterFallDamage]
+en:
+  summary: Shapes jumps and falls with heavier gravity on the way down, short hops and a terminal fall speed.
+  clip_caption: Two identical jumps side by side; the green character, using the controller, falls faster and lands first.
+  description: |
+    `CharacterGravityController` tweaks the gravity of `CharacterController2D` every frame to make
+    platforming feel snappier. While falling, gravity is multiplied by **Fall Gravity Multiplier**. While
+    still rising but with the jump button released, it uses **Low Jump Gravity Multiplier**, so a quick
+    tap gives a lower jump. Otherwise the multiplier is 1. Falling speed is also clamped to
+    **Max Fall Speed**.
+
+    By default (**Base Gravity Scale** = 0) the character keeps the **Gravity Scale** set on its
+    `Rigidbody2D`, and the multipliers apply on top of it. A value above 0 replaces the Rigidbody's
+    gravity scale as the controller's base gravity on start. When another ability takes over gravity
+    (flying, ladders, water...), the fall speed limit is skipped and that ability stays in charge.
+  setup:
+    - Build a character with `CharacterController2D` and a jump ability (`PlayerJump` or `PlayerMultiJump`).
+    - Add `CharacterGravityController` before `CharacterCore`, or anywhere if `CharacterCore` is added last (the **Create Player** menu already includes it).
+    - Set the base gravity on the `Rigidbody2D` (**Gravity Scale**) as usual, or fill **Base Gravity Scale** to override it from here, then tune the multipliers while play-testing.
+  fields:
+    baseGravityScale: Optional base gravity for the character. 0 (default) keeps the `Rigidbody2D` **Gravity Scale**; a value above 0 replaces it when the game starts.
+    fallGravityMultiplier: Gravity multiplier while moving down. Higher values make falls quicker and jumps feel less floaty.
+    lowJumpGravityMultiplier: Gravity multiplier while rising with the jump button released. Higher values make short taps lower.
+    maxFallSpeed: Maximum downward speed in units per second.
+  api:
+    AbilityEnabled: Turn the controller off to go back to plain, constant gravity.
+  example: |
+    Make falls floatier while the player holds an umbrella by toggling the controller:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class Umbrella : MonoBehaviour
+    {
+        private CharacterGravityController _gravity;
+
+        private void Awake() => _gravity = GetComponent<CharacterGravityController>();
+
+        public void SetOpen(bool open) => _gravity.AbilityEnabled = !open;
+    }
+    ```
+  tips:
+    - "`PlayerJump` already has its own jump cut (**Jump Cut Multiplier**); with both active the short hop is cut twice. Keep one source for short hops if they feel too low."
+    - "Although it's a movement tweak, it lives in the `GameplayKit.Health` namespace: add `using GameplayKit.Health;` to scripts that reference it."
+es:
+  summary: Da forma a saltos y caídas con más gravedad al bajar, saltos cortos y una velocidad máxima de caída.
+  clip_caption: Dos saltos idénticos lado a lado; el personaje verde, con el controlador, cae más rápido y aterriza primero.
+  description: |
+    `CharacterGravityController` ajusta la gravedad de `CharacterController2D` en cada frame para que el
+    plataformeo se sienta más ágil. Al caer, la gravedad se multiplica por **Fall Gravity Multiplier**.
+    Mientras todavía sube pero ya soltaste el botón de salto, usa **Low Jump Gravity Multiplier**, así un
+    toque rápido da un salto más bajo. En cualquier otro caso el multiplicador es 1. Además, la
+    velocidad de caída se limita a **Max Fall Speed**.
+
+    Por defecto (**Base Gravity Scale** = 0) el personaje conserva el **Gravity Scale** de su `Rigidbody2D`
+    y los multiplicadores se aplican sobre él. Un valor mayor que 0 reemplaza al iniciar el gravity scale
+    del Rigidbody como gravedad base del controlador. Cuando otra habilidad toma el control de la
+    gravedad (volar, escaleras, agua...), no se limita la velocidad de caída y esa habilidad sigue al
+    mando.
+  setup:
+    - Arma un personaje con `CharacterController2D` y una habilidad de salto (`PlayerJump` o `PlayerMultiJump`).
+    - Agrega `CharacterGravityController` antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final (el menú **Create Player** ya lo incluye).
+    - Ajusta la gravedad base en el `Rigidbody2D` (**Gravity Scale**) como siempre, o completa **Base Gravity Scale** para reemplazarla desde aquí, y luego afina los multiplicadores probando.
+  fields:
+    baseGravityScale: Gravedad base opcional del personaje. Con 0 (por defecto) se conserva el **Gravity Scale** del `Rigidbody2D`; un valor mayor que 0 lo reemplaza al iniciar el juego.
+    fallGravityMultiplier: Multiplicador de gravedad al bajar. Valores altos hacen las caídas más rápidas y los saltos menos flotantes.
+    lowJumpGravityMultiplier: Multiplicador de gravedad al subir con el botón de salto suelto. Valores altos hacen más bajos los toques cortos.
+    maxFallSpeed: Velocidad máxima de caída, en unidades por segundo.
+  api:
+    AbilityEnabled: Apaga el controlador para volver a una gravedad simple y constante.
+  example: |
+    Haz las caídas más flotantes mientras el jugador abre un paraguas, apagando el controlador:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class Umbrella : MonoBehaviour
+    {
+        private CharacterGravityController _gravity;
+
+        private void Awake() => _gravity = GetComponent<CharacterGravityController>();
+
+        public void SetOpen(bool open) => _gravity.AbilityEnabled = !open;
+    }
+    ```
+  tips:
+    - "`PlayerJump` ya tiene su propio corte de salto (**Jump Cut Multiplier**); con los dos activos el salto corto se recorta dos veces. Deja una sola fuente si los saltitos quedan muy bajos."
+    - "Aunque es un ajuste de movimiento, vive en el namespace `GameplayKit.Health`: agrega `using GameplayKit.Health;` en los scripts que lo usen."

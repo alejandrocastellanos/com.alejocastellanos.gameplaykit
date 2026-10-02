@@ -1,0 +1,113 @@
+name: LevelManager
+clip: true
+related: [Checkpoint, CharacterRespawn, CharacterHealth, CameraBounds]
+en:
+  summary: Tracks the active checkpoint and the level's limits, and kills anything that falls into the void.
+  clip_caption: The player passes a checkpoint, falls into a pit, dies below Void Y and reappears at the checkpoint.
+  description: |
+    `LevelManager` is a scene singleton (`LevelManager.Instance`) with three jobs. First, it remembers the
+    last activated checkpoint: every `Checkpoint` reports itself through `SetActiveCheckpoint` when the
+    player touches it, and `OnCheckpointChanged` lets your scripts react.
+
+    Second, the void: with **Kill Below Void** on, every frame it checks all active `CharacterHealth`
+    components and deals lethal damage to any living character whose position is below **Void Y**. Paired
+    with `CharacterDeath` and `CharacterRespawn`, falling into a pit becomes "die and reappear at the last
+    checkpoint" with no extra trigger colliders.
+
+    Third, the level's limits: **Level Min Bounds** and **Level Max Bounds** describe the level's rectangle.
+    A `CameraBounds` left unconfigured uses them automatically, and `HasBounds` tells you whether they were
+    set (max greater than min on both axes).
+  setup:
+    - Add `LevelManager` to a manager object in each level scene.
+    - Set **Void Y** a little below your lowest floor.
+    - Give the player `CharacterHealth`, `CharacterDeath` and `CharacterRespawn`, and place `Checkpoint`s along the level.
+    - Optionally set **Level Min Bounds** / **Level Max Bounds** so `CameraBounds` can use them.
+  fields:
+    levelMinBounds: Bottom-left corner of the level, in world units. Used by `CameraBounds` when its own bounds are empty.
+    levelMaxBounds: Top-right corner of the level, in world units. Must be greater than the min on both axes for `HasBounds` to be true.
+    voidY: World height below which characters count as fallen out of the level.
+    killBelowVoid: When on, any character with `CharacterHealth` below **Void Y** receives lethal damage (it usually respawns at the last checkpoint).
+  events:
+    OnCheckpointChanged: "C# event (`Action<Transform>`) raised when a checkpoint becomes active, with that checkpoint's Transform."
+  api:
+    Instance: The level's LevelManager (null if none).
+    ActiveCheckpoint: Transform of the last activated checkpoint, or null.
+    SetActiveCheckpoint: Marks a checkpoint as active and raises `OnCheckpointChanged` (`Checkpoint` calls it for you).
+    IsBelowVoid: True if a world Y is below **Void Y** — handy for objects that aren't characters.
+    LevelMinBounds: The configured bottom-left corner.
+    LevelMaxBounds: The configured top-right corner.
+    HasBounds: True when valid level bounds are configured.
+  example: |
+    Destroy falling crates that drop out of the level, using the same void height:
+
+    ```csharp
+    using GameplayKit.Managers;
+    using UnityEngine;
+
+    public class DestroyInVoid : MonoBehaviour
+    {
+        private void Update()
+        {
+            var level = LevelManager.Instance;
+            if (level != null && level.IsBelowVoid(transform.position.y)) Destroy(gameObject);
+        }
+    }
+    ```
+  tips:
+    - Without `CharacterRespawn` a fallen character just dies; add `CharacterLives` to limit how many times it can come back.
+    - Set **Void Y** close to the bottom of the screen so the respawn happens right after the player disappears, not seconds later.
+es:
+  summary: Recuerda el checkpoint activo y los límites del nivel, y mata a lo que cae al vacío.
+  clip_caption: El jugador pasa por un checkpoint, cae a un foso, muere bajo Void Y y reaparece en el checkpoint.
+  description: |
+    `LevelManager` es un singleton de escena (`LevelManager.Instance`) con tres tareas. Primero, recuerda el
+    último checkpoint activado: cada `Checkpoint` se reporta con `SetActiveCheckpoint` cuando el jugador lo
+    toca, y `OnCheckpointChanged` permite que tus scripts reaccionen.
+
+    Segundo, el vacío: con **Kill Below Void** activo, cada frame revisa todos los `CharacterHealth` activos y
+    aplica daño letal a cualquier personaje vivo cuya posición quede por debajo de **Void Y**. Junto con
+    `CharacterDeath` y `CharacterRespawn`, caer a un foso se vuelve "morir y reaparecer en el último
+    checkpoint" sin colliders de trigger extra.
+
+    Tercero, los límites del nivel: **Level Min Bounds** y **Level Max Bounds** describen el rectángulo del
+    nivel. Un `CameraBounds` sin configurar los usa automáticamente, y `HasBounds` te dice si se definieron
+    (máximo mayor que mínimo en ambos ejes).
+  setup:
+    - Agrega `LevelManager` a un objeto de managers en cada escena de nivel.
+    - Pon **Void Y** un poco por debajo de tu suelo más bajo.
+    - Dale al jugador `CharacterHealth`, `CharacterDeath` y `CharacterRespawn`, y reparte `Checkpoint`s por el nivel.
+    - Opcionalmente define **Level Min Bounds** / **Level Max Bounds** para que `CameraBounds` los use.
+  fields:
+    levelMinBounds: Esquina inferior izquierda del nivel, en unidades del mundo. La usa `CameraBounds` cuando sus propios límites están vacíos.
+    levelMaxBounds: Esquina superior derecha del nivel, en unidades del mundo. Debe ser mayor que la mínima en ambos ejes para que `HasBounds` sea verdadero.
+    voidY: Altura del mundo por debajo de la cual un personaje cuenta como caído fuera del nivel.
+    killBelowVoid: Si está activo, todo personaje con `CharacterHealth` por debajo de **Void Y** recibe daño letal (normalmente reaparece en el último checkpoint).
+  events:
+    OnCheckpointChanged: "Evento C# (`Action<Transform>`) que se dispara cuando un checkpoint se activa, con el Transform de ese checkpoint."
+  api:
+    Instance: El LevelManager del nivel (null si no hay).
+    ActiveCheckpoint: Transform del último checkpoint activado, o null.
+    SetActiveCheckpoint: Marca un checkpoint como activo y dispara `OnCheckpointChanged` (`Checkpoint` lo llama por ti).
+    IsBelowVoid: Verdadero si una Y del mundo está por debajo de **Void Y** — útil para objetos que no son personajes.
+    LevelMinBounds: La esquina inferior izquierda configurada.
+    LevelMaxBounds: La esquina superior derecha configurada.
+    HasBounds: Verdadero cuando hay límites de nivel válidos.
+  example: |
+    Destruye las cajas que caen fuera del nivel usando la misma altura de vacío:
+
+    ```csharp
+    using GameplayKit.Managers;
+    using UnityEngine;
+
+    public class DestroyInVoid : MonoBehaviour
+    {
+        private void Update()
+        {
+            var level = LevelManager.Instance;
+            if (level != null && level.IsBelowVoid(transform.position.y)) Destroy(gameObject);
+        }
+    }
+    ```
+  tips:
+    - Sin `CharacterRespawn` un personaje caído solo muere; agrega `CharacterLives` para limitar cuántas veces puede volver.
+    - Pon **Void Y** cerca del borde inferior de la pantalla para que el respawn ocurra justo después de que el jugador desaparece, no segundos después.

@@ -1,0 +1,141 @@
+name: CharacterController2D
+clip: true
+related: [CharacterCore, AbilityBase, PlayerWalkRun, PlayerJump, CharacterGravityController]
+en:
+  summary: The physics body of every character — ground detection, velocity and shared gravity on top of a Rigidbody2D.
+  clip_caption: Walking off a ledge and jumping; the dot at the feet is the ground check, green while grounded and red in the air.
+  description: |
+    `CharacterController2D` wraps the `Rigidbody2D` (added automatically) so abilities never touch it
+    directly. In `Awake` it freezes rotation, remembers the body's original `gravityScale` as
+    `DefaultGravityScale` and, if neither the collider nor the Rigidbody has a physics material, gives the
+    collider a zero-friction one so the character doesn't stick to walls when pushing against them.
+
+    Ground detection runs every physics step: a small circle (**Ground Check Radius**) at the bottom-center
+    of the character's `Collider2D` — or at **Ground Check** if you assign one — looks for solid colliders.
+    The character's own colliders and all triggers are ignored, so **Ground Layers** can stay on
+    *Everything*. The result is `IsGrounded`, which jumps, coyote time, animation and many other components
+    read.
+
+    Gravity is shared: abilities like swimming, ladders, flying or ledge grabs call
+    `OverrideGravity(owner, scale)` and `ReleaseGravity(owner)`; the most recent override wins, and when
+    none are left the body goes back to `DefaultGravityScale × GravityMultiplier`. It also coordinates
+    abilities with `LockHorizontalControl` (wall jumps and rolls own the horizontal speed for a moment,
+    and `PlayerWalkRun` respects it) and `BlockJumpThisFrame` (dropping through a platform uses the jump
+    button without also jumping).
+  setup:
+    - Add a `Collider2D` to your character (a `CapsuleCollider2D` works best).
+    - Add `CharacterController2D`; it adds the `Rigidbody2D` for you.
+    - Add `CharacterCore` and the abilities you want — they all move the body through this component.
+    - Leave **Ground Check** empty unless your collider's bottom isn't where the feet are.
+  fields:
+    groundCheck: Optional point to check for ground from. Empty uses the bottom-center of the character's collider, which is right for most setups.
+    groundCheckRadius: Radius of the ground check circle, in units. Raise it slightly if the character flickers between grounded and airborne on uneven floors.
+    groundLayers: Layers that count as ground. *Everything* works because the character and triggers are ignored; narrow it only to exclude specific solids.
+  api:
+    IsGrounded: True while the ground check touches a solid collider, updated every physics step.
+    Velocity: Current velocity of the `Rigidbody2D`.
+    Rigidbody: The `Rigidbody2D` this controller drives.
+    Move: Sets the full velocity of the body (X and Y).
+    SetVerticalVelocity: Sets only the vertical velocity, keeping the horizontal one.
+    DefaultGravityScale: Base gravity scale, taken from the Rigidbody on `Awake`. Change it to make the character floatier or heavier.
+    GravityMultiplier: Multiplier on the base gravity (used by `CharacterGravityController` to fall faster). Ignored while an override is active.
+    OverrideGravity: Registers a gravity scale on behalf of an owner object; the latest registered override is applied.
+    ReleaseGravity: Removes the owner's override and restores the previous one or the base gravity.
+    IsGravityOverridden: True while at least one ability is overriding gravity.
+    LockHorizontalControl: For the given seconds, `PlayerWalkRun` won't overwrite horizontal velocity with input.
+    IsHorizontalControlLocked: True while a horizontal lock is active.
+    BlockJumpThisFrame: Marks the jump button as used this frame so jump abilities ignore it.
+    IsJumpBlocked: True on the frame `BlockJumpThisFrame` was called.
+  example: |
+    A bounce pad that launches any kit character upwards and pushes it sideways for a moment:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class SideLauncher : MonoBehaviour
+    {
+        [SerializeField] private Vector2 launch = new Vector2(8f, 14f);
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            var controller = other.GetComponentInParent<CharacterController2D>();
+            if (controller == null) return;
+            controller.Move(launch);                // full velocity, X and Y
+            controller.LockHorizontalControl(0.3f); // input can't cancel the push right away
+        }
+    }
+    ```
+  tips:
+    - Never set `Rigidbody2D.gravityScale` directly on a kit character; use `DefaultGravityScale` or `OverrideGravity`, or the next physics step will overwrite it.
+    - If the character is stuck to walls, check that you didn't assign a physics material with friction to its collider.
+    - Select the character in the Scene view to see the ground check gizmo (green when grounded, red otherwise).
+es:
+  summary: El cuerpo físico de todo personaje — detección de suelo, velocidad y gravedad compartida sobre un Rigidbody2D.
+  clip_caption: Caminando fuera de una cornisa y saltando; el punto en los pies es el chequeo de suelo, verde en el suelo y rojo en el aire.
+  description: |
+    `CharacterController2D` envuelve al `Rigidbody2D` (que se agrega solo) para que las habilidades nunca lo
+    toquen directamente. En `Awake` congela la rotación, guarda el `gravityScale` original como
+    `DefaultGravityScale` y, si ni el collider ni el Rigidbody tienen un material físico, le pone al collider
+    uno sin fricción para que el personaje no se quede pegado a las paredes al empujarlas.
+
+    La detección de suelo corre en cada paso de física: un círculo pequeño (**Ground Check Radius**) en el
+    centro de la base del `Collider2D` del personaje — o en **Ground Check** si asignas uno — busca colliders
+    sólidos. Los colliders del propio personaje y todos los triggers se ignoran, así que **Ground Layers**
+    puede quedarse en *Everything*. El resultado es `IsGrounded`, que leen los saltos, el coyote time, la
+    animación y muchos otros componentes.
+
+    La gravedad es compartida: habilidades como nadar, escaleras, volar o agarrarse de cornisas llaman
+    `OverrideGravity(owner, scale)` y `ReleaseGravity(owner)`; gana la anulación más reciente y, cuando no
+    queda ninguna, el cuerpo vuelve a `DefaultGravityScale × GravityMultiplier`. También coordina habilidades
+    con `LockHorizontalControl` (el wall jump y la rodada se adueñan un momento de la velocidad
+    horizontal, y `PlayerWalkRun` lo respeta) y `BlockJumpThisFrame` (bajar de una plataforma usa el botón de
+    salto sin saltar además).
+  setup:
+    - Agrega un `Collider2D` a tu personaje (un `CapsuleCollider2D` es lo ideal).
+    - Agrega `CharacterController2D`; él agrega el `Rigidbody2D` por ti.
+    - Agrega `CharacterCore` y las habilidades que quieras — todas mueven el cuerpo a través de este componente.
+    - Deja **Ground Check** vacío salvo que la base del collider no esté donde van los pies.
+  fields:
+    groundCheck: Punto opcional desde donde buscar suelo. Vacío usa el centro de la base del collider del personaje, que sirve en casi todos los casos.
+    groundCheckRadius: Radio del círculo de chequeo, en unidades. Súbelo un poco si el personaje parpadea entre suelo y aire en pisos irregulares.
+    groundLayers: Capas que cuentan como suelo. *Everything* funciona porque se ignoran el personaje y los triggers; redúcelo solo para excluir sólidos concretos.
+  api:
+    IsGrounded: Verdadero mientras el chequeo toca un collider sólido; se actualiza en cada paso de física.
+    Velocity: Velocidad actual del `Rigidbody2D`.
+    Rigidbody: El `Rigidbody2D` que maneja este controlador.
+    Move: Fija la velocidad completa del cuerpo (X e Y).
+    SetVerticalVelocity: Fija solo la velocidad vertical y conserva la horizontal.
+    DefaultGravityScale: Escala de gravedad base, tomada del Rigidbody en `Awake`. Cámbiala para un personaje más liviano o más pesado.
+    GravityMultiplier: Multiplicador sobre la gravedad base (lo usa `CharacterGravityController` para caer más rápido). Se ignora mientras hay una anulación.
+    OverrideGravity: Registra una escala de gravedad a nombre de un objeto dueño; se aplica la última registrada.
+    ReleaseGravity: Quita la anulación de ese dueño y restaura la anterior o la gravedad base.
+    IsGravityOverridden: Verdadero mientras al menos una habilidad anula la gravedad.
+    LockHorizontalControl: Durante los segundos indicados, `PlayerWalkRun` no sobrescribe la velocidad horizontal con el input.
+    IsHorizontalControlLocked: Verdadero mientras hay un bloqueo horizontal activo.
+    BlockJumpThisFrame: Marca el botón de salto como usado este frame para que las habilidades de salto lo ignoren.
+    IsJumpBlocked: Verdadero en el frame en que se llamó `BlockJumpThisFrame`.
+  example: |
+    Un lanzador que dispara hacia arriba a cualquier personaje del kit y lo empuja de lado un momento:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class SideLauncher : MonoBehaviour
+    {
+        [SerializeField] private Vector2 launch = new Vector2(8f, 14f);
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            var controller = other.GetComponentInParent<CharacterController2D>();
+            if (controller == null) return;
+            controller.Move(launch);                // velocidad completa, X e Y
+            controller.LockHorizontalControl(0.3f); // el input no anula el empuje enseguida
+        }
+    }
+    ```
+  tips:
+    - Nunca cambies `Rigidbody2D.gravityScale` directamente en un personaje del kit; usa `DefaultGravityScale` u `OverrideGravity`, o el siguiente paso de física lo sobrescribirá.
+    - Si el personaje se pega a las paredes, revisa que no le hayas puesto al collider un material físico con fricción.
+    - Selecciona al personaje en la vista Scene para ver el gizmo del chequeo de suelo (verde en el suelo, rojo en el aire).

@@ -1,0 +1,78 @@
+name: AIDecisionTargetInRange
+clip: true
+related: [AIBrain, AIActionMoveToTarget, AIDecisionLineOfSight, EnemyChase]
+en:
+  summary: AIBrain decision that is true while the target is within a radius of the enemy.
+  clip_caption: The ring turns red and the enemy switches from Idle to Chase when the player steps inside the radius, then back to Idle when the player runs out.
+  description: |
+    Returns true when the straight-line distance between this component's GameObject and
+    `AIBrain.Target` is at most **Range**, so the detection area is a circle around the enemy, not just a
+    horizontal distance. With no target it returns false.
+
+    It works both ways: use **True Target State** to react when the player comes close (`Idle` →
+    `Chase`) and **False Target State** to react when the player gets away (`Chase` → `Idle`). The same
+    component can serve both transitions. It ignores walls; add `AIDecisionLineOfSight` if the enemy
+    shouldn't notice the player through them.
+  setup:
+    - Add `AIDecisionTargetInRange` to the enemy with the `AIBrain` and set **Range**.
+    - In the idle state's **Transitions**, drag it into **Decision** and set **True Target State** to your chase or attack state.
+    - In that chase state, add a transition with the same decision and **False Target State** pointing back.
+  fields:
+    range: Detection radius in units, measured from this GameObject's position to the target's.
+  example: |
+    Show a "!" above the enemy while the player is in range, reusing the decision from your own script:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class AlertIcon : MonoBehaviour
+    {
+        [SerializeField] private AIBrain brain;
+        [SerializeField] private AIDecisionTargetInRange inRange;
+        [SerializeField] private GameObject icon;
+
+        private void Update() => icon.SetActive(inRange.Decide(brain));
+    }
+    ```
+  tips:
+    - Add two copies with different ranges for layered behaviour, e.g. 6 to start chasing and 2 to start attacking.
+    - A slightly larger "leave" range than "enter" range avoids flickering at the border; use two components for that.
+es:
+  summary: Decisión de AIBrain que es verdadera mientras el objetivo está dentro de un radio alrededor del enemigo.
+  clip_caption: El anillo se pone rojo y el enemigo pasa de Idle a Chase cuando el jugador entra en el radio, y vuelve a Idle cuando el jugador sale corriendo.
+  description: |
+    Devuelve verdadero cuando la distancia en línea recta entre el GameObject de este componente y
+    `AIBrain.Target` es como mucho **Range**, así que el área de detección es un círculo alrededor del
+    enemigo, no solo una distancia horizontal. Sin objetivo devuelve falso.
+
+    Funciona en ambos sentidos: usa **True Target State** para reaccionar cuando el jugador se acerca
+    (`Idle` → `Chase`) y **False Target State** para reaccionar cuando se aleja (`Chase` → `Idle`). El
+    mismo componente puede servir para las dos transiciones. Ignora las paredes; agrega
+    `AIDecisionLineOfSight` si el enemigo no debe notar al jugador a través de ellas.
+  setup:
+    - Agrega `AIDecisionTargetInRange` al enemigo que tiene el `AIBrain` y ajusta **Range**.
+    - En las **Transitions** del estado de reposo, arrástrala a **Decision** y pon en **True Target State** tu estado de persecución o ataque.
+    - En ese estado de persecución, agrega una transición con la misma decisión y **False Target State** apuntando de vuelta.
+  fields:
+    range: Radio de detección en unidades, medido desde la posición de este GameObject hasta la del objetivo.
+  example: |
+    Muestra un "!" sobre el enemigo mientras el jugador está en rango, reutilizando la decisión desde tu
+    propio script:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class AlertIcon : MonoBehaviour
+    {
+        [SerializeField] private AIBrain brain;
+        [SerializeField] private AIDecisionTargetInRange inRange;
+        [SerializeField] private GameObject icon;
+
+        private void Update() => icon.SetActive(inRange.Decide(brain));
+    }
+    ```
+  tips:
+    - Agrega dos copias con rangos distintos para comportamientos por capas, por ejemplo 6 para empezar a perseguir y 2 para empezar a atacar.
+    - Un rango de "salida" un poco mayor que el de "entrada" evita parpadeos en el borde; usa dos componentes para eso.

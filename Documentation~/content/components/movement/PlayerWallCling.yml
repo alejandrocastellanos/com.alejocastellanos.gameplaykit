@@ -1,0 +1,115 @@
+name: PlayerWallCling
+clip: true
+related: [PlayerWallJump, PlayerWallSlide, PlayerJump, PlayerMultiJump]
+en:
+  summary: Hold onto a wall without sliding for as long as you keep pushing towards it.
+  clip_caption: Jumping onto a wall and hanging in place while pushing towards it, letting go briefly to drop, grabbing again, then falling.
+  description: |
+    `PlayerWallCling` is the "sticky" version of `PlayerWallSlide`. While the character is airborne, touching
+    a wall in front of it and the player pushes **towards** the wall, its vertical velocity is set to zero
+    every frame, so it hangs in place. This applies even while rising: reaching a wall in the middle of a
+    jump stops the character right there. Letting go of the direction, or pushing away, releases the grip
+    and the character falls.
+
+    Wall jumping works straight from the cling: on the frame you press **Jump**, and during the wall jump's
+    **Control Lock Time** afterwards, the grip doesn't apply, so the kick keeps its full height even if you
+    keep holding towards the wall.
+
+    Wall detection comes from `PlayerWallJump`, which is required and added automatically. "In front" is the
+    facing direction (the sign of `transform.localScale.x`, set by `PlayerWalkRun`). There's nothing to
+    configure on this component itself; tune the detection on `PlayerWallJump`.
+
+    While clinging it sets the movement state to `WallSliding`, so the same animator state can serve for
+    both wall abilities.
+  setup:
+    - Build a character with `CharacterController2D`, `PlayerWalkRun` and `PlayerJump` (or `PlayerMultiJump`).
+    - Add `PlayerWallCling`; `PlayerWallJump` is added with it. Both go before `CharacterCore` (or anywhere if `CharacterCore` is added last).
+    - Jump against a wall and hold the direction towards it to hang; release it to drop.
+  example: |
+    Limit how long the player can hang by disabling the ability after a few seconds on the wall:
+
+    ```csharp
+    using GameplayKit.Core;
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class ClingStamina : MonoBehaviour
+    {
+        [SerializeField] private float maxClingTime = 2f;
+        private PlayerWallCling _cling;
+        private CharacterCore _core;
+        private float _clingTime;
+
+        private void Start()
+        {
+            _cling = GetComponent<PlayerWallCling>();
+            _core = GetComponent<CharacterCore>();
+        }
+
+        private void Update()
+        {
+            if (_core.Controller.IsGrounded) { _clingTime = 0f; _cling.AbilityEnabled = true; return; }
+            if (_core.Movement.CurrentState == MovementState.WallSliding) _clingTime += Time.deltaTime;
+            if (_clingTime >= maxClingTime) _cling.AbilityEnabled = false;
+        }
+    }
+    ```
+  tips:
+    - Use either `PlayerWallCling` or `PlayerWallSlide` on a character, not both.
+    - "If the character re-grabs the wall too soon after a wall jump, raise **Control Lock Time** on `PlayerWallJump`: the cling stays off during that lock."
+es:
+  summary: Agárrate a una pared sin deslizarte mientras sigas empujando hacia ella.
+  clip_caption: Saltando a una pared y quedándose quieto mientras empuja hacia ella; suelta un momento para bajar, se agarra otra vez y luego cae.
+  description: |
+    `PlayerWallCling` es la versión "pegajosa" de `PlayerWallSlide`. Mientras el personaje está en el aire,
+    tocando una pared delante de él y el jugador empuja **hacia** la pared, su velocidad vertical se pone en
+    cero en cada frame, así que queda colgado en su lugar. Esto aplica incluso subiendo: llegar a una pared
+    a mitad de un salto lo detiene ahí mismo. Soltar la dirección, o empujar hacia afuera, libera el agarre
+    y el personaje cae.
+
+    El wall jump funciona directo desde el agarre: en el frame en que pulsas **Salto**, y durante el
+    **Control Lock Time** del wall jump que le sigue, el agarre no se aplica, así que el impulso conserva
+    toda su altura aunque sigas manteniendo hacia la pared.
+
+    La detección de pared viene de `PlayerWallJump`, que es obligatorio y se agrega solo. "Delante" es hacia
+    donde mira el personaje (el signo de `transform.localScale.x`, que fija `PlayerWalkRun`). Este componente
+    no tiene nada que configurar; ajusta la detección en `PlayerWallJump`.
+
+    Mientras está agarrado cambia el estado de movimiento a `WallSliding`, así que el mismo estado del
+    Animator sirve para ambas habilidades de pared.
+  setup:
+    - Arma un personaje con `CharacterController2D`, `PlayerWalkRun` y `PlayerJump` (o `PlayerMultiJump`).
+    - Agrega `PlayerWallCling`; `PlayerWallJump` se agrega con él. Ambos van antes de `CharacterCore` (o en cualquier orden si `CharacterCore` va al final).
+    - Salta contra una pared y mantén la dirección hacia ella para colgarte; suéltala para bajar.
+  example: |
+    Limita cuánto tiempo puede colgarse el jugador desactivando la habilidad tras unos segundos en la pared:
+
+    ```csharp
+    using GameplayKit.Core;
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class ClingStamina : MonoBehaviour
+    {
+        [SerializeField] private float maxClingTime = 2f;
+        private PlayerWallCling _cling;
+        private CharacterCore _core;
+        private float _clingTime;
+
+        private void Start()
+        {
+            _cling = GetComponent<PlayerWallCling>();
+            _core = GetComponent<CharacterCore>();
+        }
+
+        private void Update()
+        {
+            if (_core.Controller.IsGrounded) { _clingTime = 0f; _cling.AbilityEnabled = true; return; }
+            if (_core.Movement.CurrentState == MovementState.WallSliding) _clingTime += Time.deltaTime;
+            if (_clingTime >= maxClingTime) _cling.AbilityEnabled = false;
+        }
+    }
+    ```
+  tips:
+    - Usa `PlayerWallCling` o `PlayerWallSlide` en un personaje, no los dos.
+    - "Si el personaje se vuelve a pegar a la pared demasiado pronto tras un wall jump, sube **Control Lock Time** en `PlayerWallJump`: el agarre queda apagado durante ese bloqueo."

@@ -1,0 +1,98 @@
+name: CharacterKnockback
+clip: true
+related: [CharacterHealth, CharacterStun, EnemyMeleeOnContact, WeaponMelee]
+en:
+  summary: Pushes the character away from hits and briefly blocks its input so the push isn't cancelled.
+  clip_caption: Walking into an enemy knocks the character back and takes HP, twice in a row.
+  description: |
+    When `CharacterHealth.ApplyDamage` receives a hit with a direction, it calls `ApplyKnockback` on
+    this component. The character's velocity is replaced by one of **Force** units per second along the
+    hit direction, tilted upwards by **Upward Lift** so the push reads clearly even on the ground. Every
+    hit pushes the same: the strength doesn't depend on the damage amount or on the `Rigidbody2D` mass.
+    Hits that the health ignores (invulnerable or dead) don't push.
+
+    During **Lockout Duration** seconds the abilities of `CharacterCore` are suspended; without that,
+    `PlayerWalkRun` would overwrite the velocity on the next frame and the push would be invisible. The
+    direction comes from the damage source: `WeaponMelee` and `EnemyMeleeOnContact` push away from the
+    attacker, projectiles and hitscan push along the shot, `HazardZone` pushes away from the zone's
+    center.
+  setup:
+    - Use it on a character with a `Rigidbody2D` (required) and `CharacterHealth`.
+    - Add `CharacterKnockback`; no wiring is needed, `CharacterHealth` finds it on every hit.
+    - Tune **Force** and **Upward Lift** until the push feels right; the defaults (8 and 0.35) give a short hop backwards.
+  fields:
+    force: Speed of the push in units per second, the same for every hit regardless of damage or mass. Raise it for a stronger knockback.
+    upwardLift: How much the push is tilted upwards (0 = straight along the hit direction). The final speed is still **Force**; a bit of lift keeps grounded characters from scraping along the floor.
+    lockoutDuration: Seconds the character's abilities stay suspended after a push. 0 applies the push without blocking input.
+  api:
+    ApplyKnockback: "`ApplyKnockback(direction)` pushes with the configured **Force**; `ApplyKnockback(direction, speed)` uses an explicit speed in units per second instead (bumpers, explosions). Both apply **Upward Lift** and start the input lockout."
+  example: |
+    Launch the player away from a bumper without damaging it:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class Bumper : MonoBehaviour
+    {
+        [SerializeField] private float launchSpeed = 12f; // u/s, overrides the component's Force
+
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            var knockback = collision.collider.GetComponentInParent<CharacterKnockback>();
+            if (knockback == null) return;
+            Vector2 away = collision.transform.position - transform.position;
+            knockback.ApplyKnockback(away, launchSpeed);
+        }
+    }
+    ```
+  tips:
+    - "Want some hits to push harder? Call `ApplyKnockback(direction, speed)` from that damage source and `TakeDamage` for the health, instead of `ApplyDamage`."
+    - Keep **Lockout Duration** short (0.1–0.3 s); for longer loss of control use `CharacterStun`.
+es:
+  summary: Empuja al personaje lejos de los golpes y bloquea su input un instante para que el empujón no se anule.
+  clip_caption: Al chocar con un enemigo el personaje sale despedido hacia atrás y pierde vida, dos veces seguidas.
+  description: |
+    Cuando `CharacterHealth.ApplyDamage` recibe un golpe con dirección, llama a `ApplyKnockback` de este
+    componente. La velocidad del personaje se reemplaza por una de **Force** unidades por segundo en la
+    dirección del golpe, inclinada hacia arriba según **Upward Lift** para que el empujón se note incluso
+    en el suelo. Todos los golpes empujan igual: la fuerza no depende de la cantidad de daño ni de la masa
+    del `Rigidbody2D`. Los golpes que la vida ignora (invulnerable o muerto) no empujan.
+
+    Durante **Lockout Duration** segundos se suspenden las habilidades de `CharacterCore`; sin eso,
+    `PlayerWalkRun` pisaría la velocidad en el frame siguiente y el empujón no se vería. La dirección la
+    da la fuente del daño: `WeaponMelee` y `EnemyMeleeOnContact` empujan lejos del atacante, los
+    proyectiles y el hitscan en la dirección del disparo, y `HazardZone` lejos del centro de la zona.
+  setup:
+    - Úsalo en un personaje con `Rigidbody2D` (obligatorio) y `CharacterHealth`.
+    - Agrega `CharacterKnockback`; no hay que conectar nada, `CharacterHealth` lo busca en cada golpe.
+    - Ajusta **Force** y **Upward Lift** hasta que el empujón se sienta bien; los valores por defecto (8 y 0.35) dan un saltito hacia atrás.
+  fields:
+    force: Velocidad del empujón en unidades por segundo, igual para cualquier golpe sin importar el daño ni la masa. Súbela para un knockback más fuerte.
+    upwardLift: Cuánto se inclina el empujón hacia arriba (0 = justo en la dirección del golpe). La velocidad final sigue siendo **Force**; un poco de inclinación evita que el personaje se arrastre por el suelo.
+    lockoutDuration: Segundos que las habilidades quedan suspendidas tras el empujón. Con 0 se aplica el empujón sin bloquear el input.
+  api:
+    ApplyKnockback: "`ApplyKnockback(direction)` empuja con la **Force** configurada; `ApplyKnockback(direction, speed)` usa en su lugar una velocidad explícita en unidades por segundo (rebotadores, explosiones). Ambos aplican **Upward Lift** y arrancan el bloqueo de input."
+  example: |
+    Lanza al jugador lejos de un rebotador sin hacerle daño:
+
+    ```csharp
+    using GameplayKit.Health;
+    using UnityEngine;
+
+    public class Bumper : MonoBehaviour
+    {
+        [SerializeField] private float launchSpeed = 12f; // u/s, reemplaza la Force del componente
+
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            var knockback = collision.collider.GetComponentInParent<CharacterKnockback>();
+            if (knockback == null) return;
+            Vector2 away = collision.transform.position - transform.position;
+            knockback.ApplyKnockback(away, launchSpeed);
+        }
+    }
+    ```
+  tips:
+    - "¿Quieres que algunos golpes empujen más? Desde esa fuente de daño llama a `ApplyKnockback(direction, speed)` y a `TakeDamage` para la vida, en vez de `ApplyDamage`."
+    - Deja **Lockout Duration** corto (0.1–0.3 s); para quitar el control más tiempo usa `CharacterStun`.

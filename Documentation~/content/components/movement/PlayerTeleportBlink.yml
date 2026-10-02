@@ -1,0 +1,113 @@
+name: PlayerTeleportBlink
+clip: true
+related: [PlayerDash, PlayerRollDodge, PlayerDash8Directions]
+en:
+  summary: Instantly teleport a short distance forward, stopping just before any wall in the way, with a cooldown.
+  clip_caption: Blinking forward across open ground, then blinking towards a wall and stopping right before it, then blinking back.
+  description: |
+    Pressing the **Blink** action (C, or the left shoulder button on a gamepad, with the default
+    `KeyboardInputReader`) moves the character instantly **Blink Distance** units in the direction it is
+    facing (the sign of `transform.localScale.x`). There's no travel time: the `Rigidbody2D` and the
+    transform are placed at the destination in the same frame, and the current velocity is kept, so a blink
+    in the air keeps falling afterwards.
+
+    Before moving, it casts a ray from the center of the collider towards the destination against
+    **Obstacle Layers**, ignoring the character itself and triggers. If something solid is in the way, the
+    character stops just short of it instead of ending up inside the wall. It works on the ground and in the
+    air, and then waits **Cooldown** seconds before it can be used again.
+
+    Only horizontal blinks are supported, and the obstruction check is a single ray at the height of the
+    collider's center.
+  setup:
+    - Build a character with `CharacterController2D` and `PlayerWalkRun` (so it can turn around).
+    - Add `PlayerTeleportBlink` before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Face the way you want to go and press the **Blink** action (C by default).
+  fields:
+    blinkDistance: How far the character teleports when nothing is in the way, in units.
+    cooldown: Seconds after a blink before the next one is allowed.
+    obstacleLayers: Layers that stop the blink. *Everything* is fine since the character ignores itself; remove layers you want to blink through (for example thin fences).
+    blinkAction: Which `CharacterAction` triggers the blink. Change it to reuse another button.
+  example: |
+    `PlayerTeleportBlink` has no events, so a simple way to spawn an effect at both ends is to detect a
+    sudden jump in position:
+
+    ```csharp
+    using UnityEngine;
+
+    public class BlinkEffect : MonoBehaviour
+    {
+        [SerializeField] private GameObject puffPrefab;
+        [SerializeField] private float minJump = 1.5f;
+        private Vector3 _lastPosition;
+
+        private void Start() => _lastPosition = transform.position;
+
+        private void LateUpdate()
+        {
+            if (Vector3.Distance(transform.position, _lastPosition) > minJump)
+            {
+                Instantiate(puffPrefab, _lastPosition, Quaternion.identity);       // where it left
+                Instantiate(puffPrefab, transform.position, Quaternion.identity);  // where it arrived
+            }
+            _lastPosition = transform.position;
+        }
+    }
+    ```
+  tips:
+    - Low obstacles below the collider's center (or overhangs above it) aren't seen by the single ray; keep blink lanes clear or design walls taller than half the character.
+    - Combine with a short **Cooldown** and a lower **Blink Distance** for a twitchy "step" ability, or a long one for a puzzle tool.
+es:
+  summary: Teletranspórtate al instante una distancia corta hacia adelante, deteniéndote justo antes de cualquier pared, con recarga.
+  clip_caption: Teletransporte hacia adelante en terreno abierto, luego hacia una pared deteniéndose justo antes y de vuelta al otro lado.
+  description: |
+    Pulsar la acción **Blink** (C, o el botón superior izquierdo del gamepad, con el `KeyboardInputReader` por
+    defecto) mueve al personaje al instante **Blink Distance** unidades hacia donde mira (el signo de
+    `transform.localScale.x`). No hay tiempo de viaje: el `Rigidbody2D` y el transform se colocan en el
+    destino en el mismo frame, y la velocidad actual se conserva, así que un blink en el aire sigue cayendo
+    después.
+
+    Antes de moverse lanza un rayo desde el centro del collider hacia el destino contra las **Obstacle
+    Layers**, ignorando al propio personaje y los triggers. Si hay algo sólido en el camino, el personaje se
+    detiene justo antes en lugar de quedar metido en la pared. Funciona en el suelo y en el aire, y luego
+    espera **Cooldown** segundos antes de poder usarse otra vez.
+
+    Solo hay blinks horizontales, y el chequeo de obstáculos es un único rayo a la altura del centro del
+    collider.
+  setup:
+    - Arma un personaje con `CharacterController2D` y `PlayerWalkRun` (para que pueda darse vuelta).
+    - Agrega `PlayerTeleportBlink` antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Mira hacia donde quieres ir y pulsa la acción **Blink** (C por defecto).
+  fields:
+    blinkDistance: Cuánto se teletransporta el personaje si no hay nada en el camino, en unidades.
+    cooldown: Segundos después de un blink antes de permitir el siguiente.
+    obstacleLayers: Capas que detienen el blink. *Everything* funciona porque el personaje se ignora a sí mismo; quita las capas que quieras atravesar (por ejemplo rejas delgadas).
+    blinkAction: Qué `CharacterAction` activa el blink. Cámbiala para reutilizar otro botón.
+  example: |
+    `PlayerTeleportBlink` no tiene eventos, así que una forma simple de soltar un efecto en ambos extremos es
+    detectar un salto brusco de posición:
+
+    ```csharp
+    using UnityEngine;
+
+    public class BlinkEffect : MonoBehaviour
+    {
+        [SerializeField] private GameObject puffPrefab;
+        [SerializeField] private float minJump = 1.5f;
+        private Vector3 _lastPosition;
+
+        private void Start() => _lastPosition = transform.position;
+
+        private void LateUpdate()
+        {
+            if (Vector3.Distance(transform.position, _lastPosition) > minJump)
+            {
+                Instantiate(puffPrefab, _lastPosition, Quaternion.identity);       // de donde salió
+                Instantiate(puffPrefab, transform.position, Quaternion.identity);  // a donde llegó
+            }
+            _lastPosition = transform.position;
+        }
+    }
+    ```
+  tips:
+    - Los obstáculos bajos por debajo del centro del collider (o los salientes por encima) no los ve el rayo único; deja libres los carriles de blink o diseña paredes más altas que la mitad del personaje.
+    - Combínalo con un **Cooldown** corto y un **Blink Distance** menor para un "paso" rápido, o con uno largo para una herramienta de puzzles.

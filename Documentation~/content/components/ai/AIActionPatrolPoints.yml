@@ -1,0 +1,105 @@
+name: AIActionPatrolPoints
+clip: true
+related: [AIBrain, AIActionWait, AIDecisionTimeInState, EnemyPatrolWithinBounds]
+en:
+  summary: AIBrain action that walks the enemy horizontally through a list of waypoints, looping or stopping at the last one.
+  clip_caption: An enemy looping through three points in the order A, B, C, B; the raised point counts as reached because only X is compared.
+  description: |
+    While its state is active, the enemy moves left or right towards the current waypoint at **Speed**
+    and flips its `localScale.x` to face where it walks. Only the **X distance** is compared, so a point
+    placed a bit above or below the ground is still reached, which makes waypoints easy to place by
+    eye in a platformer. When the enemy is within **Waypoint Threshold** of the point it moves on to the
+    next one.
+
+    Waypoint positions are read once in `Awake`, so the points can be children of the enemy without
+    moving along with it. The same transform can appear more than once in the list (A, B, C, B) to
+    build back-and-forth routes. With **Loop** on, it goes back to the first point after the last one;
+    with it off, it stops at the last point and `Finished` becomes true.
+
+    The component remembers the current waypoint between visits, so after a chase the enemy resumes the
+    route where it left it. Leaving the state stops the horizontal velocity. Vertical velocity is never
+    touched, so gravity keeps working.
+  setup:
+    - Give the enemy a `Collider2D` and a `Rigidbody2D` (Freeze Rotation Z); the action requires the body.
+    - Create empty GameObjects as waypoints and add `AIActionPatrolPoints`, dragging them into **Waypoints** in order.
+    - Add an `AIBrain` and list the action in a state, for example `Patrol`.
+  fields:
+    waypoints: Points to visit in order. Positions are captured at start; repeat a point to create back-and-forth routes.
+    speed: Horizontal speed in units per second.
+    waypointThreshold: How close in X the enemy must get before heading to the next point. Raise it if a fast enemy overshoots and jitters.
+    loop: On, restart from the first point after the last. Off, stop at the last point and set `Finished`.
+  api:
+    CurrentIndex: Index in **Waypoints** of the point the enemy is heading to.
+    Finished: True once a non-looping route reaches its last point.
+  example: |
+    Open a gate when a non-looping escort route ends:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class OpenGateWhenRouteEnds : MonoBehaviour
+    {
+        [SerializeField] private AIActionPatrolPoints route;
+        [SerializeField] private GameObject gate;
+
+        private void Update()
+        {
+            if (route.Finished && gate.activeSelf) gate.SetActive(false);
+        }
+    }
+    ```
+  tips:
+    - Pair it with `AIActionWait` and two `AIDecisionTimeInState` to make guards pause now and then.
+    - It doesn't detect walls or edges; place waypoints on walkable ground or use `EnemyPatrol` instead.
+es:
+  summary: Acción de AIBrain que lleva al enemigo en horizontal por una lista de puntos, en bucle o deteniéndose en el último.
+  clip_caption: Un enemigo recorriendo tres puntos en bucle en el orden A, B, C, B; el punto elevado cuenta como alcanzado porque solo se compara la X.
+  description: |
+    Mientras su estado está activo, el enemigo se mueve a izquierda o derecha hacia el punto actual a
+    **Speed** y voltea su `localScale.x` para mirar hacia donde camina. Solo se compara la **distancia en
+    X**, así que un punto un poco más arriba o abajo del suelo igual se alcanza, lo que facilita ubicar
+    los puntos a ojo en un plataformero. Cuando el enemigo está a menos de **Waypoint Threshold** del
+    punto, pasa al siguiente.
+
+    Las posiciones se leen una sola vez en `Awake`, así que los puntos pueden ser hijos del enemigo sin
+    moverse con él. El mismo transform puede aparecer varias veces en la lista (A, B, C, B) para armar
+    rutas de ida y vuelta. Con **Loop** activado vuelve al primer punto después del último; desactivado,
+    se detiene en el último y `Finished` pasa a verdadero.
+
+    El componente recuerda el punto actual entre visitas, así que después de una persecución el enemigo
+    retoma la ruta donde la dejó. Salir del estado frena la velocidad horizontal. La velocidad vertical
+    nunca se toca, por lo que la gravedad sigue funcionando.
+  setup:
+    - Dale al enemigo un `Collider2D` y un `Rigidbody2D` (Freeze Rotation Z); la acción requiere el cuerpo.
+    - Crea GameObjects vacíos como puntos, agrega `AIActionPatrolPoints` y arrástralos a **Waypoints** en orden.
+    - Agrega un `AIBrain` y pon la acción en un estado, por ejemplo `Patrol`.
+  fields:
+    waypoints: Puntos a visitar en orden. Las posiciones se capturan al iniciar; repite un punto para crear rutas de ida y vuelta.
+    speed: Velocidad horizontal en unidades por segundo.
+    waypointThreshold: Qué tan cerca en X debe llegar el enemigo antes de ir al siguiente punto. Súbelo si un enemigo rápido se pasa y tiembla.
+    loop: Activado, vuelve al primer punto después del último. Desactivado, se detiene en el último y marca `Finished`.
+  api:
+    CurrentIndex: Índice en **Waypoints** del punto hacia el que va el enemigo.
+    Finished: Verdadero cuando una ruta sin bucle llega a su último punto.
+  example: |
+    Abre una reja cuando termina una ruta de escolta sin bucle:
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class OpenGateWhenRouteEnds : MonoBehaviour
+    {
+        [SerializeField] private AIActionPatrolPoints route;
+        [SerializeField] private GameObject gate;
+
+        private void Update()
+        {
+            if (route.Finished && gate.activeSelf) gate.SetActive(false);
+        }
+    }
+    ```
+  tips:
+    - Combínala con `AIActionWait` y dos `AIDecisionTimeInState` para que los guardias hagan pausas.
+    - No detecta paredes ni bordes; pon los puntos sobre suelo caminable o usa `EnemyPatrol`.

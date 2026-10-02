@@ -1,0 +1,89 @@
+name: Elevator
+clip: true
+related: [Lever, PressurePlate, MovingPlatform, PlayerInteract]
+en:
+  summary: A platform that travels between two points when activated, carrying whoever stands on it.
+  clip_caption: The player steps on the elevator, pulls the lever and rides up to a high ledge.
+  description: |
+    `Elevator` waits until something calls `Activate()`, usually a `Lever` or `PressurePlate` event. The
+    first activation sends it to **Top Point**; each later one sends it to the opposite end. Calls made
+    while it is moving are ignored. It moves at **Speed** with `Rigidbody2D.MovePosition`, and the
+    `Rigidbody2D` (added automatically) is switched to *Kinematic* on start.
+
+    Both points are read once on start, so they can be children of the elevator without moving with it.
+    If a point is empty, the elevator's starting position is used for that end. Dynamic bodies standing on
+    its top face (the player, boxes) are carried along with it, going up and down.
+  setup:
+    - Create a GameObject with a solid `BoxCollider2D` and add `Elevator` (a `Rigidbody2D` is added for you).
+    - Create two empty GameObjects for the ends and assign them to **Bottom Point** and **Top Point**.
+    - Add a `Lever` and, in its **On Toggled** event, drag the elevator and pick `Elevator.Activate`.
+  fields:
+    bottomPoint: Lower end of the trip. Read once on start; empty means the elevator's starting position.
+    topPoint: Upper end of the trip, where the first activation goes. Read once on start; empty means the starting position.
+    speed: Travel speed in units per second.
+  api:
+    IsMoving: True while the elevator is travelling to one of its ends.
+    Activate: Sends the elevator to the other end (the top on the first call). Ignored while it is moving.
+  example: |
+    Call the elevator when the player presses a button of your own:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    public class CallButton : MonoBehaviour
+    {
+        [SerializeField] private Elevator elevator;
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (other.CompareTag("Player") && !elevator.IsMoving) elevator.Activate();
+        }
+    }
+    ```
+  tips:
+    - Connect a `PressurePlate`'s **On Pressed** and **On Released** to `Activate` for an elevator that goes up while something stands on the plate and comes back when it leaves (a change that happens mid-trip is ignored).
+    - The points don't have to be vertical; any two positions work, so it doubles as a one-shot sliding bridge.
+es:
+  summary: Una plataforma que viaja entre dos puntos al activarse, llevando a quien esté encima.
+  clip_caption: El jugador se sube al elevador, acciona la palanca y sube hasta una cornisa alta.
+  description: |
+    `Elevator` espera a que algo llame a `Activate()`, normalmente el evento de una `Lever` o una
+    `PressurePlate`. La primera activación lo manda a **Top Point**; cada una de las siguientes, al extremo
+    opuesto. Las llamadas mientras se mueve se ignoran. Se desplaza a **Speed** con
+    `Rigidbody2D.MovePosition`, y el `Rigidbody2D` (que se agrega solo) pasa a *Kinematic* al iniciar.
+
+    Ambos puntos se leen una vez al iniciar, así que pueden ser hijos del elevador sin moverse con él. Si
+    un punto está vacío, se usa la posición inicial del elevador para ese extremo. Los cuerpos dinámicos
+    parados sobre su cara superior (el jugador, cajas) viajan con él, subiendo y bajando.
+  setup:
+    - Crea un GameObject con un `BoxCollider2D` sólido y agrégale `Elevator` (el `Rigidbody2D` se agrega solo).
+    - Crea dos GameObjects vacíos para los extremos y asígnalos a **Bottom Point** y **Top Point**.
+    - Agrega una `Lever` y, en su evento **On Toggled**, arrastra el elevador y elige `Elevator.Activate`.
+  fields:
+    bottomPoint: Extremo inferior del recorrido. Se lee una vez al iniciar; vacío significa la posición inicial del elevador.
+    topPoint: Extremo superior, adonde va la primera activación. Se lee una vez al iniciar; vacío significa la posición inicial.
+    speed: Velocidad del viaje en unidades por segundo.
+  api:
+    IsMoving: Verdadero mientras el elevador viaja hacia uno de sus extremos.
+    Activate: Manda el elevador al otro extremo (arriba en la primera llamada). Se ignora mientras se mueve.
+  example: |
+    Llama al elevador con un botón propio:
+
+    ```csharp
+    using GameplayKit.Environment;
+    using UnityEngine;
+
+    public class CallButton : MonoBehaviour
+    {
+        [SerializeField] private Elevator elevator;
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (other.CompareTag("Player") && !elevator.IsMoving) elevator.Activate();
+        }
+    }
+    ```
+  tips:
+    - Conecta **On Pressed** y **On Released** de una `PressurePlate` a `Activate` para un elevador que sube mientras algo pisa la placa y vuelve cuando se va (un cambio a mitad del viaje se ignora).
+    - Los puntos no tienen que ser verticales; sirve cualquier par de posiciones, así que también funciona como un puente que se desliza.

@@ -1,0 +1,117 @@
+name: PlayerClimbLadder
+clip: true
+related: [LadderZone, PlayerWalkRun, PlayerJump, PlayerFly]
+en:
+  summary: Climb up and down ladders with the vertical input, without gravity pulling the character off.
+  clip_caption: Walking to a ladder, climbing it, and stepping sideways onto the platform at the top.
+  description: |
+    The character climbs any trigger collider that has a `LadderZone` component, or whose tag matches
+    **Ladder Tag**. Touching the ladder alone does nothing: the character attaches the moment the player
+    presses up or down (W/S or the arrows). From then on gravity is overridden to 0 and the vertical
+    velocity follows the input times **Climb Speed**, so letting go of the stick leaves the character still
+    on the ladder instead of sliding down.
+
+    Horizontal velocity is left as it is, so with `PlayerWalkRun` before this ability in the component list
+    the player can move sideways along the ladder and walk off it. The character detaches when it leaves the
+    trigger (gravity comes back) or when it reaches the ground while pressing down.
+
+    The tag check is tolerant: if the tag doesn't exist in the Tag Manager nothing breaks, so a fresh
+    project only needs `LadderZone`.
+  setup:
+    - Build a character with `CharacterController2D` and `PlayerWalkRun`.
+    - Add `PlayerClimbLadder` after `PlayerWalkRun` and before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Create the ladder - a `BoxCollider2D` with **Is Trigger** on - and add `LadderZone` to it (or give it the **Ladder Tag**).
+    - Stand in front of it and press up to climb; press down to go back to the ground.
+  fields:
+    climbSpeed: Vertical speed while climbing, in units per second, at full input.
+    ladderTag: Optional tag that also marks triggers as ladders, on top of any `LadderZone`. Leave it as is or clear it if you only use `LadderZone`.
+  api:
+    IsOnLadder: True while the character is attached to a ladder (gravity off, climbing control).
+  example: |
+    Switch to a climbing animation while the character is on a ladder:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class LadderAnimation : MonoBehaviour
+    {
+        [SerializeField] private Animator animator;
+        private PlayerClimbLadder _ladder;
+        private Rigidbody2D _body;
+
+        private void Awake()
+        {
+            _ladder = GetComponent<PlayerClimbLadder>();
+            _body = GetComponent<Rigidbody2D>();
+        }
+
+        private void Update()
+        {
+            animator.SetBool("Climbing", _ladder.IsOnLadder);
+            // Pause the climb cycle while the character holds still on the ladder.
+            animator.speed = _ladder.IsOnLadder && Mathf.Abs(_body.linearVelocity.y) < 0.01f ? 0f : 1f;
+        }
+    }
+    ```
+  tips:
+    - Make the ladder trigger reach a bit above the platform it leads to. If it ends exactly at the floor line, the character drops back the moment it leaves the trigger at the top.
+    - Keep `PlayerWalkRun` before this ability so walking left or right can carry the character off the ladder onto a platform.
+    - '`PlayerJump` only jumps from the ground, so it won''t kick the character off the middle of a ladder; walk off the side or climb down instead.'
+es:
+  summary: Sube y baja escaleras con el input vertical, sin que la gravedad haga caer al personaje.
+  clip_caption: Camina hasta una escalera, la sube y se pasa de lado a la plataforma de arriba.
+  description: |
+    El personaje trepa cualquier collider trigger que tenga un componente `LadderZone`, o cuyo tag coincida con
+    **Ladder Tag**. Tocar la escalera no basta: se engancha en cuanto el jugador pulsa arriba o abajo (W/S o
+    las flechas). Desde ese momento la gravedad se fija en 0 y la velocidad vertical sigue al input
+    multiplicado por **Climb Speed**, así que al soltar el stick el personaje se queda quieto en la escalera
+    en lugar de resbalar.
+
+    La velocidad horizontal no se toca, así que con `PlayerWalkRun` antes de esta habilidad en la lista de
+    componentes el jugador puede moverse de lado sobre la escalera y bajarse caminando. El personaje se
+    suelta al salir del trigger (vuelve la gravedad) o al llegar al suelo pulsando abajo.
+
+    El chequeo del tag es tolerante: si el tag no existe en el Tag Manager no se rompe nada, así que en un
+    proyecto nuevo basta con `LadderZone`.
+  setup:
+    - Arma un personaje con `CharacterController2D` y `PlayerWalkRun`.
+    - Agrega `PlayerClimbLadder` después de `PlayerWalkRun` y antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Crea la escalera - un `BoxCollider2D` con **Is Trigger** activado - y agrégale `LadderZone` (o ponle el **Ladder Tag**).
+    - Párate frente a ella y pulsa arriba para subir; pulsa abajo para volver al suelo.
+  fields:
+    climbSpeed: Velocidad vertical al trepar, en unidades por segundo, con el input al máximo.
+    ladderTag: Tag opcional que también marca triggers como escalera, además de cualquier `LadderZone`. Déjalo así o vacíalo si solo usas `LadderZone`.
+  api:
+    IsOnLadder: Verdadero mientras el personaje está enganchado a una escalera (sin gravedad y con control de trepar).
+  example: |
+    Cambia a una animación de trepar mientras el personaje está en una escalera:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class LadderAnimation : MonoBehaviour
+    {
+        [SerializeField] private Animator animator;
+        private PlayerClimbLadder _ladder;
+        private Rigidbody2D _body;
+
+        private void Awake()
+        {
+            _ladder = GetComponent<PlayerClimbLadder>();
+            _body = GetComponent<Rigidbody2D>();
+        }
+
+        private void Update()
+        {
+            animator.SetBool("Climbing", _ladder.IsOnLadder);
+            // Pausa el ciclo de trepar mientras el personaje se queda quieto en la escalera.
+            animator.speed = _ladder.IsOnLadder && Mathf.Abs(_body.linearVelocity.y) < 0.01f ? 0f : 1f;
+        }
+    }
+    ```
+  tips:
+    - Haz que el trigger de la escalera sobresalga un poco por encima de la plataforma a la que lleva. Si termina justo a ras del piso, el personaje vuelve a caer en cuanto sale del trigger por arriba.
+    - Deja `PlayerWalkRun` antes de esta habilidad para que caminar a izquierda o derecha saque al personaje de la escalera hacia una plataforma.
+    - '`PlayerJump` solo salta desde el suelo, así que no lanza al personaje desde la mitad de una escalera; bájate por un lado o desciende.'

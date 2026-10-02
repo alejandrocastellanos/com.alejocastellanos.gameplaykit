@@ -1,0 +1,82 @@
+name: PlayerGlide
+clip: true
+related: [PlayerJump, PlayerMultiJump, PlayerWalkRun, PlayerJetpack]
+en:
+  summary: Hold jump while falling to glide down slowly, like a parachute or a cape.
+  clip_caption: A normal jump falls fast; the same jump while holding the button glides down slowly and travels further.
+  description: |
+    While the character is airborne, moving down and the **Jump** button is held, its fall speed is capped at
+    **Glide Fall Speed**. Horizontal movement is untouched, so with `PlayerWalkRun` the player keeps full air
+    control and covers much more ground before landing.
+
+    It never affects the way up: holding jump during the rise keeps the full jump height (with `PlayerJump`'s
+    variable height), and the glide starts on its own at the apex if the button is still held. Releasing the
+    button returns to normal falling instantly, and pressing it again mid-fall starts gliding again.
+  setup:
+    - Build a character with `CharacterController2D`, `PlayerWalkRun` and `PlayerJump` (or `PlayerMultiJump`).
+    - Add `PlayerGlide` before `CharacterCore`, or anywhere if `CharacterCore` is added last.
+    - Jump and keep **Jump** held after the top of the jump to glide.
+  fields:
+    glideFallSpeed: Maximum downward speed while gliding, in units per second. Lower values float longer.
+  api:
+    IsGliding: True while the glide is limiting the fall this frame.
+  example: |
+    Show a glider sprite only while gliding:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class GliderVisual : MonoBehaviour
+    {
+        [SerializeField] private GameObject glider;
+        private PlayerGlide _glide;
+
+        private void Awake() => _glide = GetComponent<PlayerGlide>();
+
+        private void Update() => glider.SetActive(_glide.IsGliding);
+    }
+    ```
+  tips:
+    - With `PlayerMultiJump`, pressing jump in the air spends an air jump first; glide happens while the button stays held after that.
+    - Combine it with `CharacterGravityController` for snappy jumps that still float when the player holds the button.
+es:
+  summary: Mantén salto mientras caes para planear despacio, como con un paracaídas o una capa.
+  clip_caption: Un salto normal cae rápido; el mismo salto manteniendo el botón planea despacio y llega más lejos.
+  description: |
+    Mientras el personaje está en el aire, bajando y con el botón de **Salto** mantenido, su velocidad de
+    caída se limita a **Glide Fall Speed**. El movimiento horizontal no se toca, así que con `PlayerWalkRun`
+    el jugador conserva todo el control en el aire y recorre mucha más distancia antes de aterrizar.
+
+    Nunca afecta la subida: mantener salto durante el ascenso conserva la altura completa (con la altura
+    variable de `PlayerJump`), y el planeo empieza solo en el punto más alto si el botón sigue apretado.
+    Soltar el botón vuelve a la caída normal al instante, y volver a pulsarlo en plena caída retoma el
+    planeo.
+  setup:
+    - Arma un personaje con `CharacterController2D`, `PlayerWalkRun` y `PlayerJump` (o `PlayerMultiJump`).
+    - Agrega `PlayerGlide` antes de `CharacterCore`, o en cualquier orden si `CharacterCore` va al final.
+    - Salta y mantén **Salto** apretado después del punto más alto para planear.
+  fields:
+    glideFallSpeed: Velocidad máxima de caída al planear, en unidades por segundo. Valores más bajos flotan más tiempo.
+  api:
+    IsGliding: Verdadero mientras el planeo está limitando la caída en este frame.
+  example: |
+    Muestra un sprite de planeador solo mientras planea:
+
+    ```csharp
+    using GameplayKit.Movement;
+    using UnityEngine;
+
+    public class GliderVisual : MonoBehaviour
+    {
+        [SerializeField] private GameObject glider;
+        private PlayerGlide _glide;
+
+        private void Awake() => _glide = GetComponent<PlayerGlide>();
+
+        private void Update() => glider.SetActive(_glide.IsGliding);
+    }
+    ```
+  tips:
+    - Con `PlayerMultiJump`, pulsar salto en el aire gasta primero un salto extra; el planeo ocurre mientras el botón siga apretado después.
+    - Combínalo con `CharacterGravityController` para saltos ágiles que igual flotan cuando el jugador mantiene el botón.

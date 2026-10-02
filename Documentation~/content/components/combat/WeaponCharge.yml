@@ -1,0 +1,103 @@
+name: WeaponCharge
+clip: true
+related: [PlayerAttack, WeaponMelee, WeaponHitscan, WeaponProjectile]
+en:
+  summary: Turns a weapon into a charged attack — hold to charge, release to hit harder.
+  clip_caption: A quick tap deals minimum damage, while holding attack until the bar fills releases a full-power hit.
+  description: |
+    Put `WeaponCharge` next to a `WeaponMelee`, `WeaponHitscan` or `WeaponProjectile`. With
+    `PlayerAttack`, pressing **Attack** starts charging instead of attacking right away; releasing the
+    button attacks once with a damage between **Min Damage** and **Max Damage**, interpolated by how long
+    you held it (full charge after **Max Charge Time** seconds, holding longer adds nothing).
+
+    The charged damage replaces the weapon's own **Damage** for that attack; the weapon's cooldown still
+    applies, so releasing while it's on cooldown wastes the charge. The value is ignored when the active
+    weapon is a `WeaponCombo`. `ChargeRatio01` is handy to drive a charge bar or glow.
+  setup:
+    - Give the character `PlayerAttack` and a weapon (for example `WeaponMelee`).
+    - Add `WeaponCharge` on the same object as the weapon.
+    - Set **Min Damage**, **Max Damage** and **Max Charge Time**, then hold and release **Attack**.
+  fields:
+    maxChargeTime: Seconds of holding needed to reach full charge.
+    minDamage: Damage of an instant release (no charge).
+    maxDamage: Damage at full charge.
+  events:
+    OnReleased: C# event fired on release with the final damage.
+  api:
+    IsCharging: True while the button is held and the weapon is charging.
+    ChargeRatio01: Charge progress from 0 to 1. Use it for a charge bar.
+    BeginCharge: Starts charging from zero (called by `PlayerAttack` when the button is pressed).
+    ReleaseCharge: Stops charging and returns the damage for the current charge; also fires `OnReleased`.
+  example: |
+    Fill a UI image while charging:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+    using UnityEngine.UI;
+
+    public class ChargeBar : MonoBehaviour
+    {
+        [SerializeField] private WeaponCharge charge;
+        [SerializeField] private Image fill;
+
+        private void Update()
+        {
+            fill.enabled = charge.IsCharging;
+            fill.fillAmount = charge.ChargeRatio01;
+        }
+    }
+    ```
+  tips:
+    - Show the charge with `ChargeRatio01`; without feedback, players won't know they can hold the button.
+    - Works with ranged weapons too — a charged hitscan shot makes a nice sniper.
+es:
+  summary: Convierte un arma en un ataque cargado — mantén para cargar y suelta para golpear más fuerte.
+  clip_caption: Un toque rápido hace el daño mínimo, mientras que mantener el ataque hasta llenar la barra suelta un golpe a máxima potencia.
+  description: |
+    Pon `WeaponCharge` junto a un `WeaponMelee`, `WeaponHitscan` o `WeaponProjectile`. Con
+    `PlayerAttack`, pulsar **Attack** empieza a cargar en vez de atacar enseguida; al soltar el botón el
+    arma ataca una vez con un daño entre **Min Damage** y **Max Damage**, interpolado según cuánto lo
+    mantuviste (carga completa tras **Max Charge Time** segundos; mantenerlo más no suma nada).
+
+    El daño cargado reemplaza el **Damage** del arma en ese ataque; el cooldown del arma sigue
+    aplicando, así que soltar mientras está en cooldown desperdicia la carga. El valor se ignora cuando
+    el arma activa es un `WeaponCombo`. `ChargeRatio01` es útil para una barra de carga o un brillo.
+  setup:
+    - Dale al personaje `PlayerAttack` y un arma (por ejemplo `WeaponMelee`).
+    - Agrega `WeaponCharge` en el mismo objeto que el arma.
+    - Ajusta **Min Damage**, **Max Damage** y **Max Charge Time**, y luego mantén y suelta **Attack**.
+  fields:
+    maxChargeTime: Segundos que hay que mantener el botón para llegar a la carga completa.
+    minDamage: Daño al soltar al instante (sin carga).
+    maxDamage: Daño con la carga completa.
+  events:
+    OnReleased: Evento C# que se dispara al soltar, con el daño final.
+  api:
+    IsCharging: Verdadero mientras se mantiene el botón y el arma está cargando.
+    ChargeRatio01: Progreso de la carga de 0 a 1. Úsalo para una barra de carga.
+    BeginCharge: Empieza a cargar desde cero (lo llama `PlayerAttack` al pulsar el botón).
+    ReleaseCharge: Deja de cargar y devuelve el daño de la carga actual; también dispara `OnReleased`.
+  example: |
+    Llena una imagen de UI mientras se carga:
+
+    ```csharp
+    using GameplayKit.Combat;
+    using UnityEngine;
+    using UnityEngine.UI;
+
+    public class ChargeBar : MonoBehaviour
+    {
+        [SerializeField] private WeaponCharge charge;
+        [SerializeField] private Image fill;
+
+        private void Update()
+        {
+            fill.enabled = charge.IsCharging;
+            fill.fillAmount = charge.ChargeRatio01;
+        }
+    }
+    ```
+  tips:
+    - Muestra la carga con `ChargeRatio01`; sin feedback, el jugador no sabrá que puede mantener el botón.
+    - También funciona con armas a distancia — un disparo hitscan cargado es un buen francotirador.

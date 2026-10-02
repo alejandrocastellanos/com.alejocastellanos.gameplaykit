@@ -1,0 +1,95 @@
+name: PlayerWallSlide
+clip: true
+related: [PlayerWallJump, PlayerWallCling, PlayerJump, PlayerMultiJump]
+en:
+  summary: Slow the fall while pressing against a wall, sliding down at a capped speed.
+  clip_caption: Jumping against a tall wall and sliding down slowly while pushing towards it, then letting go and dropping fast.
+  description: |
+    While the character is in the air, falling, touching a wall in front of it and the player pushes
+    **towards** that wall, `PlayerWallSlide` caps the fall speed at **Slide Speed**. Rising is never slowed,
+    and pushing away from the wall (or letting go of the direction) drops the character at normal speed.
+
+    Wall detection comes from `PlayerWallJump`, which is required and added automatically, so every
+    character that slides can also wall jump. "In front" means the direction the character is facing (the
+    sign of `transform.localScale.x`, set by `PlayerWalkRun`), and the wall must be a solid collider on the
+    **Wall Layers** of `PlayerWallJump`.
+
+    While sliding it sets the movement state to `WallSliding`, handy for a wall-slide animation through
+    `CharacterAnimatorBridge`.
+  setup:
+    - Build a character with `CharacterController2D`, `PlayerWalkRun` and `PlayerJump` (or `PlayerMultiJump`).
+    - Add `PlayerWallSlide`; `PlayerWallJump` is added with it. Both go before `CharacterCore` (or anywhere if `CharacterCore` is added last).
+    - Jump against a wall and keep holding the direction towards it.
+  fields:
+    slideSpeed: Maximum fall speed while sliding, in units per second. Lower values feel stickier.
+  example: |
+    Emit sparks while the character slides down a wall:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class WallSlideSparks : MonoBehaviour
+    {
+        [SerializeField] private ParticleSystem sparks;
+        private CharacterCore _core;
+
+        private void Start() => _core = GetComponent<CharacterCore>();
+
+        private void LateUpdate()
+        {
+            bool sliding = _core.Movement.CurrentState == MovementState.WallSliding;
+            if (sliding && !sparks.isPlaying) sparks.Play();
+            else if (!sliding && sparks.isPlaying) sparks.Stop();
+        }
+    }
+    ```
+  tips:
+    - Use either `PlayerWallSlide` or `PlayerWallCling` on a character, not both.
+    - Keep **Slide Speed** well below the normal fall speed (2–3) so players clearly feel the grip and have time to wall jump.
+es:
+  summary: Frena la caída al presionar contra una pared, deslizándote hacia abajo a una velocidad limitada.
+  clip_caption: Saltando contra una pared alta y deslizándose despacio mientras empuja hacia ella; al soltar, cae rápido.
+  description: |
+    Mientras el personaje está en el aire, cayendo, tocando una pared delante de él y el jugador empuja
+    **hacia** esa pared, `PlayerWallSlide` limita la velocidad de caída a **Slide Speed**. La subida nunca se
+    frena, y empujar lejos de la pared (o soltar la dirección) deja caer al personaje a velocidad normal.
+
+    La detección de pared viene de `PlayerWallJump`, que es obligatorio y se agrega solo, así que todo
+    personaje que se desliza también puede hacer wall jump. "Delante" es hacia donde mira el personaje (el
+    signo de `transform.localScale.x`, que fija `PlayerWalkRun`), y la pared debe ser un collider sólido en
+    las **Wall Layers** de `PlayerWallJump`.
+
+    Mientras se desliza cambia el estado de movimiento a `WallSliding`, útil para una animación de
+    deslizamiento con `CharacterAnimatorBridge`.
+  setup:
+    - Arma un personaje con `CharacterController2D`, `PlayerWalkRun` y `PlayerJump` (o `PlayerMultiJump`).
+    - Agrega `PlayerWallSlide`; `PlayerWallJump` se agrega con él. Ambos van antes de `CharacterCore` (o en cualquier orden si `CharacterCore` va al final).
+    - Salta contra una pared y sigue manteniendo la dirección hacia ella.
+  fields:
+    slideSpeed: Velocidad máxima de caída mientras te deslizas, en unidades por segundo. Valores más bajos se sienten más pegajosos.
+  example: |
+    Suelta chispas mientras el personaje se desliza por una pared:
+
+    ```csharp
+    using GameplayKit.Core;
+    using UnityEngine;
+
+    public class WallSlideSparks : MonoBehaviour
+    {
+        [SerializeField] private ParticleSystem sparks;
+        private CharacterCore _core;
+
+        private void Start() => _core = GetComponent<CharacterCore>();
+
+        private void LateUpdate()
+        {
+            bool sliding = _core.Movement.CurrentState == MovementState.WallSliding;
+            if (sliding && !sparks.isPlaying) sparks.Play();
+            else if (!sliding && sparks.isPlaying) sparks.Stop();
+        }
+    }
+    ```
+  tips:
+    - Usa `PlayerWallSlide` o `PlayerWallCling` en un personaje, no los dos.
+    - Deja **Slide Speed** bastante por debajo de la caída normal (2–3) para que el agarre se note y haya tiempo de hacer wall jump.

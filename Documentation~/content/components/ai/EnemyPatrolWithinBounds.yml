@@ -1,0 +1,84 @@
+name: EnemyPatrolWithinBounds
+clip: true
+related: [EnemyPatrol, AIActionPatrolPoints, EnemyShootOnSight, EnemyMeleeOnContact]
+en:
+  summary: Walks back and forth between a fixed left and right limit in the world.
+  clip_caption: The enemy paces between two limits, turning around each time it reaches one.
+  description: |
+    The enemy walks at **Speed**, starting to the right, and turns around (flipping `localScale.x`) when
+    its position passes the X of **Right Bound** or **Left Bound**. Only the X coordinates matter, and
+    they are read once in `Awake`, so the bound objects can be children of the enemy: they stay where
+    they were at start instead of moving along with it.
+
+    Either bound can be left empty, which means no limit on that side. Unlike `EnemyPatrol` it doesn't
+    look for walls or edges, so make sure the stretch between the bounds is walkable.
+  setup:
+    - Give the enemy a `Collider2D` and a `Rigidbody2D` (Freeze Rotation Z); the component requires the body.
+    - Create two empty GameObjects (they can be children of the enemy) at the left and right ends of the patrol zone.
+    - Add `EnemyPatrolWithinBounds` and drag them into **Left Bound** and **Right Bound**.
+  fields:
+    speed: Walking speed in units per second.
+    leftBound: Object marking the left limit (only its X is used). Empty means no left limit.
+    rightBound: Object marking the right limit (only its X is used). Empty means no right limit.
+  example: |
+    Draw the patrol zone in the Scene view so it's easy to adjust:
+
+    ```csharp
+    using UnityEngine;
+
+    public class PatrolZoneGizmo : MonoBehaviour
+    {
+        [SerializeField] private Transform leftBound, rightBound;
+
+        private void OnDrawGizmos()
+        {
+            if (leftBound == null || rightBound == null) return;
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(leftBound.position, rightBound.position);
+        }
+    }
+    ```
+  tips:
+    - Making the bounds children of the enemy keeps the prefab self-contained; move the whole enemy and its zone moves too.
+    - Combine with `EnemyShootOnSight` for a guard that sweeps its vision cone as it turns.
+es:
+  summary: Camina de un lado a otro entre un límite izquierdo y uno derecho fijos en el mundo.
+  clip_caption: El enemigo va y viene entre dos límites, dándose vuelta cada vez que llega a uno.
+  description: |
+    El enemigo camina a **Speed**, empezando hacia la derecha, y se da vuelta (volteando `localScale.x`)
+    cuando su posición pasa la X de **Right Bound** o **Left Bound**. Solo importan las coordenadas X, y se
+    leen una vez en `Awake`, así que los límites pueden ser hijos del enemigo: se quedan donde estaban al
+    iniciar en lugar de moverse con él.
+
+    Cualquiera de los dos límites puede quedar vacío, lo que significa sin límite de ese lado. A
+    diferencia de `EnemyPatrol` no busca paredes ni bordes, así que asegúrate de que el tramo entre los
+    límites sea caminable.
+  setup:
+    - Dale al enemigo un `Collider2D` y un `Rigidbody2D` (Freeze Rotation Z); el componente requiere el cuerpo.
+    - Crea dos GameObjects vacíos (pueden ser hijos del enemigo) en los extremos izquierdo y derecho de la zona.
+    - Agrega `EnemyPatrolWithinBounds` y arrástralos a **Left Bound** y **Right Bound**.
+  fields:
+    speed: Velocidad de caminata en unidades por segundo.
+    leftBound: Objeto que marca el límite izquierdo (solo se usa su X). Vacío significa sin límite a la izquierda.
+    rightBound: Objeto que marca el límite derecho (solo se usa su X). Vacío significa sin límite a la derecha.
+  example: |
+    Dibuja la zona de patrulla en la vista Scene para ajustarla fácilmente:
+
+    ```csharp
+    using UnityEngine;
+
+    public class PatrolZoneGizmo : MonoBehaviour
+    {
+        [SerializeField] private Transform leftBound, rightBound;
+
+        private void OnDrawGizmos()
+        {
+            if (leftBound == null || rightBound == null) return;
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(leftBound.position, rightBound.position);
+        }
+    }
+    ```
+  tips:
+    - Hacer los límites hijos del enemigo mantiene el prefab autocontenido; mueves el enemigo y su zona se mueve con él.
+    - Combínalo con `EnemyShootOnSight` para un guardia que barre su cono de visión al darse vuelta.

@@ -1,0 +1,87 @@
+name: AIActionFlee
+clip: true
+related: [AIBrain, AIDecisionHealthThreshold, AIDecisionTargetInRange, EnemyFlee]
+en:
+  summary: AIBrain action that runs away from the target horizontally while its state is active.
+  clip_caption: A creature waits until the player enters its range, flees, and stops again once the player is far enough.
+  description: |
+    Every frame of its state, the enemy moves horizontally away from `AIBrain.Target` at **Speed**: if
+    the target is to its left it runs right, and vice versa. Only the X velocity of the `Rigidbody2D` is
+    set, so gravity still applies. The action keeps fleeing as long as the state is active; how long
+    that is depends on your transitions (for example `AIDecisionTargetInRange` false → back to `Idle`).
+
+    Leaving the state stops the horizontal velocity. Without a target it does nothing, and it doesn't
+    flip the sprite, so the enemy keeps facing the same way unless you add a facing action.
+  setup:
+    - Give the enemy a `Collider2D` and a `Rigidbody2D` (Freeze Rotation Z).
+    - Add `AIActionFlee`, a decision to trigger it (e.g. `AIDecisionTargetInRange` or `AIDecisionHealthThreshold`) and an `AIBrain` with the player as **Target**.
+    - Create a `Flee` state with the action and a transition into it from another state.
+  fields:
+    speed: Horizontal flee speed in units per second. Slightly slower than the player makes it catchable.
+  example: |
+    Count how many times the enemy started fleeing (for a "coward" achievement, for example):
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class FleeCounter : MonoBehaviour
+    {
+        [SerializeField] private AIBrain brain;
+        public int TimesFled { get; private set; }
+        private bool _wasFleeing;
+
+        private void Update()
+        {
+            bool fleeing = brain.CurrentState != null && brain.CurrentState.name == "Flee";
+            if (fleeing && !_wasFleeing) TimesFled++;
+            _wasFleeing = fleeing;
+        }
+    }
+    ```
+  tips:
+    - With `AIDecisionHealthThreshold` you get enemies that retreat when hurt.
+    - Fleeing enemies walk off ledges and into walls; keep them in enclosed areas or add your own edge check.
+es:
+  summary: Acción de AIBrain que huye del objetivo en horizontal mientras su estado está activo.
+  clip_caption: Una criatura espera hasta que el jugador entra en su rango, huye y se vuelve a detener cuando el jugador queda lo bastante lejos.
+  description: |
+    En cada frame de su estado, el enemigo se mueve en horizontal alejándose de `AIBrain.Target` a
+    **Speed**: si el objetivo está a su izquierda corre a la derecha, y al revés. Solo se fija la
+    velocidad X del `Rigidbody2D`, así que la gravedad sigue actuando. La acción huye mientras el estado
+    esté activo; cuánto dura eso depende de tus transiciones (por ejemplo `AIDecisionTargetInRange` en
+    false → volver a `Idle`).
+
+    Al salir del estado se frena la velocidad horizontal. Sin objetivo no hace nada, y no voltea el
+    sprite, así que el enemigo sigue mirando hacia el mismo lado salvo que agregues una acción para
+    orientarlo.
+  setup:
+    - Dale al enemigo un `Collider2D` y un `Rigidbody2D` (Freeze Rotation Z).
+    - Agrega `AIActionFlee`, una decisión que la active (por ejemplo `AIDecisionTargetInRange` o `AIDecisionHealthThreshold`) y un `AIBrain` con el jugador como **Target**.
+    - Crea un estado `Flee` con la acción y una transición hacia él desde otro estado.
+  fields:
+    speed: Velocidad de huida horizontal en unidades por segundo. Un poco más lenta que el jugador hace que se le pueda alcanzar.
+  example: |
+    Cuenta cuántas veces empezó a huir el enemigo (para un logro de "cobarde", por ejemplo):
+
+    ```csharp
+    using GameplayKit.AI;
+    using UnityEngine;
+
+    public class FleeCounter : MonoBehaviour
+    {
+        [SerializeField] private AIBrain brain;
+        public int TimesFled { get; private set; }
+        private bool _wasFleeing;
+
+        private void Update()
+        {
+            bool fleeing = brain.CurrentState != null && brain.CurrentState.name == "Flee";
+            if (fleeing && !_wasFleeing) TimesFled++;
+            _wasFleeing = fleeing;
+        }
+    }
+    ```
+  tips:
+    - Con `AIDecisionHealthThreshold` consigues enemigos que se retiran cuando están heridos.
+    - Los enemigos que huyen se caen de las cornisas y chocan con paredes; mantenlos en zonas cerradas o agrega tu propio chequeo de borde.

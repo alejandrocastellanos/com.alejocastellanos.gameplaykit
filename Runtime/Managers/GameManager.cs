@@ -22,6 +22,8 @@ namespace GameplayKit.Managers
             }
 
             Instance = this;
+            // DontDestroyOnLoad solo funciona con objetos raíz.
+            if (transform.parent != null) transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
         }
 

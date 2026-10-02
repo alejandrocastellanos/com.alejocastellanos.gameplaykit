@@ -62,7 +62,8 @@ namespace GameplayKit.Core
         {
             foreach (AbilityBase ability in _abilities)
             {
-                if (!ability.AbilityEnabled) continue;
+                // Una habilidad desmarcada en el Inspector (enabled = false) no corre, igual que cualquier MonoBehaviour.
+                if (!ability.AbilityEnabled || !ability.enabled) continue;
                 try { phase(ability); }
                 catch (System.Exception e) { DisableFaultyAbility(ability, e); }
             }

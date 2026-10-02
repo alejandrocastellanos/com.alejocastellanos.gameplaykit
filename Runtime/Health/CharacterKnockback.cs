@@ -10,6 +10,10 @@ namespace GameplayKit.Health
     public class CharacterKnockback : MonoBehaviour
     {
         [Header("Knockback")]
+        [Tooltip("Velocidad (u/s) del empujón, igual para cualquier golpe sin importar el daño ni la masa.")]
+        [SerializeField] private float force = 8f;
+        [Tooltip("Cuánto se inclina el empujón hacia arriba (0 = solo en la dirección del golpe). Ayuda a que se lea en el suelo.")]
+        [SerializeField] private float upwardLift = 0.35f;
         [SerializeField] private float lockoutDuration = 0.2f;
 
         private Rigidbody2D _rb;
@@ -22,12 +26,17 @@ namespace GameplayKit.Health
             _character = GetComponent<CharacterCore>();
         }
 
-        public void ApplyKnockback(Vector2 direction, float force)
-        {
-            if (_rb == null) return;
+        /// <summary>Empuja con la fuerza configurada en el Inspector.</summary>
+        public void ApplyKnockback(Vector2 direction) => ApplyKnockback(direction, force);
 
-            _rb.linearVelocity = Vector2.zero;
-            _rb.AddForce(direction.normalized * force, ForceMode2D.Impulse);
+        /// <summary>Empuja con una velocidad explícita (u/s) en lugar de la configurada.</summary>
+        public void ApplyKnockback(Vector2 direction, float speed)
+        {
+            if (_rb == null || direction == Vector2.zero) return;
+
+            Vector2 dir = direction.normalized;
+            if (upwardLift > 0f) dir = (dir + Vector2.up * upwardLift).normalized;
+            _rb.linearVelocity = dir * speed;
 
             if (lockoutDuration > 0f)
             {

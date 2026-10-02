@@ -1,3 +1,4 @@
+using GameplayKit.Core;
 using UnityEngine;
 
 namespace GameplayKit.AI
@@ -7,6 +8,7 @@ namespace GameplayKit.AI
     public class EnemyChase : MonoBehaviour
     {
         [Header("Persecución")]
+        [Tooltip("Vacío = el objeto con tag Player (se busca solo, útil para enemigos instanciados en runtime).")]
         [SerializeField] private Transform target;
         [SerializeField] private float detectionRange = 8f;
         [SerializeField] private float speed = 3f;
@@ -15,6 +17,10 @@ namespace GameplayKit.AI
         public bool IsChasing { get; private set; }
 
         private Rigidbody2D _rb;
+        private float _nextTargetSearch;
+
+        /// <summary>Objetivo actual; asígnalo por código o déjalo vacío para usar el jugador.</summary>
+        public Transform Target { get => target; set => target = value; }
 
         private void Awake()
         {
@@ -23,7 +29,7 @@ namespace GameplayKit.AI
 
         private void Update()
         {
-            if (target == null)
+            if (!PlayerLocator.Resolve(ref target, ref _nextTargetSearch))
             {
                 IsChasing = false;
                 _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);

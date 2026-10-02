@@ -28,6 +28,8 @@ namespace GameplayKit.Managers
             }
 
             Instance = this;
+            // DontDestroyOnLoad solo funciona con objetos raíz.
+            if (transform.parent != null) transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
             // Sin fuentes asignadas se crean solas: el manager funciona recién agregado.
             if (musicSourceA == null) musicSourceA = CreateSource("Music A", loop: true);

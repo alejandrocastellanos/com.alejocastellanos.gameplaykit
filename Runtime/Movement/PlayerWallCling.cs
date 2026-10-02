@@ -29,6 +29,9 @@ namespace GameplayKit.Movement
                             PushingTowardWall();
 
             if (!clinging) return;
+            // El frame del salto y el bloqueo de control posterior pertenecen al wall jump: aferrarse aquí
+            // anularía su impulso vertical.
+            if (CharacterInput.JumpPressedThisFrame || Character.Controller.IsHorizontalControlLocked) return;
 
             Character.Controller.SetVerticalVelocity(0f);
             Character.Movement.ChangeState(MovementState.WallSliding);

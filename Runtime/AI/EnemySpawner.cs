@@ -51,12 +51,18 @@ namespace GameplayKit.AI
             _alive.Add(instance);
             SpawnedCount++;
 
-            var brain = instance.GetComponent<AIBrain>();
-            if (brain != null && brain.Target == null)
+            Transform t = target;
+            if (t == null) { var player = GameObject.FindWithTag("Player"); if (player != null) t = player.transform; }
+            if (t != null)
             {
-                Transform t = target;
-                if (t == null) { var player = GameObject.FindWithTag("Player"); if (player != null) t = player.transform; }
-                brain.Target = t;
+                var brain = instance.GetComponent<AIBrain>();
+                if (brain != null && brain.Target == null) brain.Target = t;
+                var chase = instance.GetComponent<EnemyChase>();
+                if (chase != null && chase.Target == null) chase.Target = t;
+                var flee = instance.GetComponent<EnemyFlee>();
+                if (flee != null && flee.Target == null) flee.Target = t;
+                var shooter = instance.GetComponent<EnemyShootOnSight>();
+                if (shooter != null && shooter.Target == null) shooter.Target = t;
             }
 
             OnSpawned?.Invoke(instance);

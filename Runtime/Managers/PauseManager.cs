@@ -67,6 +67,15 @@ namespace GameplayKit.Managers
         {
             IsPaused = paused;
             Time.timeScale = paused ? 0f : 1f;
+
+            // Refleja la pausa en el estado global (sin pisar un GameOver).
+            var game = GameManager.Instance;
+            if (game != null)
+            {
+                if (paused && game.CurrentState == GameManager.GameState.Playing) game.SetState(GameManager.GameState.Paused);
+                else if (!paused && game.CurrentState == GameManager.GameState.Paused) game.SetState(GameManager.GameState.Playing);
+            }
+
             OnPauseChanged?.Invoke(paused);
         }
     }

@@ -11,6 +11,7 @@ namespace GameplayKit.AI
     public class EnemyShootOnSight : MonoBehaviour
     {
         [Header("Detección")]
+        [Tooltip("Vacío = el objeto con tag Player (se busca solo, útil para enemigos instanciados en runtime).")]
         [SerializeField] private Transform target;
         [SerializeField] private float sightRange = 10f;
         [SerializeField] private float sightAngle = 60f;
@@ -20,6 +21,10 @@ namespace GameplayKit.AI
         private WeaponHitscan _hitscan;
         private WeaponProjectile _projectile;
         private float _fireTimer;
+        private float _nextTargetSearch;
+
+        /// <summary>Objetivo actual; asígnalo por código o déjalo vacío para usar el jugador.</summary>
+        public Transform Target { get => target; set => target = value; }
 
         private void Awake()
         {
@@ -29,7 +34,7 @@ namespace GameplayKit.AI
 
         private void Update()
         {
-            if (target == null || !CanSeeTarget()) return;
+            if (!PlayerLocator.Resolve(ref target, ref _nextTargetSearch) || !CanSeeTarget()) return;
 
             _fireTimer -= Time.deltaTime;
             if (_fireTimer > 0f) return;

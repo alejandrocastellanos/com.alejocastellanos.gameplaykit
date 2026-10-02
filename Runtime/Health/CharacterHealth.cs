@@ -64,7 +64,7 @@ namespace GameplayKit.Health
             var knockback = GetComponent<GameplayKit.Health.CharacterKnockback>();
             if (knockback != null && hitDirection != Vector2.zero)
             {
-                knockback.ApplyKnockback(hitDirection, amount);
+                knockback.ApplyKnockback(hitDirection);
             }
         }
 

@@ -45,12 +45,12 @@ namespace GameplayKit.AI
 
             foreach (AIActionBase action in _currentState.actions)
             {
-                if (action != null) action.PerformAction(this);
+                if (action != null && action.enabled) action.PerformAction(this);
             }
 
             foreach (AITransition transition in _currentState.transitions)
             {
-                if (transition.decision == null) continue;
+                if (transition.decision == null || !transition.decision.enabled) continue;
 
                 bool result = transition.decision.Decide(this);
                 string target = result ? transition.trueTargetState : transition.falseTargetState;

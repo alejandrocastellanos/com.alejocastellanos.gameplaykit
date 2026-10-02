@@ -11,7 +11,8 @@ namespace GameplayKit.Health
     public class CharacterGravityController : AbilityBase
     {
         [Header("Gravedad")]
-        [SerializeField] private float baseGravityScale = 1f;
+        [Tooltip("Gravity Scale base del personaje. 0 = respeta el Gravity Scale del Rigidbody2D.")]
+        [SerializeField] private float baseGravityScale = 0f;
         [SerializeField] private float fallGravityMultiplier = 2f;
         [SerializeField] private float lowJumpGravityMultiplier = 1.5f;
         [SerializeField] private float maxFallSpeed = 20f;
@@ -22,7 +23,8 @@ namespace GameplayKit.Health
         {
             base.Initialize(character);
             _rb = Character.Controller.Rigidbody;
-            Character.Controller.DefaultGravityScale = baseGravityScale;
+            // Solo reemplaza el Gravity Scale del Rigidbody2D si se configuró un valor propio.
+            if (baseGravityScale > 0f) Character.Controller.DefaultGravityScale = baseGravityScale;
         }
 
         public override void ProcessAbility()

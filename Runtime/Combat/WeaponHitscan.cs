@@ -29,7 +29,9 @@ namespace GameplayKit.Combat
             IsOnCooldown = _cooldownTimer > 0f;
         }
 
-        public bool TryFire(Vector2 direction)
+        public bool TryFire(Vector2 direction) => TryFire(direction, damage);
+
+        public bool TryFire(Vector2 direction, float damageAmount)
         {
             if (IsOnCooldown) return false;
 
@@ -40,7 +42,7 @@ namespace GameplayKit.Combat
             if (hit.collider != null)
             {
                 var damageable = hit.collider.GetComponentInParent<IDamageable>();
-                damageable?.ApplyDamage(damage, hit.point, direction.normalized, gameObject);
+                if (damageable != null) damageable.ApplyDamage(damageAmount, hit.point, direction.normalized, gameObject);
             }
 
             OnShotFired?.Invoke(origin, endPoint);

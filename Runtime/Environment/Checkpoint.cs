@@ -21,6 +21,7 @@ namespace GameplayKit.Environment
 
             var respawn = other.GetComponentInParent<CharacterRespawn>();
             if (respawn != null) respawn.SetCheckpoint(transform);
+            if (GameplayKit.Managers.LevelManager.Instance != null) GameplayKit.Managers.LevelManager.Instance.SetActiveCheckpoint(transform);
 
             IsActivated = true;
             if (activeVisual != null) activeVisual.SetActive(true);

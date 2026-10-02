@@ -9,7 +9,7 @@ namespace GameplayKit.Health
     /// No depende de CharacterCore para poder usarse también en objetos sin abilities (barriles, enemigos simples, etc).
     /// </summary>
     [DisallowMultipleComponent]
-    public class CharacterHealth : MonoBehaviour, IDamageable
+    public class CharacterHealth : MonoBehaviour, IDamageable, IHealthSource
     {
         [Header("Vida")]
         [SerializeField] private float maxHealth = 100f;
@@ -25,7 +25,17 @@ namespace GameplayKit.Health
         public event Action<float> OnHealed;                 // amount
         public event Action OnDeath;
 
+        event Action<float> IHealthSource.Damaged { add => OnDamaged += value; remove => OnDamaged -= value; }
+        event Action<float> IHealthSource.Healed { add => OnHealed += value; remove => OnHealed -= value; }
+
         private float _invulnerabilityTimer;
+
+        private static readonly System.Collections.Generic.List<CharacterHealth> ActiveList = new System.Collections.Generic.List<CharacterHealth>();
+        /// <summary>Personajes con vida activos en la escena (lo usa LevelManager para la zona de vacío).</summary>
+        public static System.Collections.Generic.IReadOnlyList<CharacterHealth> Active => ActiveList;
+
+        private void OnEnable() => ActiveList.Add(this);
+        private void OnDisable() => ActiveList.Remove(this);
 
         private void Awake()
         {

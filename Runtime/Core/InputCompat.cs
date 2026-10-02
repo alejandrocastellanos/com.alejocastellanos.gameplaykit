@@ -96,6 +96,19 @@ namespace GameplayKit.Core
             }
         }
 
+        /// <summary>Stick derecho del gamepad (para apuntar). Cero sin gamepad o con el Input Manager clásico.</summary>
+        public static Vector2 AimStick
+        {
+            get
+            {
+#if GK_NEW_INPUT
+                return Gamepad.current != null ? Gamepad.current.rightStick.ReadValue() : Vector2.zero;
+#else
+                return Vector2.zero;
+#endif
+            }
+        }
+
         /// <summary>Salto: Space o botón sur del gamepad (A / Cruz). En el sistema clásico usa el botón "Jump".</summary>
         public static bool JumpHeld
         {

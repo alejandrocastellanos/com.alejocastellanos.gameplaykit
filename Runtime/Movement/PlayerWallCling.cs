@@ -18,11 +18,15 @@ namespace GameplayKit.Movement
             _wallCheck = GetComponent<PlayerWallJump>();
         }
 
+        // Solo cuenta si el input empuja hacia la pared (no hacia afuera).
+        private bool PushingTowardWall() =>
+            Mathf.Abs(CharacterInput.MoveInput.x) > 0.1f && Mathf.Sign(CharacterInput.MoveInput.x) == PhysicsQuery2D.Facing(transform);
+
         public override void ProcessAbility()
         {
             bool clinging = _wallCheck.IsTouchingWall &&
                             !Character.Controller.IsGrounded &&
-                            !Mathf.Approximately(CharacterInput.MoveInput.x, 0f);
+                            PushingTowardWall();
 
             if (!clinging) return;
 

@@ -34,7 +34,8 @@ namespace GameplayKit.AI
 
         private void Start()
         {
-            string first = string.IsNullOrEmpty(initialState) && states.Count > 0 ? states[0].name : initialState;
+            if (states.Count == 0) return; // sin estados configurados todavía: no hace nada (ni avisa)
+            string first = string.IsNullOrEmpty(initialState) ? states[0].name : initialState;
             TransitionTo(first);
         }
 

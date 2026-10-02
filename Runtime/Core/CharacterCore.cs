@@ -50,22 +50,20 @@ namespace GameplayKit.Core
         {
             if (Condition.CurrentState == ConditionState.Paused || AbilitiesSuspended) return;
 
-            foreach (AbilityBase ability in _abilities)
-            {
-                if (!ability.AbilityEnabled) continue;
-                try
-                {
-                    ability.HandleInput();
-                    ability.EarlyProcessAbility();
-                    ability.ProcessAbility();
-                }
-                catch (System.Exception e) { DisableFaultyAbility(ability, e); }
-            }
+            // Cada fase corre para todas las habilidades antes de pasar a la siguiente: así una habilidad
+            // puede reaccionar en Early (ej. bloquear un salto) antes de que cualquier otra procese.
+            RunPhase(a => a.HandleInput());
+            RunPhase(a => a.EarlyProcessAbility());
+            RunPhase(a => a.ProcessAbility());
+            RunPhase(a => a.LateProcessAbility());
+        }
 
+        private void RunPhase(System.Action<AbilityBase> phase)
+        {
             foreach (AbilityBase ability in _abilities)
             {
                 if (!ability.AbilityEnabled) continue;
-                try { ability.LateProcessAbility(); }
+                try { phase(ability); }
                 catch (System.Exception e) { DisableFaultyAbility(ability, e); }
             }
         }

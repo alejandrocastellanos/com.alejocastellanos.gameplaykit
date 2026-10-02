@@ -9,6 +9,9 @@ namespace GameplayKit.AI
     /// Navigation (o generado en runtime con el paquete AI Navigation) — no requiere el paquete
     /// para funcionar con un NavMesh horneado clásico.
     /// </summary>
+    /// <remarks>EXPERIMENTAL: usa el NavMesh de Unity, que se hornea en 3D. En un juego 2D necesita un NavMesh
+    /// sobre el plano XY (por ejemplo con el paquete comunitario NavMeshPlus). Sin NavMesh no hace nada.</remarks>
+    [AddComponentMenu("GameplayKit/Experimental/Enemy Pathfinding Agent (NavMesh)")]
     [RequireComponent(typeof(NavMeshAgent))]
     public class EnemyPathfindingAgent : MonoBehaviour
     {
@@ -24,6 +27,9 @@ namespace GameplayKit.AI
         private void Awake()
         {
             _agent = GetComponent<NavMeshAgent>();
+            // Configuración para 2D (plano XY): sin esto el agente rota el sprite y lo saca del plano.
+            _agent.updateRotation = false;
+            _agent.updateUpAxis = false;
         }
 
         public void SetTarget(Transform newTarget)
@@ -33,7 +39,7 @@ namespace GameplayKit.AI
 
         private void Update()
         {
-            if (target == null) return;
+            if (target == null || !_agent.isOnNavMesh) return;
 
             _repathTimer -= Time.deltaTime;
             if (_repathTimer > 0f) return;

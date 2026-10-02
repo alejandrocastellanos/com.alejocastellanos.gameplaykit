@@ -9,11 +9,11 @@ opcionales).
 
 - **GameplayKit → Create Demo Scene** genera un nivel jugable que recorre las mecánicas principales.
   También está como sample: *Package Manager → Gameplay Kit → Samples → Demo 2D → Import*.
-- **GameplayKit → Create Player / Create Enemy / Create Platform / Create 2D Camera / Create Managers / Create HUD**
+- **GameplayKit → Create Player / Create Top-Down Player / Create Enemy / Create Platform / Create 2D Camera / Create Managers / Create HUD**
   crean objetos listos para usar (también con clic derecho en la jerarquía → *GameplayKit*).
 
 Controles por defecto: A/D o flechas para moverse, Espacio saltar, Shift correr, Ctrl agacharse,
-Q dash, J atacar, E interactuar, Esc pausa. Con gamepad: stick izquierdo, A/Cruz saltar, X/Cuadrado
+Q dash, J atacar, E interactuar, Esc pausa; abajo + salto atraviesa plataformas de un sentido. Con gamepad: stick izquierdo, A/Cruz saltar, X/Cuadrado
 atacar. Las acciones (atacar, especial, volar, rodar, blink) se reasignan en `KeyboardInputReader`.
 
 ## Cómo se arma un personaje
@@ -24,7 +24,31 @@ atacar. Las acciones (atacar, especial, volar, rodar, blink) se reasignan en `Ke
 3. `CharacterCore`, que descubre las habilidades y las ejecuta cada frame. Si no hay una fuente de
    input, agrega `KeyboardInputReader` sola.
 
+Para un juego de vista superior usa `PlayerTopDownMovement` (anula la gravedad) en lugar de
+`PlayerWalkRun` + saltos; *Create Top-Down Player* lo arma completo.
+
 Para controlarlo con otra cosa (IA, replays, PlayerInput con acciones) implementa `ICharacterInput`.
+
+## Qué incluye
+
+- **Movimiento:** caminar/correr, salto con *coyote time* y *jump buffer*, multi-salto, dash (también en
+  8 direcciones), wall jump/slide/cling, agacharse y gatear, escaleras, cuerdas, ziplines, bordes
+  (grab, climb, dangle), nado, vuelo, planeo, jetpack, ground slam, roll, blink, pendientes (sin
+  deslizarse quieto), atravesar plataformas (`PlayerDropThrough`) y movimiento top-down.
+- **Combate:** melee, hitscan, proyectiles, combos, carga (`WeaponCharge` integrado en `PlayerAttack`),
+  inventario de armas con cambio por acción *Special*, apuntado con mouse o stick derecho.
+- **Vida:** `CharacterHealth`, knockback, muerte, respawn, vidas y game over (`CharacterLives`),
+  persistencia entre escenas, `DamageFlash` y números de daño (`DamagePopupSpawner`).
+- **IA:** patrullas, persecución, huida, disparo, `EnemySpawner` y la máquina de estados `AIBrain`.
+  `EnemyPathfindingAgent` es experimental: requiere un NavMesh 2D (p. ej. NavMeshPlus).
+- **Entorno:** checkpoints, puertas con llave, palancas y placas de presión, plataformas móviles,
+  que caen y de un sentido, ascensores, cintas, resortes, viento, agua, zonas de daño, cajas
+  empujables, objetos rompibles, teletransportes, coleccionables, `HealthPickup` y `LevelExit`
+  (escena por nombre o la siguiente del build).
+- **Cámara, managers y UI:** seguimiento, límites (o los del `LevelManager`), shake, zoom por velocidad,
+  audio con crossfade, guardado, transiciones con fade automático, HUD, barra de vida y pausa.
+- **Animación:** `CharacterAnimatorBridge` envía velocidad, suelo y estados al Animator si los
+  parámetros existen.
 
 ## Arquitectura
 
@@ -36,7 +60,7 @@ Para controlarlo con otra cosa (IA, replays, PlayerInput con acciones) implement
 - `PhysicsQuery2D`: raycasts y overlaps que ignoran al propio personaje, por eso las capas por defecto
   pueden ser *Everything*.
 - `InputCompat`: funciona con el Input System nuevo, el Input Manager clásico o ambos.
-- `IDamageable`, `IKeyHolder`, `IInteractable`: contratos entre categorías (armas, vida, puertas,
+- `IDamageable`, `IHealthSource`, `IKeyHolder`, `IInteractable`: contratos entre categorías (armas, vida, puertas,
   inventario, palancas) sin dependencias directas.
 - `AIBrain` / `AIState` / `AIActionBase` / `AIDecisionBase`: máquina de estados de IA armable desde el
   Inspector.

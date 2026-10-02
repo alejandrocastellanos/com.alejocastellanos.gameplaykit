@@ -98,6 +98,11 @@ namespace GameplayKit.Core
         }
 
         private float _horizontalLockUntil;
+        private int _jumpBlockedFrame = -1;
+
+        /// <summary>Otra habilidad usó el botón de salto este frame (ej. bajar de una plataforma): los saltos lo respetan.</summary>
+        public bool IsJumpBlocked => _jumpBlockedFrame == Time.frameCount;
+        public void BlockJumpThisFrame() => _jumpBlockedFrame = Time.frameCount;
 
         /// <summary>
         /// True mientras otra mecánica (wall jump, knockback...) es dueña de la velocidad horizontal;

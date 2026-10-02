@@ -11,7 +11,9 @@ namespace GameplayKit.Managers
         [Header("Nivel")]
         [SerializeField] private Vector2 levelMinBounds;
         [SerializeField] private Vector2 levelMaxBounds;
-        [SerializeField] private float voidY = -20f;
+        [SerializeField] private float voidY = -30f;
+        [Tooltip("Mata a cualquier personaje con CharacterHealth que caiga por debajo de Void Y (normalmente reaparece en el último checkpoint).")]
+        [SerializeField] private bool killBelowVoid = true;
 
         public Transform ActiveCheckpoint { get; private set; }
         public event Action<Transform> OnCheckpointChanged;
@@ -37,5 +39,21 @@ namespace GameplayKit.Managers
         }
 
         public bool IsBelowVoid(float worldY) => worldY < voidY;
+        public bool HasBounds => levelMaxBounds.x > levelMinBounds.x && levelMaxBounds.y > levelMinBounds.y;
+
+        private void Update()
+        {
+            if (!killBelowVoid) return;
+            foreach (var health in GameplayKit.Health.CharacterHealth.Active)
+            {
+                if (health != null && !health.IsDead && IsBelowVoid(health.transform.position.y))
+                    health.TakeDamage(float.MaxValue);
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
     }
 }

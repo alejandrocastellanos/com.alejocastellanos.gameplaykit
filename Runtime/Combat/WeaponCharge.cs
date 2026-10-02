@@ -3,7 +3,8 @@ using UnityEngine;
 
 namespace GameplayKit.Combat
 {
-    /// <summary>Se carga mientras se mantiene presionado el botón y libera un ataque proporcional a la carga.</summary>
+    /// <summary>Ataque cargado: ponlo junto al arma (WeaponMelee, WeaponHitscan o WeaponProjectile). Con PlayerAttack, mantener
+    /// el botón carga y al soltarlo el arma ataca con un daño entre Min y Max según el tiempo cargado.</summary>
     public class WeaponCharge : MonoBehaviour
     {
         [Header("Carga")]

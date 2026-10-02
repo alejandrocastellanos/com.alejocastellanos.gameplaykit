@@ -23,6 +23,11 @@ namespace GameplayKit.CameraSystem
 
         private void LateUpdate()
         {
+            if (target == null)
+            {
+                var player = GameObject.FindWithTag("Player");
+                if (player != null) target = player.GetComponentInParent<Rigidbody2D>();
+            }
             if (target == null || !_camera.orthographic) return;
 
             float speedRatio = Mathf.Clamp01(target.linearVelocity.magnitude / speedForMaxZoom);

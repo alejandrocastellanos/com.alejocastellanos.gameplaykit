@@ -29,16 +29,34 @@ namespace GameplayKit.Managers
 
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            // Sin fuentes asignadas se crean solas: el manager funciona recién agregado.
+            if (musicSourceA == null) musicSourceA = CreateSource("Music A", loop: true);
+            if (musicSourceB == null) musicSourceB = CreateSource("Music B", loop: true);
+            if (sfxSource == null) sfxSource = CreateSource("SFX", loop: false);
             _activeMusicSource = musicSourceA;
+        }
+
+        private AudioSource CreateSource(string sourceName, bool loop)
+        {
+            var go = new GameObject(sourceName);
+            go.transform.SetParent(transform, false);
+            var source = go.AddComponent<AudioSource>();
+            source.playOnAwake = false;
+            source.loop = loop;
+            return source;
         }
 
         public void PlayMusic(AudioClip clip, bool loop = true)
         {
             if (clip == null) return;
-
+            _currentClip = clip;
             if (_fadeRoutine != null) StopCoroutine(_fadeRoutine);
             _fadeRoutine = StartCoroutine(CrossfadeMusic(clip, loop));
         }
+
+        public AudioClip CurrentMusic => _currentClip;
+        private AudioClip _currentClip;
+        public bool IsMusicPlaying => _activeMusicSource != null && _activeMusicSource.isPlaying;
 
         public void PlaySfx(AudioClip clip, float volume = 1f)
         {
@@ -70,7 +88,7 @@ namespace GameplayKit.Managers
                 incoming.volume = Mathf.Lerp(0f, 1f, t);
                 if (outgoing != null) outgoing.volume = Mathf.Lerp(outgoingStartVolume, 0f, t);
 
-                elapsed += Time.deltaTime;
+                elapsed += Time.unscaledDeltaTime; // el fundido sigue aunque el juego esté en pausa
                 yield return null;
             }
 

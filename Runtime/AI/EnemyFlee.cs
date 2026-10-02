@@ -40,6 +40,9 @@ namespace GameplayKit.AI
 
             float direction = Mathf.Sign(transform.position.x - target.position.x);
             _rb.linearVelocity = new Vector2(direction * speed, _rb.linearVelocity.y);
+            Vector3 scale = transform.localScale;
+            scale.x = Mathf.Abs(scale.x) * direction; // mira hacia donde huye
+            transform.localScale = scale;
         }
     }
 }

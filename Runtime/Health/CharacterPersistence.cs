@@ -23,6 +23,8 @@ namespace GameplayKit.Health
             }
 
             _instances[persistenceId] = this;
+            // DontDestroyOnLoad solo funciona con objetos raíz: si es hijo, se suelta de su padre.
+            if (transform.parent != null) transform.SetParent(null, true);
             DontDestroyOnLoad(gameObject);
         }
 

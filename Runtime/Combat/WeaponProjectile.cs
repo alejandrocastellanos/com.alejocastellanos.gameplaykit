@@ -24,13 +24,15 @@ namespace GameplayKit.Combat
             IsOnCooldown = _cooldownTimer > 0f;
         }
 
-        public bool TryFire(Vector2 direction)
+        public bool TryFire(Vector2 direction) => TryFire(direction, damage);
+
+        public bool TryFire(Vector2 direction, float damageAmount)
         {
             if (IsOnCooldown || projectilePrefab == null) return false;
 
             Vector3 spawnPos = firePoint != null ? firePoint.position : transform.position;
             var projectile = Instantiate(projectilePrefab, spawnPos, Quaternion.identity);
-            projectile.Launch(direction.normalized, projectileSpeed, damage, gameObject);
+            projectile.Launch(direction.normalized, projectileSpeed, damageAmount, gameObject);
 
             _cooldownTimer = cooldown;
             IsOnCooldown = true;

@@ -38,10 +38,13 @@ namespace GameplayKit.Editor
         [MenuItem("GameplayKit/Create Player", false, 0)]
         private static void CreatePlayerMenu() => Place(BuildPlayer(SpawnPoint()), "Crear Player");
 
-        [MenuItem("GameplayKit/Create Enemy", false, 1)]
+        [MenuItem("GameplayKit/Create Top-Down Player", false, 1)]
+        private static void CreateTopDownPlayerMenu() => Place(BuildTopDownPlayer(SpawnPoint()), "Crear Top-Down Player");
+
+        [MenuItem("GameplayKit/Create Enemy", false, 2)]
         private static void CreateEnemyMenu() => Place(BuildEnemy(SpawnPoint()), "Crear Enemy");
 
-        [MenuItem("GameplayKit/Create Platform", false, 2)]
+        [MenuItem("GameplayKit/Create Platform", false, 3)]
         private static void CreatePlatformMenu() => Place(BuildBlock("Platform", SpawnPoint(), new Vector2(4f, 0.5f), GroundColor), "Crear Platform");
 
         [MenuItem("GameplayKit/Create 2D Camera", false, 20)]
@@ -105,6 +108,8 @@ namespace GameplayKit.Editor
             go.AddComponent<PlayerCrouch>();
             go.AddComponent<PlayerClimbLadder>();
             go.AddComponent<PlayerSwim>();
+            go.AddComponent<PlayerDropThrough>();
+            go.AddComponent<PlayerSlopeWalk>();
             go.AddComponent<PlayerInteract>();
             go.AddComponent<PlayerAttack>();
             go.AddComponent<WeaponMelee>();
@@ -114,8 +119,37 @@ namespace GameplayKit.Editor
             go.AddComponent<CharacterDeath>();
             go.AddComponent<CharacterRespawn>();
             go.AddComponent<InventoryManager>();
+            go.AddComponent<DamageFlash>();
+            go.AddComponent<CharacterAnimatorBridge>();
 
             go.AddComponent<CharacterCore>(); // al final: descubre las habilidades al iniciar
+            return go;
+        }
+
+        /// <summary>Personaje para juegos vistos desde arriba: movimiento en 8 direcciones sin gravedad, ataque, vida y respawn.</summary>
+        public static GameObject BuildTopDownPlayer(Vector2 position)
+        {
+            var go = new GameObject("Player (Top-Down)") { tag = "Player" };
+            go.transform.position = position;
+            AddVisual(go, new Vector2(0.8f, 0.8f), PlayerColor, 10);
+            go.AddComponent<CircleCollider2D>().radius = 0.4f;
+            var rb = go.AddComponent<Rigidbody2D>();
+            rb.interpolation = RigidbodyInterpolation2D.Interpolate;
+            go.AddComponent<CharacterController2D>();
+            go.AddComponent<KeyboardInputReader>();
+            go.AddComponent<PlayerTopDownMovement>();
+            go.AddComponent<PlayerDash8Directions>();
+            go.AddComponent<PlayerInteract>();
+            go.AddComponent<PlayerAttack>();
+            go.AddComponent<WeaponMelee>();
+            go.AddComponent<CharacterHealth>();
+            go.AddComponent<CharacterKnockback>();
+            go.AddComponent<CharacterDeath>();
+            go.AddComponent<CharacterRespawn>();
+            go.AddComponent<InventoryManager>();
+            go.AddComponent<DamageFlash>();
+            go.AddComponent<CharacterAnimatorBridge>();
+            go.AddComponent<CharacterCore>();
             return go;
         }
 
@@ -131,6 +165,8 @@ namespace GameplayKit.Editor
             go.AddComponent<EnemyPatrol>();
             go.AddComponent<EnemyMeleeOnContact>();
             go.AddComponent<DamageableObject>();
+            go.AddComponent<DamageFlash>();
+            go.AddComponent<DamagePopupSpawner>();
             return go;
         }
 
@@ -268,6 +304,11 @@ namespace GameplayKit.Editor
             var spikes = BuildBlock("Spikes", new Vector2(24f, -4f), new Vector2(8f, 1f), new Color(0.85f, 0.2f, 0.6f), trigger: true);
             spikes.AddComponent<HazardZone>();
             Add(spikes);
+
+            // Corazón para recuperar vida después de los pinchos
+            var heart = BuildBlock("HealthPickup", new Vector2(28.8f, 0.8f), new Vector2(0.5f, 0.5f), new Color(1f, 0.35f, 0.5f), trigger: true, order: 5);
+            heart.AddComponent<HealthPickup>();
+            Add(heart);
 
             // Checkpoint, escalera a la torre y llave arriba
             var checkpoint = BuildBlock("Checkpoint", new Vector2(30f, 1f), new Vector2(0.4f, 2f), new Color(1f, 0.85f, 0.2f, 0.6f), trigger: true);

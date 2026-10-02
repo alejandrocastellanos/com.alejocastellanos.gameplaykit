@@ -3,14 +3,17 @@ using GameplayKit.Core;
 
 namespace GameplayKit.Combat
 {
-    /// <summary>Rota al personaje o a su arma hacia el mouse, un stick analógico o el objetivo más cercano.</summary>
+    /// <summary>Calcula hacia dónde apunta el personaje (mouse, stick derecho o el objetivo más cercano) y, si se asigna
+    /// Part To Rotate, gira esa parte (el arma o el brazo). El cuerpo del personaje no se rota.</summary>
     public class CharacterAimAndOrient : MonoBehaviour
     {
         public enum AimMode { Mouse, Stick, ClosestTarget }
 
         [Header("Apuntado")]
         [SerializeField] private AimMode aimMode = AimMode.Mouse;
+        [Tooltip("Parte que gira hacia el apuntado (arma, brazo). Vacío = solo se calcula AimDirection.")]
         [SerializeField] private Transform partToRotate;
+        [SerializeField] private float stickDeadZone = 0.25f;
         [SerializeField] private Camera aimCamera;
         [SerializeField] private float targetSearchRadius = 10f;
         [SerializeField] private LayerMask targetLayers = ~0;
@@ -32,7 +35,10 @@ namespace GameplayKit.Combat
                 case AimMode.ClosestTarget:
                     AimAtClosestTarget();
                     break;
-                    // AimMode.Stick: llamar a SetAimDirection(vector) desde el input del personaje (stick derecho).
+                case AimMode.Stick:
+                    Vector2 stick = InputCompat.AimStick;
+                    if (stick.magnitude > stickDeadZone) SetAimDirection(stick);
+                    break;
             }
 
             ApplyRotation();
@@ -80,9 +86,12 @@ namespace GameplayKit.Combat
 
         private void ApplyRotation()
         {
-            var target = partToRotate != null ? partToRotate : transform;
-            float angle = Mathf.Atan2(AimDirection.y, AimDirection.x) * Mathf.Rad2Deg;
-            target.rotation = Quaternion.Euler(0f, 0f, angle);
+            if (partToRotate == null) return;
+            // Ángulo en el espacio del personaje: si está volteado (escala X negativa) el arma no queda boca abajo.
+            float facing = PhysicsQuery2D.Facing(transform);
+            Vector2 local = new Vector2(AimDirection.x * facing, AimDirection.y);
+            float angle = Mathf.Atan2(local.y, local.x) * Mathf.Rad2Deg;
+            partToRotate.localRotation = Quaternion.Euler(0f, 0f, angle);
         }
     }
 }

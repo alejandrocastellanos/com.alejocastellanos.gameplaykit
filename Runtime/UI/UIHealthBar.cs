@@ -33,6 +33,19 @@ namespace GameplayKit.UI
             if (health != null) HandleHealthChanged(health.CurrentHealth, health.MaxHealth);
         }
 
+        // Si el personaje enlazado desaparece (cambio de escena con CharacterPersistence, respawn por prefab...)
+        // se vuelve a buscar al jugador.
+        private void LateUpdate()
+        {
+            if (health != null) return;
+            var player = GameObject.FindWithTag("Player");
+            if (player == null) return;
+            health = player.GetComponentInParent<CharacterHealth>();
+            if (health == null) return;
+            health.OnHealthChanged += HandleHealthChanged;
+            HandleHealthChanged(health.CurrentHealth, health.MaxHealth);
+        }
+
         private void OnDisable()
         {
             if (health != null) health.OnHealthChanged -= HandleHealthChanged;

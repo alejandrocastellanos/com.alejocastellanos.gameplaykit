@@ -32,9 +32,13 @@ namespace GameplayKit.Combat
             IsOnCooldown = _cooldownTimer > 0f;
         }
 
-        public bool TryAttack()
+        public bool TryAttack() => TryAttack(damage);
+
+        /// <summary>Ataca con un daño distinto al configurado (lo usa WeaponCharge al soltar la carga).</summary>
+        public bool TryAttack(float damageAmount)
         {
             if (IsOnCooldown) return false;
+            _currentDamage = damageAmount;
 
             StartCoroutine(ActiveWindow());
             _cooldownTimer = cooldown;
@@ -60,6 +64,8 @@ namespace GameplayKit.Combat
             IsHitboxActive = false;
         }
 
+        private float _currentDamage;
+
         private void DealDamage()
         {
             Vector2 origin = HitboxCenter();
@@ -74,7 +80,7 @@ namespace GameplayKit.Combat
                 if (damageable == null || _alreadyHit.Contains(damageable)) continue;
 
                 _alreadyHit.Add(damageable);
-                damageable.ApplyDamage(damage, origin, ((Vector2)hit.transform.position - origin).normalized, gameObject);
+                damageable.ApplyDamage(_currentDamage, origin, ((Vector2)hit.transform.position - origin).normalized, gameObject);
             }
         }
 

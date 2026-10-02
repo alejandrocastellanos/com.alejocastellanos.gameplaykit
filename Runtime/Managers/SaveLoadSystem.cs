@@ -41,9 +41,21 @@ namespace GameplayKit.Managers
             }
 
             string json = PlayerPrefs.GetString(saveKey);
-            data = JsonUtility.FromJson<T>(json);
-            return true;
+            try
+            {
+                data = JsonUtility.FromJson<T>(json);
+                return data != null;
+            }
+            catch (System.ArgumentException)
+            {
+                // Guardado corrupto o de otra versión: se trata como si no existiera.
+                Debug.LogWarning($"[GameplayKit] El guardado '{saveKey}' no se pudo leer y se ignora.");
+                data = default;
+                return false;
+            }
         }
+
+        public bool HasSave => PlayerPrefs.HasKey(saveKey);
 
         public void ClearSave()
         {

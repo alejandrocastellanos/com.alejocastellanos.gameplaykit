@@ -14,6 +14,8 @@ namespace GameplayKit.Health
 
         public event Action OnRespawn;
 
+        public bool AutoRespawn { get => autoRespawnOnDeath; set => autoRespawnOnDeath = value; }
+
         private Transform _currentCheckpoint;
         private Vector3 _startPosition;
         private CharacterHealth _health;
@@ -44,7 +46,11 @@ namespace GameplayKit.Health
 
         private void HandleDeath()
         {
-            if (autoRespawnOnDeath) Invoke(nameof(Respawn), respawnDelay);
+            if (!autoRespawnOnDeath) return;
+            // Con CharacterLives, solo reaparece si quedan vidas.
+            var lives = GetComponent<CharacterLives>();
+            if (lives != null && !lives.ConsumeLife()) return;
+            Invoke(nameof(Respawn), respawnDelay);
         }
 
         public void Respawn()

@@ -21,14 +21,23 @@ namespace GameplayKit.CameraSystem
         private void LateUpdate()
         {
             if (!_camera.orthographic) return;
-            if (maxBounds.x <= minBounds.x || maxBounds.y <= minBounds.y) return; // sin configurar: no limita
+            Vector2 min = minBounds, max = maxBounds;
+            if (max.x <= min.x || max.y <= min.y)
+            {
+                // Sin configurar: usa los límites del LevelManager si existen; si no, no limita.
+                var level = GameplayKit.Managers.LevelManager.Instance;
+                if (level == null || !level.HasBounds) return;
+                min = level.LevelMinBounds;
+                max = level.LevelMaxBounds;
+            }
 
             float halfHeight = _camera.orthographicSize;
             float halfWidth = halfHeight * _camera.aspect;
 
             Vector3 position = transform.position;
-            position.x = Mathf.Clamp(position.x, minBounds.x + halfWidth, maxBounds.x - halfWidth);
-            position.y = Mathf.Clamp(position.y, minBounds.y + halfHeight, maxBounds.y - halfHeight);
+            // Si el nivel es más chico que la cámara en un eje, se centra en vez de oscilar.
+            position.x = max.x - min.x < halfWidth * 2f ? (min.x + max.x) * 0.5f : Mathf.Clamp(position.x, min.x + halfWidth, max.x - halfWidth);
+            position.y = max.y - min.y < halfHeight * 2f ? (min.y + max.y) * 0.5f : Mathf.Clamp(position.y, min.y + halfHeight, max.y - halfHeight);
             transform.position = position;
         }
 

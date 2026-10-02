@@ -13,8 +13,10 @@ namespace GameplayKit.Movement
         [SerializeField] private float airJumpForce = 10f;
         [SerializeField] private int extraJumps = 1;
         [SerializeField] private float jumpCutMultiplier = 0.5f;
+        [SerializeField] private float jumpBufferTime = 0.12f;
 
         private int _jumpsRemaining;
+        private float _lastJumpPressedTime = -999f;
 
         public override void EarlyProcessAbility()
         {
@@ -23,16 +25,22 @@ namespace GameplayKit.Movement
 
         public override void ProcessAbility()
         {
-            if (CharacterInput.JumpPressedThisFrame)
+            if (CharacterInput.JumpPressedThisFrame) _lastJumpPressedTime = Time.time;
+            if (Character.Controller.IsJumpBlocked) { _lastJumpPressedTime = -999f; return; }
+            bool buffered = Time.time - _lastJumpPressedTime <= jumpBufferTime;
+
+            if (Character.Controller.IsGrounded && buffered)
             {
-                if (Character.Controller.IsGrounded)
-                {
-                    Character.Controller.SetVerticalVelocity(jumpForce);
-                    Character.Movement.ChangeState(MovementState.Jumping);
-                }
-                else if (_jumpsRemaining > 0)
+                _lastJumpPressedTime = -999f;
+                Character.Controller.SetVerticalVelocity(CharacterInput.JumpHeld ? jumpForce : jumpForce * jumpCutMultiplier);
+                Character.Movement.ChangeState(MovementState.Jumping);
+            }
+            else if (CharacterInput.JumpPressedThisFrame)
+            {
+                if (_jumpsRemaining > 0)
                 {
                     _jumpsRemaining--;
+                    _lastJumpPressedTime = -999f; // ya se usó: no debe repetirse al aterrizar
                     Character.Controller.SetVerticalVelocity(airJumpForce);
                     Character.Movement.ChangeState(MovementState.Jumping);
                 }

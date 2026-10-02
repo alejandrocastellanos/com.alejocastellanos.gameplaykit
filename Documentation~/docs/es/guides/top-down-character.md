@@ -144,15 +144,16 @@ patrulla un pasillo si su `Rigidbody2D` tiene Gravity Scale 0.
 
 **GameplayKit → Create Top-Down Demo Scene** arma todo esto en un dungeon de tres salas
 (`Assets/GameplayKitDemo/GameplayKitTopDownDemo.unity`) para que veas cómo se conectan las piezas: ábrelo
-y dale Play. Controles: ++w++ ++a++ ++s++ ++d++ o flechas para moverte, el mouse para apuntar, ++j++ para
-disparar o atacar, ++k++ para cambiar de arma, ++shift++ para correr, ++q++ para el dash, ++e++ para
+y dale Play. Controles: ++w++ ++a++ ++s++ ++d++ o flechas para moverte, el mouse para apuntar, clic izquierdo o
+++j++ para disparar o atacar, ++k++ para cambiar de arma, ++shift++ para correr, ++q++ para el dash, ++e++ para
 interactuar y ++esc++ para pausar.
 
 El jugador de la demo lleva dos armas en un [WeaponInventorySlot](../components/combat/WeaponInventorySlot.md):
 un hijo `Gun` con [WeaponProjectile](../components/combat/WeaponProjectile.md) y un hijo `Sword` con
 [WeaponMelee](../components/combat/WeaponMelee.md). [CharacterAimAndOrient](../components/combat/CharacterAimAndOrient.md)
 en modo **Mouse** gira la pistola hacia el cursor, y [PlayerAttack](../components/combat/PlayerAttack.md) dispara
-el arma activa hacia ese apuntado en 360°. Cambia el modo a **Stick** para gamepad.
+el arma activa hacia ese apuntado en 360°. La demo además asigna **Attack** al clic izquierdo (`Mouse0`) en su
+[KeyboardInputReader](../components/core/KeyboardInputReader.md), junto a ++j++. Cambia el modo a **Stick** para gamepad.
 
 ## Siguientes pasos
 

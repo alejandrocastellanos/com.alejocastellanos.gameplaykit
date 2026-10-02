@@ -56,7 +56,7 @@ water, a conveyor belt, a lever with an elevator, a health pickup, the HUD and t
 - **GameplayKit → Create Top-Down Demo Scene** builds a small top-down dungeon and saves it as
   `Assets/GameplayKitDemo/GameplayKitTopDownDemo.unity` (prefabs `TopDownPlayer`, `TopDownChaser`,
   `TopDownTurret`, `TopDownBullet` and `TopDownPlayerBullet`). It never touches the platformer scene: 8-direction
-  movement and dash, a gun aimed with the mouse plus a sword (switch with ++k++), chasing enemies, a turret, a patrol, spikes, breakable crates, a key and a locked door, a lever
+  movement and dash, a gun aimed with the mouse (fire with left click or ++j++) plus a sword (switch with ++k++), chasing enemies, a turret, a patrol, spikes, breakable crates, a key and a locked door, a lever
   that opens a gate, teleporters, a checkpoint, the HUD and the pause menu.
 - Both levels are listed as a sample: **Package Manager → Gameplay Kit → Samples → Demo 2D →
   Import**.

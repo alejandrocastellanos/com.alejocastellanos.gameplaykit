@@ -138,14 +138,15 @@ corridor if its `Rigidbody2D` has Gravity Scale 0.
 
 **GameplayKit → Create Top-Down Demo Scene** builds all of this into a three-room dungeon
 (`Assets/GameplayKitDemo/GameplayKitTopDownDemo.unity`) so you can see how the pieces are wired: open it
-and press Play. Controls: ++w++ ++a++ ++s++ ++d++ or arrows to move, the mouse to aim, ++j++ to shoot or
-attack, ++k++ to switch weapon, ++shift++ to run, ++q++ to dash, ++e++ to interact and ++esc++ to pause.
+and press Play. Controls: ++w++ ++a++ ++s++ ++d++ or arrows to move, the mouse to aim, left click or ++j++ to
+shoot or attack, ++k++ to switch weapon, ++shift++ to run, ++q++ to dash, ++e++ to interact and ++esc++ to pause.
 
 The demo player carries two weapons in a [WeaponInventorySlot](../components/combat/WeaponInventorySlot.md):
 a `Gun` child with [WeaponProjectile](../components/combat/WeaponProjectile.md) and a `Sword` child with
 [WeaponMelee](../components/combat/WeaponMelee.md). [CharacterAimAndOrient](../components/combat/CharacterAimAndOrient.md)
 in **Mouse** mode rotates the gun towards the cursor, and [PlayerAttack](../components/combat/PlayerAttack.md)
-fires the active weapon towards that aim in 360°. Switch the aim mode to **Stick** for gamepads.
+fires the active weapon towards that aim in 360°. The demo also binds **Attack** to the left mouse button
+(`Mouse0`) in its [KeyboardInputReader](../components/core/KeyboardInputReader.md), next to ++j++. Switch the aim mode to **Stick** for gamepads.
 
 ## Next steps
 

@@ -69,7 +69,7 @@ namespace GameplayKit.Editor
         {
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
             string path = BuildTopDownDemoScene(DemoFolder);
-            EditorUtility.DisplayDialog("Gameplay Kit", $"Escena demo top-down creada en {path}.\n\nControles: WASD o flechas mover, mouse apuntar, J disparar / atacar, K cambiar de arma, Shift correr, Q dash en 8 direcciones, E interactuar, Esc pausa.", "OK");
+            EditorUtility.DisplayDialog("Gameplay Kit", $"Escena demo top-down creada en {path}.\n\nControles: WASD o flechas mover, mouse apuntar, clic izquierdo o J disparar / atacar, K cambiar de arma, Shift correr, Q dash en 8 direcciones, E interactuar, Esc pausa.", "OK");
         }
 
         [MenuItem("GameObject/GameplayKit/Player", false, 10)]
@@ -495,6 +495,10 @@ namespace GameplayKit.Editor
 
             var aim = player.AddComponent<CharacterAimAndOrient>();
             SetRef(aim, "partToRotate", gun.transform);
+
+            // Con apuntado al mouse lo natural es disparar con clic: Attack = J o clic izquierdo.
+            var reader = player.GetComponent<KeyboardInputReader>();
+            if (reader != null) AddActionBinding(reader, CharacterAction.Attack, KeyCode.Mouse0);
             var inventory = player.AddComponent<WeaponInventorySlot>();
             SetRefArray(inventory, "weapons", gun, sword);
         }
@@ -712,6 +716,20 @@ namespace GameplayKit.Editor
             var prop = so.FindProperty(field);
             if (prop.propertyType == SerializedPropertyType.Integer) prop.intValue = Mathf.RoundToInt(value);
             else prop.floatValue = value;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        /// <summary>Agrega un binding extra (tecla o botón del mouse) a una acción del KeyboardInputReader.</summary>
+        private static void AddActionBinding(KeyboardInputReader reader, CharacterAction action, KeyCode key)
+        {
+            var so = new SerializedObject(reader);
+            var bindings = so.FindProperty("actionBindings");
+            int i = bindings.arraySize;
+            bindings.arraySize = i + 1;
+            var element = bindings.GetArrayElementAtIndex(i);
+            element.FindPropertyRelative("action").intValue = (int)action;
+            element.FindPropertyRelative("key").intValue = (int)key;
+            element.FindPropertyRelative("padButton").intValue = (int)InputCompat.PadButton.None;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 

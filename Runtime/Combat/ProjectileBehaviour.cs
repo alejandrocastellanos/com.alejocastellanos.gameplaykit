@@ -28,6 +28,7 @@ namespace GameplayKit.Combat
         /// <summary>Configura y lanza el proyectil. Llamado por el arma justo después de Instantiate.</summary>
         public void Launch(Vector2 direction, float speed, float damage, GameObject instigator)
         {
+            if (_rb == null) _rb = GetComponent<Rigidbody2D>();
             _damage = damage;
             _instigator = instigator;
             _owner = instigator != null ? PhysicsQuery2D.OwnerOf(instigator.transform) : null;

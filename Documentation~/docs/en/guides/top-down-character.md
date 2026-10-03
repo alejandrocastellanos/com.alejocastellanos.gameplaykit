@@ -130,6 +130,8 @@ then follows with **Smooth Time** `0.2` and **Offset** `(0, 0, -10)`.
 
 ## Enemies and the demo dungeon
 
+<figure class="gk-clip" markdown="0"><video src="../../assets/clips/TopDownShooter.mp4" poster="../../assets/clips/TopDownShooter.jpg" autoplay loop muted playsinline preload="metadata"></video><figcaption>Aiming in 360° and shooting chasers that move on both axes while a turret fires back, then switching to the sword with K.</figcaption></figure>
+
 Tick **Move Vertically** on [EnemyChase](../components/ai/EnemyChase.md) or
 [EnemyFlee](../components/ai/EnemyFlee.md) and they move on both axes with no gravity. A static
 [EnemyShootOnSight](../components/ai/EnemyShootOnSight.md) with **Sight Angle** 360 works as a turret that
@@ -138,7 +140,12 @@ corridor if its `Rigidbody2D` has Gravity Scale 0.
 
 **GameplayKit → Create Top-Down Demo Scene** builds all of this into a three-room dungeon
 (`Assets/GameplayKitDemo/GameplayKitTopDownDemo.unity`) so you can see how the pieces are wired: open it
-and press Play. Controls: ++w++ ++a++ ++s++ ++d++ or arrows to move, the mouse to aim, left click or ++j++ to
+and press Play.
+
+<figure markdown>
+  ![Map of the top-down demo dungeon](../../assets/images/topdown-demo-map.jpg)
+  <figcaption>The demo dungeon: start room with breakable crates, coins and a health pickup (left); spike corridor and checkpoint; arena with two chasers, a patrol, a turret and the key (right); locked door to the treasure room with the lever, the gate and the goal (top); and a pair of teleporters between the start room and the treasure room.</figcaption>
+</figure> Controls: ++w++ ++a++ ++s++ ++d++ or arrows to move, the mouse to aim, left click or ++j++ to
 shoot or attack, ++k++ to switch weapon, ++shift++ to run, ++q++ to dash, ++e++ to interact and ++esc++ to pause.
 
 The demo player carries two weapons in a [WeaponInventorySlot](../components/combat/WeaponInventorySlot.md):

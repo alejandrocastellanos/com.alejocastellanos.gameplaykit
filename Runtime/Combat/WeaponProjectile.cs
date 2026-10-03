@@ -32,6 +32,8 @@ namespace GameplayKit.Combat
 
             Vector3 spawnPos = firePoint != null ? firePoint.position : transform.position;
             var projectile = Instantiate(projectilePrefab, spawnPos, Quaternion.identity);
+            // Si el "prefab" es una plantilla desactivada de la escena, la copia nace desactivada: se activa.
+            if (!projectile.gameObject.activeSelf) projectile.gameObject.SetActive(true);
             projectile.Launch(direction.normalized, projectileSpeed, damageAmount, gameObject);
 
             _cooldownTimer = cooldown;

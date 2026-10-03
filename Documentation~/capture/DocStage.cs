@@ -243,6 +243,7 @@ namespace GameplayKit.DocCapture
             var go = col.gameObject;
             hasEye = false;
             order = 0;
+            if (go.name.StartsWith("PlayerBullet")) { order = 15; return Hex("80DEEA"); }
             foreach (var mb in go.GetComponents<MonoBehaviour>())
             {
                 if (mb == null) continue;

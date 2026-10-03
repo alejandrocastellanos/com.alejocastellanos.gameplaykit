@@ -136,6 +136,8 @@ lo sigue con **Smooth Time** `0.2` y **Offset** `(0, 0, -10)`.
 
 ## Enemigos y el dungeon demo
 
+<figure class="gk-clip" markdown="0"><video src="../../../assets/clips/TopDownShooter.mp4" poster="../../../assets/clips/TopDownShooter.jpg" autoplay loop muted playsinline preload="metadata"></video><figcaption>Apuntando en 360° y disparando a perseguidores que se mueven en los dos ejes mientras una torreta responde; al final, cambio a la espada con K.</figcaption></figure>
+
 Marca **Move Vertically** en [EnemyChase](../components/ai/EnemyChase.md) o
 [EnemyFlee](../components/ai/EnemyFlee.md) y se moverán en los dos ejes sin gravedad. Un
 [EnemyShootOnSight](../components/ai/EnemyShootOnSight.md) quieto con **Sight Angle** en 360 funciona como
@@ -144,7 +146,12 @@ patrulla un pasillo si su `Rigidbody2D` tiene Gravity Scale 0.
 
 **GameplayKit → Create Top-Down Demo Scene** arma todo esto en un dungeon de tres salas
 (`Assets/GameplayKitDemo/GameplayKitTopDownDemo.unity`) para que veas cómo se conectan las piezas: ábrelo
-y dale Play. Controles: ++w++ ++a++ ++s++ ++d++ o flechas para moverte, el mouse para apuntar, clic izquierdo o
+y dale Play.
+
+<figure markdown>
+  ![Mapa del dungeon demo top-down](../../assets/images/topdown-demo-map.jpg)
+  <figcaption>El dungeon demo: sala de inicio con cajas rompibles, monedas y un corazón (izquierda); pasillo con pinchos y checkpoint; arena con dos perseguidores, una patrulla, una torreta y la llave (derecha); puerta con llave hacia la sala del tesoro con la palanca, la reja y la meta (arriba); y un par de teletransportes entre la sala de inicio y la del tesoro.</figcaption>
+</figure> Controles: ++w++ ++a++ ++s++ ++d++ o flechas para moverte, el mouse para apuntar, clic izquierdo o
 ++j++ para disparar o atacar, ++k++ para cambiar de arma, ++shift++ para correr, ++q++ para el dash, ++e++ para
 interactuar y ++esc++ para pausar.
 

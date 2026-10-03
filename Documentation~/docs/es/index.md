@@ -123,10 +123,10 @@ paquete local:
 "com.alejocastellanos.gameplaykit": "file:/ruta/a/com.alejocastellanos.gameplaykit"
 ```
 
-O desde git, una vez publicado:
+O desde git:
 
 ```json
-"com.alejocastellanos.gameplaykit": "https://github.com/<usuario>/<repo>.git#v1.1.0"
+"com.alejocastellanos.gameplaykit": "https://github.com/alejandrocastellanos/com.alejocastellanos.gameplaykit.git#v1.1.0"
 ```
 
 El paquete Input System es opcional: el kit lo usa si está instalado y activo, y si no, usa el Input Manager

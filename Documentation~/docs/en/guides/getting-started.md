@@ -20,17 +20,16 @@ package into your project and a playable character on screen in a few minutes.
     repository URL with the version tag:
 
     ```text
-    https://github.com/<user>/<repo>.git#v1.1.0
+    https://github.com/alejandrocastellanos/com.alejocastellanos.gameplaykit.git#v1.1.0
     ```
 
     Or add it directly to your project's `Packages/manifest.json`:
 
     ```json
-    "com.alejocastellanos.gameplaykit": "https://github.com/<user>/<repo>.git#v1.1.0"
+    "com.alejocastellanos.gameplaykit": "https://github.com/alejandrocastellanos/com.alejocastellanos.gameplaykit.git#v1.1.0"
     ```
 
-    Replace `<user>/<repo>` with the repository you are installing from. The `#v1.1.0` suffix pins
-    the release, so your project won't change when new commits land.
+    The `#v1.1.0` suffix pins the release, so your project won't change when new commits land.
 
 === "Local folder"
 

@@ -7,7 +7,9 @@ opcionales).
 
 ## Documentación
 
-La documentación completa (inglés y español), con un clip de cada componente, guías y referencia del
+Sitio de documentación: **https://alejandrocastellanos.github.io/com.alejocastellanos.gameplaykit/** (inglés y español; [versión en español](https://alejandrocastellanos.github.io/com.alejocastellanos.gameplaykit/es/)).
+
+La documentación completa, con un clip de cada componente, guías y referencia del
 Inspector, vive en `Documentation~/` y se publica en GitHub Pages con el workflow
 `.github/workflows/docs.yml` (activa *Settings → Pages → Source: GitHub Actions*). Para verla en local:
 `cd Documentation~ && pip install -r requirements.txt && python tools/generate.py && mkdocs serve`.
@@ -94,10 +96,10 @@ Como paquete local (desarrollo), en el `Packages/manifest.json` del proyecto:
 "com.alejocastellanos.gameplaykit": "file:/ruta/a/com.alejocastellanos.gameplaykit"
 ```
 
-Desde git, una vez publicado:
+Desde git (Package Manager → **+ → Add package from git URL…**, o en el manifest):
 
 ```
-"com.alejocastellanos.gameplaykit": "https://github.com/<usuario>/<repo>.git#v1.1.0"
+"com.alejocastellanos.gameplaykit": "https://github.com/alejandrocastellanos/com.alejocastellanos.gameplaykit.git#v1.1.0"
 ```
 
 Requiere Unity 6000.0 o superior.

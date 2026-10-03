@@ -20,17 +20,16 @@ esta página instalas el paquete y tienes un personaje jugable en pantalla en po
     del repositorio con la etiqueta de versión:
 
     ```text
-    https://github.com/<user>/<repo>.git#v1.1.0
+    https://github.com/alejandrocastellanos/com.alejocastellanos.gameplaykit.git#v1.1.0
     ```
 
     O agrégalo directamente en el `Packages/manifest.json` de tu proyecto:
 
     ```json
-    "com.alejocastellanos.gameplaykit": "https://github.com/<user>/<repo>.git#v1.1.0"
+    "com.alejocastellanos.gameplaykit": "https://github.com/alejandrocastellanos/com.alejocastellanos.gameplaykit.git#v1.1.0"
     ```
 
-    Reemplaza `<user>/<repo>` por el repositorio desde el que instalas. El sufijo `#v1.1.0` fija la
-    versión, así tu proyecto no cambia cuando llegan commits nuevos.
+    El sufijo `#v1.1.0` fija la versión, así tu proyecto no cambia cuando llegan commits nuevos.
 
 === "Carpeta local"
 

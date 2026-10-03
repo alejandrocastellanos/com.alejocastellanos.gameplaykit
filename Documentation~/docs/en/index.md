@@ -122,10 +122,10 @@ package:
 "com.alejocastellanos.gameplaykit": "file:/path/to/com.alejocastellanos.gameplaykit"
 ```
 
-Or from git, once published:
+Or from git:
 
 ```json
-"com.alejocastellanos.gameplaykit": "https://github.com/<user>/<repo>.git#v1.1.0"
+"com.alejocastellanos.gameplaykit": "https://github.com/alejandrocastellanos/com.alejocastellanos.gameplaykit.git#v1.1.0"
 ```
 
 The Input System package is optional: the kit uses it when it is installed and active, and falls back to the

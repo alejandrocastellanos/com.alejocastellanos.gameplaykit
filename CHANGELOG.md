@@ -72,5 +72,5 @@ Primera versión publicada.
 - `EnemyPathfindingAgent` requiere un NavMesh 2D externo (por ejemplo NavMeshPlus); sin NavMesh
   no hace nada.
 
-[1.1.0]: https://github.com/<usuario>/<repo>/releases/tag/v1.1.0
-[1.0.0]: https://github.com/<usuario>/<repo>/releases/tag/v1.0.0
+[1.1.0]: https://github.com/alejandrocastellanos/com.alejocastellanos.gameplaykit/releases/tag/v1.1.0
+[1.0.0]: https://github.com/alejandrocastellanos/com.alejocastellanos.gameplaykit/releases/tag/v1.0.0

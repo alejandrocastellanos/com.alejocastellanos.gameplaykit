@@ -16,6 +16,11 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 - Escena demo top-down (**GameplayKit → Create Top-Down Demo Scene**, también en el sample Demo): dungeon
   de tres salas con pistola apuntada con el mouse y espada (se cambian con K), perseguidores, torreta,
   patrulla, pinchos, llave y puerta, palanca con reja y teletransportes. Opción **Move Vertically** en `EnemyChase` y `EnemyFlee` para enemigos top-down.
+- Menú **GameplayKit → Create Top-Down Enemy** (perseguidor top-down listo para usar). El menú
+  **GameObject → GameplayKit** (clic derecho en la jerarquía) ahora tiene todos los objetos: Player,
+  Top-Down Player, Enemy, Top-Down Enemy, Platform, 2D Camera, Managers y HUD.
+- Guías reorganizadas por estilo de juego: Primeros pasos común, un camino para plataformas y otro
+  para top-down (cada uno con su demo, controles y arranque en cinco minutos) y guías comunes.
 
 ### Corregido
 

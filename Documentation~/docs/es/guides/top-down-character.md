@@ -6,10 +6,12 @@ pantalla. [PlayerTopDownMovement](../components/movement/PlayerTopDownMovement.m
 reemplaza a `PlayerWalkRun` y a las habilidades de salto. Todo lo demás del kit (vida, armas,
 interacción, cámara) funciona igual que en un plataformas.
 
+Si buscas la demo, los controles o un arranque rápido, empieza por [Juego top-down](top-down-game.md).
+
 ## La forma rápida
 
-**GameplayKit → Create Top-Down Player** crea un objeto `Player (Top-Down)`, con tag `Player`, que
-tiene:
+**GameplayKit → Create Top-Down Player** (o clic derecho en la jerarquía → **GameplayKit → Top-Down
+Player**) crea un objeto `Player (Top-Down)`, con tag `Player`, que tiene:
 
 - un `CircleCollider2D` (radio `0.4`), un `Rigidbody2D` con interpolación y
   [CharacterController2D](../components/core/CharacterController2D.md);
@@ -108,12 +110,35 @@ public class HitboxFollowsMovement : MonoBehaviour
 }
 ```
 
+## Disparar hacia el mouse
+
+<figure class="gk-clip" markdown="0"><video src="../../../assets/clips/TopDownShooter.mp4" poster="../../../assets/clips/TopDownShooter.jpg" autoplay loop muted playsinline preload="metadata"></video><figcaption>El jugador de la demo: la pistola sigue al mouse y dispara en 360°; con K cambia a la espada.</figcaption></figure>
+
 Para combate a distancia, usa [WeaponProjectile](../components/combat/WeaponProjectile.md) o
 [WeaponHitscan](../components/combat/WeaponHitscan.md) junto con
-[CharacterAimAndOrient](../components/combat/CharacterAimAndOrient.md): en modo **Mouse** los
-disparos van hacia el cursor, en modo **Stick** hacia el stick derecho y en modo **Closest Target**
-hacia el objeto dañable más cercano. Es un twin-stick shooter sin escribir código. Mira
-[Combate](combat.md).
+[CharacterAimAndOrient](../components/combat/CharacterAimAndOrient.md). Con **Aim Mode** en **Mouse**
+los disparos van hacia el cursor, en **Stick** hacia el stick derecho y en **Closest Target** hacia el
+objeto dañable más cercano: es un twin-stick shooter sin escribir código. Así está armado el jugador
+de la demo:
+
+1. **El proyectil.** Crea un objeto pequeño con un `CircleCollider2D` marcado como **Is Trigger**, un
+   `Rigidbody2D` con **Gravity Scale** `0` y [ProjectileBehaviour](../components/combat/ProjectileBehaviour.md),
+   y guárdalo como prefab (la demo usa `TopDownPlayerBullet`).
+2. **La pistola.** Crea un hijo `Gun` en el jugador, agrégale `WeaponProjectile` y asigna el prefab en
+   **Projectile Prefab**. Agrega un hijo `FirePoint` a `Gun`, un poco por delante del cuerpo (la demo lo
+   pone en x = `0.95`), y asígnalo en **Fire Point**.
+3. **El apuntado.** Agrega `CharacterAimAndOrient` al jugador y arrastra `Gun` a **Part To Rotate**, para
+   que la pistola gire hacia el cursor.
+4. **Una segunda arma (opcional).** Quita el `WeaponMelee` de la raíz, crea un hijo `Sword` con
+   `WeaponMelee` y agrega [WeaponInventorySlot](../components/combat/WeaponInventorySlot.md) al jugador con
+   `Gun` y `Sword` en **Weapons**. ++k++ (la acción Special) cambia de arma, y
+   [PlayerAttack](../components/combat/PlayerAttack.md) siempre usa la activa.
+5. **Disparar con clic izquierdo (opcional).** En el [KeyboardInputReader](../components/core/KeyboardInputReader.md)
+   del jugador, agrega un elemento a **Action Bindings** con **Action** `Attack` y **Key** `Mouse0`. ++j++
+   sigue funcionando.
+
+`PlayerAttack` dispara el arma activa hacia la dirección de apuntado en 360°. Para gamepad, cambia
+**Aim Mode** a **Stick**. Más detalles en [Combate](combat.md).
 
 ## Configura la cámara
 
@@ -134,36 +159,21 @@ lo sigue con **Smooth Time** `0.2` y **Offset** `(0, 0, -10)`.
   jugador se mueve más rápido. Toma el control del **Size** de la cámara, entre su **Min Zoom**
   (`5`) y su **Max Zoom** (`8`).
 
-## Enemigos y el dungeon demo
+## Enemigos top-down
 
-<figure class="gk-clip" markdown="0"><video src="../../../assets/clips/TopDownShooter.mp4" poster="../../../assets/clips/TopDownShooter.jpg" autoplay loop muted playsinline preload="metadata"></video><figcaption>Apuntando en 360° y disparando a perseguidores que se mueven en los dos ejes mientras una torreta responde; al final, cambio a la espada con K.</figcaption></figure>
+**GameplayKit → Create Top-Down Enemy** crea un perseguidor listo para usar: sin gravedad, con
+[EnemyChase](../components/ai/EnemyChase.md) en **Move Vertically**, daño por contacto y 30 de vida.
 
-Marca **Move Vertically** en [EnemyChase](../components/ai/EnemyChase.md) o
+Para armar tus propios enemigos, marca **Move Vertically** en `EnemyChase` o
 [EnemyFlee](../components/ai/EnemyFlee.md) y se moverán en los dos ejes sin gravedad. Un
 [EnemyShootOnSight](../components/ai/EnemyShootOnSight.md) quieto con **Sight Angle** en 360 funciona como
 torreta que dispara en cualquier dirección, y [EnemyPatrolWithinBounds](../components/ai/EnemyPatrolWithinBounds.md)
-patrulla un pasillo si su `Rigidbody2D` tiene Gravity Scale 0.
-
-**GameplayKit → Create Top-Down Demo Scene** arma todo esto en un dungeon de tres salas
-(`Assets/GameplayKitDemo/GameplayKitTopDownDemo.unity`) para que veas cómo se conectan las piezas: ábrelo
-y dale Play.
-
-<figure markdown>
-  ![Mapa del dungeon demo top-down](../../assets/images/topdown-demo-map.jpg)
-  <figcaption>El dungeon demo: sala de inicio con cajas rompibles, monedas y un corazón (izquierda); pasillo con pinchos y checkpoint; arena con dos perseguidores, una patrulla, una torreta y la llave (derecha); puerta con llave hacia la sala del tesoro con la palanca, la reja y la meta (arriba); y un par de teletransportes entre la sala de inicio y la del tesoro.</figcaption>
-</figure> Controles: ++w++ ++a++ ++s++ ++d++ o flechas para moverte, el mouse para apuntar, clic izquierdo o
-++j++ para disparar o atacar, ++k++ para cambiar de arma, ++shift++ para correr, ++q++ para el dash, ++e++ para
-interactuar y ++esc++ para pausar.
-
-El jugador de la demo lleva dos armas en un [WeaponInventorySlot](../components/combat/WeaponInventorySlot.md):
-un hijo `Gun` con [WeaponProjectile](../components/combat/WeaponProjectile.md) y un hijo `Sword` con
-[WeaponMelee](../components/combat/WeaponMelee.md). [CharacterAimAndOrient](../components/combat/CharacterAimAndOrient.md)
-en modo **Mouse** gira la pistola hacia el cursor, y [PlayerAttack](../components/combat/PlayerAttack.md) dispara
-el arma activa hacia ese apuntado en 360°. La demo además asigna **Attack** al clic izquierdo (`Mouse0`) en su
-[KeyboardInputReader](../components/core/KeyboardInputReader.md), junto a ++j++. Cambia el modo a **Stick** para gamepad.
+patrulla un pasillo si su `Rigidbody2D` tiene **Gravity Scale** `0`. Los tres están en el
+[dungeon demo](top-down-game.md#el-dungeon-demo).
 
 ## Siguientes pasos
 
+- [Juego top-down](top-down-game.md) — el dungeon demo, los controles y una sala en cinco minutos.
 - [Input](input.md) — soporte para gamepad y fuentes de input propias.
 - [Combate](combat.md) — armas, apuntado y daño.
 - [Enemigos e IA](enemies-and-ai.md) — enemigos que persiguen y disparan.

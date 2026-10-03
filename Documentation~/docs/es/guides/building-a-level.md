@@ -1,52 +1,18 @@
 ---
 title: Construir un nivel
-description: Managers, cámara, piezas de entorno, checkpoints, llaves y puertas, salidas de nivel y HUD, con un recorrido por la escena demo.
+description: Managers, cámara, piezas de entorno, checkpoints, llaves y puertas, salidas de nivel y HUD, para juegos de plataformas y top-down.
 ---
 
 # Construir un nivel
 
 Un nivel jugable con Gameplay Kit es un jugador, algunos colliders sólidos, unas cuantas piezas de entorno, una
-cámara, un puñado de managers y un HUD. Esta guía recorre cada capa empezando por la escena demo, que ya usa
-casi todas.
+cámara, un puñado de managers y un HUD. Todo esto sirve igual para los dos estilos: en un plataformas los
+colliders son pisos y en un top-down son paredes, pero los managers, los checkpoints, las puertas y el HUD
+son los mismos.
 
-<figure class="gk-clip" markdown="0"><video src="../../../assets/clips/Showcase.mp4" poster="../../../assets/clips/Showcase.jpg" autoplay loop muted playsinline preload="metadata"></video><figcaption>Un recorrido por el nivel demo: plataformas, un enemigo, pinchos, checkpoint, escalera, llave, agua, cinta, un elevador con palanca y la puerta con llave.</figcaption></figure>
-
-## Recorrido por la escena demo
-
-**GameplayKit → Create Demo Scene** arma y guarda un nivel corto en
-`Assets/GameplayKitDemo/GameplayKitDemo.unity` (con un número si ya existe), y los prefabs del jugador y del
-enemigo en `Assets/GameplayKitDemo/Prefabs/`. Todo sale de los mismos constructores que el resto del menú
-**GameplayKit**, así que es una buena referencia de cómo conectar las piezas. El nivel se lee de izquierda a
-derecha (cara superior del suelo en y = 0 salvo que se indique otra cosa):
-
-| x | Qué hay | Componentes |
-|---|---|---|
-| −10.5 | Una pared alta cierra el lado izquierdo. | `BoxCollider2D` simple |
-| 0 | Aquí empieza el jugador; dos monedas más adelante. | Prefab del jugador, [Collectible](../components/environment/Collectible.md) |
-| 6 | Una plataforma delgada que se atraviesa desde abajo, con una moneda encima. | [OneWayPlatform](../components/environment/OneWayPlatform.md) |
-| 9 | Una caja que se rompe de un golpe (**J**). | [BreakableObject](../components/environment/BreakableObject.md) |
-| 12.5 – 19.5 | Dos muros bajos con un enemigo patrullando entre ellos. | Prefab del enemigo ([EnemyPatrol](../components/ai/EnemyPatrol.md), daño por contacto) |
-| 20 – 28 | Un hueco: una plataforma va 5 unidades a la derecha y vuelve, con pinchos abajo. | [MovingPlatform](../components/environment/MovingPlatform.md) (ping-pong), [HazardZone](../components/environment/HazardZone.md) |
-| 28.8 | Un corazón para recuperar lo que quitaron los pinchos. | [HealthPickup](../components/environment/HealthPickup.md) |
-| 30 | El checkpoint. | [Checkpoint](../components/environment/Checkpoint.md) |
-| 33.4 | Una escalera hasta una torre (cima en y = 4) con una moneda y la llave en x = 42. | [LadderZone](../components/movement/LadderZone.md), [ItemPickup](../components/environment/ItemPickup.md) |
-| 44 – 52 | Una piscina de dos unidades de profundidad. | [WaterZone](../components/environment/WaterZone.md) |
-| 56 | Una cinta transportadora que empuja a la derecha. | [ConveyorBelt](../components/environment/ConveyorBelt.md) |
-| 60 – 63 | Una palanca (**E**) cuyo evento **On Toggled** llama `Elevator.Activate`; el elevador sube 6 unidades. | [Lever](../components/environment/Lever.md), [Elevator](../components/environment/Elevator.md) |
-| 65 – 75, y = 6 | El piso superior: una puerta con llave en x = 70 y la meta, un coleccionable de 100 puntos. | [DoorWithKey](../components/environment/DoorWithKey.md), `Collectible` |
-| debajo de todo | Un trigger invisible de 120 unidades de ancho en y = −14 que hace 9999 de daño. | `HazardZone` |
-
-El resto de la escena:
-
-- **Main Camera**: tamaño ortográfico 6, con [CameraFollow](../components/camera/CameraFollow.md) sobre el
-  jugador, [CameraShake](../components/camera/CameraShake.md) y [CameraBounds](../components/camera/CameraBounds.md)
-  limitada a (−11, −12)–(80, 20).
-- **Managers**: [ScoreManager](../components/managers/ScoreManager.md) y [PauseManager](../components/managers/PauseManager.md).
-- **HUD**: barra de vida, puntaje y menú de pausa, más un `EventSystem`.
-
-Hay dos detalles que vale la pena notar. Caerse del nivel no necesita un `LevelManager`: la zona de muerte es
-simplemente una `HazardZone` con daño suficiente, y el `CharacterRespawn` del jugador lo devuelve al último
-checkpoint. Y la meta es un `Collectible`, no un `LevelExit`, así que la demo nunca carga otra escena.
+Si quieres ver todas estas capas armadas antes de empezar, recorre una de las demos: la
+[demo de plataformas](platformer-game.md#la-demo-de-plataformas) o el
+[dungeon top-down](top-down-game.md#el-dungeon-demo).
 
 ## Managers
 

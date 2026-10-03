@@ -97,6 +97,10 @@ plugins:
           nav_translations:
             Home: Inicio
             Guides: Guías
+            Start here: Para empezar
+            Platformer games: Juegos de plataformas
+            Top-down games: Juegos top-down
+            For both styles: Para los dos estilos
             Components: Componentes
             Reference: Referencia
             Core: Núcleo

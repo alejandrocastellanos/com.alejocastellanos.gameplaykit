@@ -1,52 +1,19 @@
 ---
 title: Building a level
-description: Managers, camera, environment pieces, checkpoints, keys and doors, level exits and the HUD, with a tour of the demo scene.
+description: Managers, camera, environment pieces, checkpoints, keys and doors, level exits and the HUD, for platformer and top-down games.
 ---
 
 # Building a level
 
 A playable level in Gameplay Kit is a player, some solid colliders, a few environment pieces, a camera, a
-handful of managers and a HUD. This guide walks through each layer, starting from the demo scene, since it
-already uses most of them.
+handful of managers and a HUD. All of it works the same for both styles: in a platformer the colliders are
+floors and in a top-down game they're walls, but the managers, checkpoints, doors and HUD don't change.
 
-<figure class="gk-clip" markdown="0"><video src="../../assets/clips/Showcase.mp4" poster="../../assets/clips/Showcase.jpg" autoplay loop muted playsinline preload="metadata"></video><figcaption>A run through the demo level: platforms, an enemy, spikes, a checkpoint, a ladder, a key, water, a conveyor, a lever-driven elevator and the locked door.</figcaption></figure>
+If you'd like to see every layer wired up before you start, walk through one of the demos: the
+[platformer demo](platformer-game.md#the-platformer-demo) or the
+[top-down dungeon](top-down-game.md#the-demo-dungeon).
 
-## A tour of the demo scene
-
-**GameplayKit → Create Demo Scene** builds and saves a short level at
-`Assets/GameplayKitDemo/GameplayKitDemo.unity` (a numbered name if one already exists). The player and enemy
-prefabs go in `Assets/GameplayKitDemo/Prefabs/`. Everything is made from the same builders as the other
-**GameplayKit** menu items, so it's a good reference for wiring things up. The level reads left to right
-(ground top at y = 0 unless noted):
-
-| x | What's there | Components |
-|---|---|---|
-| −10.5 | A tall wall closes the left side. | Plain `BoxCollider2D` |
-| 0 | The player starts here. Two coins sit ahead. | Player prefab, [Collectible](../components/environment/Collectible.md) |
-| 6 | A thin platform you can jump through from below, with a coin on top. | [OneWayPlatform](../components/environment/OneWayPlatform.md) |
-| 9 | A crate that breaks with one hit (**J**). | [BreakableObject](../components/environment/BreakableObject.md) |
-| 12.5 – 19.5 | Two low walls with an enemy patrolling between them. | Enemy prefab ([EnemyPatrol](../components/ai/EnemyPatrol.md), contact damage) |
-| 20 – 28 | A gap. A platform shuttles 5 units to the right and back, with spikes below. | [MovingPlatform](../components/environment/MovingPlatform.md) (ping-pong), [HazardZone](../components/environment/HazardZone.md) |
-| 28.8 | A heart to recover what the spikes took. | [HealthPickup](../components/environment/HealthPickup.md) |
-| 30 | The checkpoint. | [Checkpoint](../components/environment/Checkpoint.md) |
-| 33.4 | A ladder up to a tower (top at y = 4) with a coin and the key at x = 42. | [LadderZone](../components/movement/LadderZone.md), [ItemPickup](../components/environment/ItemPickup.md) |
-| 44 – 52 | A pool, two units deep. | [WaterZone](../components/environment/WaterZone.md) |
-| 56 | A conveyor belt pushing right. | [ConveyorBelt](../components/environment/ConveyorBelt.md) |
-| 60 – 63 | A lever (**E**) whose **On Toggled** event calls `Elevator.Activate`. The elevator rises 6 units. | [Lever](../components/environment/Lever.md), [Elevator](../components/environment/Elevator.md) |
-| 65 – 75, y = 6 | The upper floor: a locked door at x = 70 and the goal, a collectible worth 100 points. | [DoorWithKey](../components/environment/DoorWithKey.md), `Collectible` |
-| under everything | An invisible 120-unit-wide trigger at y = −14 that deals 9999 damage. | `HazardZone` |
-
-The rest of the scene:
-
-- **Main Camera**: orthographic size 6, with [CameraFollow](../components/camera/CameraFollow.md) on the
-  player, [CameraShake](../components/camera/CameraShake.md) and [CameraBounds](../components/camera/CameraBounds.md)
-  clamped to (−11, −12)–(80, 20).
-- **Managers**: [ScoreManager](../components/managers/ScoreManager.md) and [PauseManager](../components/managers/PauseManager.md).
-- **HUD**: a health bar, the score and a pause menu, plus an `EventSystem`.
-
-Two things are worth noticing. Falling off the level doesn't need a `LevelManager`: the kill zone is just a
-`HazardZone` strong enough to kill, and the player's `CharacterRespawn` brings it back to the last checkpoint.
-And the goal is a `Collectible`, not a `LevelExit`, so the demo never loads another scene.
+e.
 
 ## Managers
 

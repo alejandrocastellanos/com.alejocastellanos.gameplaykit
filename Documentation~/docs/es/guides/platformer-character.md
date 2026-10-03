@@ -5,6 +5,8 @@ puestas. Es ideal para probar, pero en tu propio juego normalmente vas a querer 
 que necesita. Esta guía arma un personaje de plataformas a mano, explica cómo encajan las piezas y
 muestra cómo ajustar el salto hasta que se sienta bien.
 
+Si buscas la demo, los controles o un arranque rápido, empieza por [Juego de plataformas](platformer-game.md).
+
 ## Ármalo paso a paso
 
 1. **Crea un GameObject vacío** llamado `Player` y ponle el tag **Player**. El tag no hace falta
@@ -183,6 +185,7 @@ del kit pueden quedarse en *Everything*.
 
 ## Siguientes pasos
 
+- [Juego de plataformas](platformer-game.md) — la demo, los controles y un nivel en cinco minutos.
 - [Input](input.md) — reasigna teclas o controla al personaje desde una IA.
 - [Habilidades propias](custom-abilities.md) — escribe tu propio `AbilityBase`.
 - [Construir un nivel](building-a-level.md) — plataformas, escaleras, agua y peligros.

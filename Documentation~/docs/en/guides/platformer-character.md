@@ -5,6 +5,8 @@ attached. That's great for trying things out, but for your own game you'll usual
 mechanics it needs. This guide builds a platformer character by hand, explains how the pieces fit
 together, and shows how to tune the jump until it feels right.
 
+Looking for the demo, the controls or a quick start? Begin with [Platformer game](platformer-game.md).
+
 ## Build it step by step
 
 1. **Create an empty GameObject** named `Player` and set its tag to **Player**. The tag isn't needed
@@ -177,6 +179,7 @@ ledge checks and weapons follow the same rule, which is why every layer mask in 
 
 ## Next steps
 
+- [Platformer game](platformer-game.md) — the demo, the controls and a level in five minutes.
 - [Input](input.md) — rebind keys or drive the character from AI.
 - [Custom abilities](custom-abilities.md) — write your own `AbilityBase`.
 - [Building a level](building-a-level.md) — platforms, ladders, water and hazards.

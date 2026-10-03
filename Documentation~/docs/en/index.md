@@ -129,7 +129,8 @@ Or from git:
 ```
 
 The Input System package is optional: the kit uses it when it is installed and active, and falls back to the
-classic Input Manager otherwise. Then open **GameplayKit → Create Demo Scene** and press Play.
+classic Input Manager otherwise. Then, from the **GameplayKit** menu in the main menu bar, run **Create Demo Scene** (platformer) or
+**Create Top-Down Demo Scene** and press Play.
 
 ## How it works
 
@@ -159,8 +160,9 @@ knowing the concrete classes. See [Architecture](reference/architecture.md) for 
 
 ## Where to go next
 
-- [Getting started](guides/getting-started.md): install the package, open the demo and build your first character.
-- [Platformer character](guides/platformer-character.md) and [Top-down character](guides/top-down-character.md): pick the abilities for your game.
+- [Getting started](guides/getting-started.md): install the package and meet the kit's menus.
+- [Platformer game](guides/platformer-game.md): the platformer demo, its controls and your first level; then [Platformer character](guides/platformer-character.md).
+- [Top-down game](guides/top-down-game.md): the demo dungeon, its controls and your first room; then [Top-down character](guides/top-down-character.md).
 - [Combat](guides/combat.md), [Health and damage](guides/health-and-damage.md) and [Enemies and AI](guides/enemies-and-ai.md): fights from both sides.
 - [Building a level](guides/building-a-level.md): managers, camera, checkpoints, doors and the HUD.
 - [Custom abilities](guides/custom-abilities.md): write your own mechanic on top of `AbilityBase`.

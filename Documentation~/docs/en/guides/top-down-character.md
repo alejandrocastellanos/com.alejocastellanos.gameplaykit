@@ -6,9 +6,12 @@ moves freely in two axes and gravity must not pull it down the screen.
 replaces `PlayerWalkRun` and the jump abilities. Everything else in the kit (health, weapons,
 interaction, camera) works the same as in a platformer.
 
+Looking for the demo, the controls or a quick start? Begin with [Top-down game](top-down-game.md).
+
 ## The quick way
 
-**GameplayKit → Create Top-Down Player** builds a `Player (Top-Down)` object, tagged `Player`, with:
+**GameplayKit → Create Top-Down Player** (or right-click in the Hierarchy → **GameplayKit → Top-Down
+Player**) builds a `Player (Top-Down)` object, tagged `Player`, with:
 
 - a `CircleCollider2D` (radius `0.4`), a `Rigidbody2D` with interpolation and
   [CharacterController2D](../components/core/CharacterController2D.md);
@@ -104,12 +107,35 @@ public class HitboxFollowsMovement : MonoBehaviour
 }
 ```
 
+## Shooting towards the mouse
+
+<figure class="gk-clip" markdown="0"><video src="../../assets/clips/TopDownShooter.mp4" poster="../../assets/clips/TopDownShooter.jpg" autoplay loop muted playsinline preload="metadata"></video><figcaption>The demo player: the gun follows the mouse and fires in 360°; K switches to the sword.</figcaption></figure>
+
 For ranged combat, use [WeaponProjectile](../components/combat/WeaponProjectile.md) or
 [WeaponHitscan](../components/combat/WeaponHitscan.md) together with
-[CharacterAimAndOrient](../components/combat/CharacterAimAndOrient.md): in **Mouse** mode the shots
-go towards the cursor, in **Stick** mode towards the right stick, and in **Closest Target** mode
-towards the nearest damageable object. That's a twin-stick shooter with no code. See
-[Combat](combat.md).
+[CharacterAimAndOrient](../components/combat/CharacterAimAndOrient.md). With **Aim Mode** set to
+**Mouse** the shots go towards the cursor, with **Stick** towards the right stick, and with **Closest
+Target** towards the nearest damageable object: a twin-stick shooter with no code. This is how the demo
+player is built:
+
+1. **The projectile.** Create a small object with a `CircleCollider2D` set to **Is Trigger**, a
+   `Rigidbody2D` with **Gravity Scale** `0` and [ProjectileBehaviour](../components/combat/ProjectileBehaviour.md),
+   and save it as a prefab (the demo uses `TopDownPlayerBullet`).
+2. **The gun.** Create a `Gun` child on the player, add `WeaponProjectile` and assign the prefab to
+   **Projectile Prefab**. Add a `FirePoint` child to `Gun`, slightly in front of the body (the demo puts
+   it at x = `0.95`), and assign it to **Fire Point**.
+3. **The aim.** Add `CharacterAimAndOrient` to the player and drag `Gun` into **Part To Rotate**, so the
+   gun turns towards the cursor.
+4. **A second weapon (optional).** Remove the root `WeaponMelee`, create a `Sword` child with
+   `WeaponMelee`, and add [WeaponInventorySlot](../components/combat/WeaponInventorySlot.md) to the player
+   with `Gun` and `Sword` in **Weapons**. ++k++ (the Special action) switches weapons, and
+   [PlayerAttack](../components/combat/PlayerAttack.md) always uses the active one.
+5. **Shoot with left click (optional).** On the player's
+   [KeyboardInputReader](../components/core/KeyboardInputReader.md), add an element to **Action Bindings**
+   with **Action** `Attack` and **Key** `Mouse0`. ++j++ keeps working.
+
+`PlayerAttack` fires the active weapon towards the aim direction in 360°. For gamepads, set **Aim Mode**
+to **Stick**. More in [Combat](combat.md).
 
 ## Camera setup
 
@@ -128,35 +154,21 @@ then follows with **Smooth Time** `0.2` and **Offset** `(0, 0, -10)`.
 - [CameraZoomBySpeed](../components/camera/CameraZoomBySpeed.md) zooms out as the player moves
   faster. It takes over the camera's **Size**, between its **Min Zoom** (`5`) and **Max Zoom** (`8`).
 
-## Enemies and the demo dungeon
+## Top-down enemies
 
-<figure class="gk-clip" markdown="0"><video src="../../assets/clips/TopDownShooter.mp4" poster="../../assets/clips/TopDownShooter.jpg" autoplay loop muted playsinline preload="metadata"></video><figcaption>Aiming in 360° and shooting chasers that move on both axes while a turret fires back, then switching to the sword with K.</figcaption></figure>
+**GameplayKit → Create Top-Down Enemy** builds a ready-made chaser: no gravity,
+[EnemyChase](../components/ai/EnemyChase.md) with **Move Vertically**, contact damage and 30 HP.
 
-Tick **Move Vertically** on [EnemyChase](../components/ai/EnemyChase.md) or
-[EnemyFlee](../components/ai/EnemyFlee.md) and they move on both axes with no gravity. A static
+To build your own, tick **Move Vertically** on `EnemyChase` or [EnemyFlee](../components/ai/EnemyFlee.md)
+and they move on both axes with no gravity. A static
 [EnemyShootOnSight](../components/ai/EnemyShootOnSight.md) with **Sight Angle** 360 works as a turret that
 fires in any direction, and [EnemyPatrolWithinBounds](../components/ai/EnemyPatrolWithinBounds.md) patrols a
-corridor if its `Rigidbody2D` has Gravity Scale 0.
-
-**GameplayKit → Create Top-Down Demo Scene** builds all of this into a three-room dungeon
-(`Assets/GameplayKitDemo/GameplayKitTopDownDemo.unity`) so you can see how the pieces are wired: open it
-and press Play.
-
-<figure markdown>
-  ![Map of the top-down demo dungeon](../../assets/images/topdown-demo-map.jpg)
-  <figcaption>The demo dungeon: start room with breakable crates, coins and a health pickup (left); spike corridor and checkpoint; arena with two chasers, a patrol, a turret and the key (right); locked door to the treasure room with the lever, the gate and the goal (top); and a pair of teleporters between the start room and the treasure room.</figcaption>
-</figure> Controls: ++w++ ++a++ ++s++ ++d++ or arrows to move, the mouse to aim, left click or ++j++ to
-shoot or attack, ++k++ to switch weapon, ++shift++ to run, ++q++ to dash, ++e++ to interact and ++esc++ to pause.
-
-The demo player carries two weapons in a [WeaponInventorySlot](../components/combat/WeaponInventorySlot.md):
-a `Gun` child with [WeaponProjectile](../components/combat/WeaponProjectile.md) and a `Sword` child with
-[WeaponMelee](../components/combat/WeaponMelee.md). [CharacterAimAndOrient](../components/combat/CharacterAimAndOrient.md)
-in **Mouse** mode rotates the gun towards the cursor, and [PlayerAttack](../components/combat/PlayerAttack.md)
-fires the active weapon towards that aim in 360°. The demo also binds **Attack** to the left mouse button
-(`Mouse0`) in its [KeyboardInputReader](../components/core/KeyboardInputReader.md), next to ++j++. Switch the aim mode to **Stick** for gamepads.
+corridor if its `Rigidbody2D` has **Gravity Scale** `0`. All three are in the
+[demo dungeon](top-down-game.md#the-demo-dungeon).
 
 ## Next steps
 
+- [Top-down game](top-down-game.md) — the demo dungeon, the controls and a room in five minutes.
 - [Input](input.md) — gamepad support and custom input sources.
 - [Combat](combat.md) — weapons, aiming and damage.
 - [Enemies and AI](enemies-and-ai.md) — enemies that chase and shoot.

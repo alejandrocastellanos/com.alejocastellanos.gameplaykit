@@ -44,7 +44,10 @@ namespace GameplayKit.Editor
         [MenuItem("GameplayKit/Create Enemy", false, 2)]
         private static void CreateEnemyMenu() => Place(BuildEnemy(SpawnPoint()), "Crear Enemy");
 
-        [MenuItem("GameplayKit/Create Platform", false, 3)]
+        [MenuItem("GameplayKit/Create Top-Down Enemy", false, 3)]
+        private static void CreateTopDownEnemyMenu() => Place(BuildTopDownChaser(SpawnPoint()), "Crear Top-Down Enemy");
+
+        [MenuItem("GameplayKit/Create Platform", false, 4)]
         private static void CreatePlatformMenu() => Place(BuildBlock("Platform", SpawnPoint(), new Vector2(4f, 0.5f), GroundColor), "Crear Platform");
 
         [MenuItem("GameplayKit/Create 2D Camera", false, 20)]
@@ -72,11 +75,35 @@ namespace GameplayKit.Editor
             EditorUtility.DisplayDialog("Gameplay Kit", $"Escena demo top-down creada en {path}.\n\nControles: WASD o flechas mover, mouse apuntar, clic izquierdo o J disparar / atacar, K cambiar de arma, Shift correr, Q dash en 8 direcciones, E interactuar, Esc pausa.", "OK");
         }
 
+        // Clic derecho en la jerarquía (o menú GameObject → GameplayKit): los objetos se crean como hijos del objeto donde hiciste clic.
         [MenuItem("GameObject/GameplayKit/Player", false, 10)]
         private static void CreatePlayerContext(MenuCommand command) => Place(BuildPlayer(SpawnPoint()), "Crear Player", command.context as GameObject);
 
-        [MenuItem("GameObject/GameplayKit/Enemy", false, 11)]
+        [MenuItem("GameObject/GameplayKit/Top-Down Player", false, 11)]
+        private static void CreateTopDownPlayerContext(MenuCommand command) => Place(BuildTopDownPlayer(SpawnPoint()), "Crear Top-Down Player", command.context as GameObject);
+
+        [MenuItem("GameObject/GameplayKit/Enemy", false, 12)]
         private static void CreateEnemyContext(MenuCommand command) => Place(BuildEnemy(SpawnPoint()), "Crear Enemy", command.context as GameObject);
+
+        [MenuItem("GameObject/GameplayKit/Top-Down Enemy", false, 13)]
+        private static void CreateTopDownEnemyContext(MenuCommand command) => Place(BuildTopDownChaser(SpawnPoint()), "Crear Top-Down Enemy", command.context as GameObject);
+
+        [MenuItem("GameObject/GameplayKit/Platform", false, 14)]
+        private static void CreatePlatformContext(MenuCommand command) => Place(BuildBlock("Platform", SpawnPoint(), new Vector2(4f, 0.5f), GroundColor), "Crear Platform", command.context as GameObject);
+
+        // Cámara, managers y HUD son únicos por escena: se crean en la raíz y una sola vez aunque haya varios objetos seleccionados.
+        [MenuItem("GameObject/GameplayKit/2D Camera", false, 30)]
+        private static void CreateCameraContext(MenuCommand command) { if (FirstOfSelection(command)) CreateCameraMenu(); }
+
+        [MenuItem("GameObject/GameplayKit/Managers", false, 31)]
+        private static void CreateManagersContext(MenuCommand command) { if (FirstOfSelection(command)) CreateManagersMenu(); }
+
+        [MenuItem("GameObject/GameplayKit/HUD", false, 32)]
+        private static void CreateHudContext(MenuCommand command) { if (FirstOfSelection(command)) CreateHudMenu(); }
+
+        /// <summary>Unity llama a los ítems de GameObject/ una vez por objeto seleccionado; esto deja pasar solo la primera llamada.</summary>
+        private static bool FirstOfSelection(MenuCommand command) =>
+            command.context == null || Selection.gameObjects.Length <= 1 || command.context == Selection.gameObjects[0];
 
         private static void Place(GameObject go, string undoName, GameObject parent = null)
         {

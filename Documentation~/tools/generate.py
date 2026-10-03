@@ -272,16 +272,26 @@ def build_nav(by_cat: dict) -> list:
         {"Home": "index.md"},
         {"Guides": [
             "guides/index.md",
-            "guides/getting-started.md",
-            "guides/platformer-character.md",
-            "guides/top-down-character.md",
-            "guides/input.md",
-            "guides/combat.md",
-            "guides/health-and-damage.md",
-            "guides/enemies-and-ai.md",
-            "guides/building-a-level.md",
-            "guides/custom-abilities.md",
-            "guides/troubleshooting.md",
+            {"Start here": [
+                "guides/getting-started.md",
+                "guides/input.md",
+            ]},
+            {"Platformer games": [
+                "guides/platformer-game.md",
+                "guides/platformer-character.md",
+            ]},
+            {"Top-down games": [
+                "guides/top-down-game.md",
+                "guides/top-down-character.md",
+            ]},
+            {"For both styles": [
+                "guides/combat.md",
+                "guides/health-and-damage.md",
+                "guides/enemies-and-ai.md",
+                "guides/building-a-level.md",
+                "guides/custom-abilities.md",
+                "guides/troubleshooting.md",
+            ]},
         ]},
     ]
     comp = ["components/index.md"]
